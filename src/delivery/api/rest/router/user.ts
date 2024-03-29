@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { CreateUserController } from "../controller/user";
+import {
+  CreateUserController,
+  LoginController,
+  VerifyTokenController,
+} from "../controller/user";
 
 class UserRouter {
   private router: Router;
@@ -7,7 +11,12 @@ class UserRouter {
   constructor() {
     this.router = Router();
 
+    // const verifyTokenMiddleware = new VerifyTokenController(true);
+    const verifyToken = new VerifyTokenController(false);
+
     this.router.post("/users", new CreateUserController().createUser);
+    this.router.post("/login", new LoginController().login);
+    this.router.get("/token", verifyToken.verifyToken.bind(verifyToken));
   }
 
   getRouter(): Router {

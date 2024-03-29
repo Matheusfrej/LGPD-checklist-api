@@ -1,5 +1,9 @@
+import { compareSync } from "bcryptjs";
 import { UserEntity } from "../../../../domain/entity/user";
-import { CreateUserUseCaseRequest } from "../../../../domain/usecase/ucio/user";
+import {
+  CreateUserUseCaseRequest,
+  LoginUseCaseRequest,
+} from "../../../../domain/usecase/ucio/user";
 import { prisma } from "../../connection/prisma";
 
 async function createUser(data: CreateUserUseCaseRequest): Promise<UserEntity> {
@@ -9,6 +13,18 @@ async function createUser(data: CreateUserUseCaseRequest): Promise<UserEntity> {
       office: data.office,
       email: data.email,
       password: data.password,
+    },
+  });
+
+  return user
+    ? new UserEntity(user.id, user.name, user.office, user.email, null)
+    : null;
+}
+
+async function getUser(id: number): Promise<UserEntity> {
+  const user = await prisma.users.findFirst({
+    where: {
+      id,
     },
   });
 
@@ -30,4 +46,22 @@ async function checkUserByEmailExists(
   return user && user.id !== id;
 }
 
-export { createUser, checkUserByEmailExists };
+async function login(req: LoginUseCaseRequest): Promise<UserEntity> {
+  const user = await prisma.users.findFirst({
+    where: {
+      email: req.email,
+    },
+  });
+
+  if (user && compareSync(req.password, user.password)) {
+    delete user.password;
+
+    return user
+      ? new UserEntity(user.id, user.name, user.office, user.email, null)
+      : null;
+  }
+
+  return null;
+}
+
+export { createUser, checkUserByEmailExists, login, getUser };

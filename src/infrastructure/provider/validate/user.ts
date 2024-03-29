@@ -1,5 +1,9 @@
 import * as userInterface from "@/domain/usecase/validate/user";
-import { CreateUserUseCaseRequest } from "../../../domain/usecase/ucio/user";
+import {
+  CreateUserUseCaseRequest,
+  LoginUseCaseRequest,
+  VerifyTokenUseCaseRequest,
+} from "../../../domain/usecase/ucio/user";
 import { checkEmpty, validateEmail } from "./validate";
 import { checkUserByEmailExists } from "../../internal/database/postgresql/user";
 
@@ -35,4 +39,36 @@ class CreateUserUseCaseValidate
   }
 }
 
-export { CreateUserUseCaseValidate };
+class LoginUseCaseValidate
+  implements userInterface.LoginUseCaseValidateInterface
+{
+  login(req: LoginUseCaseRequest): string {
+    if (checkEmpty(req.email)) {
+      return "O email não pode ser vazio.";
+    }
+
+    if (checkEmpty(req.password)) {
+      return "A senha não pode ser vazia.";
+    }
+
+    return null;
+  }
+}
+
+class VerifyTokenUseCaseValidate
+  implements userInterface.VerifyTokenUseCaseValidateInterface
+{
+  verifyToken(req: VerifyTokenUseCaseRequest): string {
+    if (checkEmpty(req.token)) {
+      return "O token não pode ser vazio.";
+    }
+
+    return null;
+  }
+}
+
+export {
+  CreateUserUseCaseValidate,
+  LoginUseCaseValidate,
+  VerifyTokenUseCaseValidate,
+};

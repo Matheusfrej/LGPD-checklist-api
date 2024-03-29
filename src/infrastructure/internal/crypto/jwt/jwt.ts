@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import jwt from "jsonwebtoken";
 import { config } from "./config/config";
 
@@ -10,10 +9,13 @@ function encrypt(id: number): string {
   return token;
 }
 
-function verifyToken(token: string): any {
-  const checkedToken = jwt.verify(token, config.SECRET_KEY);
-
-  return checkedToken;
+function verifyToken(token: string) {
+  try {
+    const checkedToken = jwt.verify(token.split(" ")[1], config.SECRET_KEY);
+    return checkedToken;
+  } catch (error) {
+    return "invalid token";
+  }
 }
 
 export { encrypt, verifyToken };

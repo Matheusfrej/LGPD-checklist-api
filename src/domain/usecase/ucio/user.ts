@@ -25,4 +25,53 @@ class CreateUserUseCaseResponse {
   }
 }
 
-export { CreateUserUseCaseRequest, CreateUserUseCaseResponse };
+class LoginUseCaseRequest {
+  public email: string;
+  public password: string;
+
+  constructor(email: string, password: string) {
+    this.email = email;
+    this.password = password;
+  }
+}
+
+class LoginUseCaseResponse {
+  public user: UserEntity;
+  public token: string;
+  public error: ErrorEntity;
+
+  constructor(user: UserEntity, token: string, error: ErrorEntity) {
+    this.user = user;
+    this.token = token;
+    this.error = error;
+  }
+}
+
+class VerifyTokenUseCaseRequest {
+  public token: string;
+
+  constructor(token: string) {
+    this.token = token;
+  }
+}
+
+class VerifyTokenUseCaseResponse {
+  public user: UserEntity;
+  public token: string;
+  public error: ErrorEntity;
+
+  constructor(user: UserEntity, token: string, error: ErrorEntity) {
+    this.user = user;
+    this.token = token;
+    this.error = error;
+  }
+}
+
+export {
+  CreateUserUseCaseRequest,
+  CreateUserUseCaseResponse,
+  LoginUseCaseRequest,
+  LoginUseCaseResponse,
+  VerifyTokenUseCaseRequest,
+  VerifyTokenUseCaseResponse,
+};

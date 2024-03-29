@@ -1,7 +1,23 @@
-import { CreateUserUseCaseRequest } from "../ucio/user";
+import {
+  CreateUserUseCaseRequest,
+  LoginUseCaseRequest,
+  VerifyTokenUseCaseRequest,
+} from "../ucio/user";
 
 interface CreateUserUseCaseValidateInterface {
   createUser(user: CreateUserUseCaseRequest): Promise<string>;
 }
 
-export { CreateUserUseCaseValidateInterface };
+interface LoginUseCaseValidateInterface {
+  login(req: LoginUseCaseRequest): string;
+}
+
+interface VerifyTokenUseCaseValidateInterface {
+  verifyToken(req: VerifyTokenUseCaseRequest): string;
+}
+
+export {
+  CreateUserUseCaseValidateInterface,
+  LoginUseCaseValidateInterface,
+  VerifyTokenUseCaseValidateInterface,
+};
