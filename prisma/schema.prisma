@@ -1,0 +1,66 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(255)
+  office     String       @db.VarChar(255)
+  email      String       @unique @db.VarChar(255)
+  password   String       @db.VarChar(255)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at")
+  Checklists Checklists[]
+  Systems    Systems[]
+
+  @@map("users")
+}
+
+model Systems {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(255)
+  description String       @db.VarChar(255)
+  userId      Int
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @default(now()) @updatedAt @map("updated_at")
+  user        Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Checklists  Checklists[]
+
+  @@map("systems")
+}
+
+model Families {
+  id         Int          @id @default(autoincrement())
+  general    Boolean      @default(true)
+  iot        Boolean      @default(false)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at")
+  Checklists Checklists[]
+
+  @@map("families")
+}
+
+model Checklists {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  systemId      Int
+  familiesId    Int
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  user          Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  system        Systems  @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  families      Families @relation(fields: [familiesId], references: [id], onDelete: Cascade)
+  checklistData Json
+
+  @@map("checklists")
+}

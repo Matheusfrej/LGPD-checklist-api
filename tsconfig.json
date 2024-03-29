@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+      "target": "es6",
+      "moduleResolution": "node",
+      "module": "commonjs",
+      "lib": [
+      "es6"
+      ],
+      "sourceMap": true,
+      "outDir": "dist/src",
+      "strict": true,
+      "noImplicitAny": true,
+      "strictNullChecks": false,
+      "strictFunctionTypes": true,
+      "noImplicitThis": true,
+      "resolveJsonModule": true,
+      "alwaysStrict": true,
+      "removeComments": true,
+      "noImplicitReturns": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "baseUrl": ".",
+      "rootDirs": [
+      "./src",
+      "./test"
+      ],
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "paths": {
+          "@/domain/*": ["./src/domain/*"],
+          "@/delivery/*": ["./src/delivery/*"],
+          "@/infrastructure/*": ["./src/infrastructure/*"],
+          "@/internal/*": ["./src/infrastructure/internal/*"]
+      }
+  },
+  "include": [
+      "./src/**/*.ts",
+      "./test/**/*.ts",
+  ],
+  "exclude": [
+      "./node_modules/*",
+      "dist"
+  ]
+}
