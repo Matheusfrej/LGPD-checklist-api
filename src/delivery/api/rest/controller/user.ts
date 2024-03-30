@@ -94,4 +94,35 @@ class VerifyTokenController {
   }
 }
 
-export { CreateUserController, LoginController, VerifyTokenController };
+class UpdateUserController {
+  async updateUser(req: Request, res: Response) {
+    const { id } = req.params;
+    const { tokenUserId, name, office } = req.body;
+
+    const ucReq = new userUcio.UpdateUserUseCaseRequest(
+      tokenUserId,
+      +id,
+      name,
+      office,
+    );
+
+    const validate = new userValidate.UpdateUserUseCaseValidate();
+    const repository = new userRepository.UpdateUserUseCaseRepository();
+    const usecase = new userUseCase.UpdateUserUseCase(validate, repository);
+
+    const ucRes = await usecase.updateUser(ucReq);
+
+    if (!ucRes.error) {
+      new SuccessResponse().success(res, undefined);
+    } else {
+      new InternalServerErrorResponse().internalServerError(res, ucRes.error);
+    }
+  }
+}
+
+export {
+  CreateUserController,
+  LoginController,
+  VerifyTokenController,
+  UpdateUserController,
+};

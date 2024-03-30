@@ -43,8 +43,17 @@ class VerifyTokenUseCaseRepository
   }
 }
 
+class UpdateUserUseCaseRepository
+  implements userInterface.UpdateUserUseCaseRepositoryInterface
+{
+  updateUser(req: userUcio.UpdateUserUseCaseRequest) {
+    return userService.updateUser(req);
+  }
+}
+
 export {
   CreateUserUseCaseRepository,
   LoginUseCaseRepository,
   VerifyTokenUseCaseRepository,
+  UpdateUserUseCaseRepository,
 };

@@ -2,10 +2,14 @@ import * as userInterface from "@/domain/usecase/validate/user";
 import {
   CreateUserUseCaseRequest,
   LoginUseCaseRequest,
+  UpdateUserUseCaseRequest,
   VerifyTokenUseCaseRequest,
 } from "../../../domain/usecase/ucio/user";
 import { checkEmpty, validateEmail } from "./validate";
-import { checkUserByEmailExists } from "../../internal/database/postgresql/user";
+import {
+  checkUserByEmailExists,
+  getUser,
+} from "../../internal/database/postgresql/user";
 
 class CreateUserUseCaseValidate
   implements userInterface.CreateUserUseCaseValidateInterface
@@ -67,8 +71,33 @@ class VerifyTokenUseCaseValidate
   }
 }
 
+class UpdateUserUseCaseValidate
+  implements userInterface.UpdateUserUseCaseValidateInterface
+{
+  async updateUser(req: UpdateUserUseCaseRequest): Promise<string> {
+    if (checkEmpty(req.id)) {
+      return "O id não pode ser vazio.";
+    }
+    if (checkEmpty(req.name)) {
+      return "O nome não pode ser vazio.";
+    }
+    if (checkEmpty(req.office)) {
+      return "O cargo/função não pode ser vazio.";
+    }
+    if (!(await getUser(req.id))) {
+      return "O usuário informado não existe";
+    }
+    if (req.tokenUserId !== req.id) {
+      return "Você não tem permissão para isso";
+    }
+
+    return null;
+  }
+}
+
 export {
   CreateUserUseCaseValidate,
   LoginUseCaseValidate,
   VerifyTokenUseCaseValidate,
+  UpdateUserUseCaseValidate,
 };

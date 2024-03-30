@@ -3,6 +3,7 @@ import { UserEntity } from "../../../../domain/entity/user";
 import {
   CreateUserUseCaseRequest,
   LoginUseCaseRequest,
+  UpdateUserUseCaseRequest,
 } from "../../../../domain/usecase/ucio/user";
 import { prisma } from "../../connection/prisma";
 
@@ -25,6 +26,22 @@ async function getUser(id: number): Promise<UserEntity> {
   const user = await prisma.users.findFirst({
     where: {
       id,
+    },
+  });
+
+  return user
+    ? new UserEntity(user.id, user.name, user.office, user.email, null)
+    : null;
+}
+
+async function updateUser(req: UpdateUserUseCaseRequest): Promise<UserEntity> {
+  const user = await prisma.users.update({
+    where: {
+      id: req.id,
+    },
+    data: {
+      name: req.name,
+      office: req.office,
     },
   });
 
@@ -64,4 +81,4 @@ async function login(req: LoginUseCaseRequest): Promise<UserEntity> {
   return null;
 }
 
-export { createUser, checkUserByEmailExists, login, getUser };
+export { createUser, checkUserByEmailExists, login, getUser, updateUser };

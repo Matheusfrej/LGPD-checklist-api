@@ -164,4 +164,46 @@ class VerifyTokenUseCase {
   }
 }
 
-export { CreateUserUseCase, LoginUseCase, VerifyTokenUseCase };
+class UpdateUserUseCase {
+  public validate: userValidateInterface.UpdateUserUseCaseValidateInterface;
+  public repository: userRepositoryInterface.UpdateUserUseCaseRepositoryInterface;
+
+  constructor(
+    validate: userValidateInterface.UpdateUserUseCaseValidateInterface,
+    repository: userRepositoryInterface.UpdateUserUseCaseRepositoryInterface,
+  ) {
+    this.validate = validate;
+    this.repository = repository;
+  }
+
+  async updateUser(
+    req: userUcioInterface.UpdateUserUseCaseRequest,
+  ): Promise<userUcioInterface.UpdateUserUseCaseResponse> {
+    try {
+      const messageError = await this.validate.updateUser(req);
+
+      if (!messageError) {
+        await this.repository.updateUser(req);
+
+        return new userUcioInterface.UpdateUserUseCaseResponse(null);
+      } else {
+        console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
+        return new userUcioInterface.UpdateUserUseCaseResponse(
+          newPreConditionalError(messageError),
+        );
+      }
+    } catch (error: any) {
+      console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
+      return new userUcioInterface.UpdateUserUseCaseResponse(
+        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      );
+    }
+  }
+}
+
+export {
+  CreateUserUseCase,
+  LoginUseCase,
+  VerifyTokenUseCase,
+  UpdateUserUseCase,
+};

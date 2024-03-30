@@ -67,6 +67,28 @@ class VerifyTokenUseCaseResponse {
   }
 }
 
+class UpdateUserUseCaseRequest {
+  public tokenUserId: number;
+  public id: number;
+  public name: string;
+  public office: string;
+
+  constructor(tokenUserId: number, id: number, name: string, office: string) {
+    this.tokenUserId = tokenUserId;
+    this.id = id;
+    this.name = name;
+    this.office = office;
+  }
+}
+
+class UpdateUserUseCaseResponse {
+  public error: ErrorEntity;
+
+  constructor(error: ErrorEntity) {
+    this.error = error;
+  }
+}
+
 export {
   CreateUserUseCaseRequest,
   CreateUserUseCaseResponse,
@@ -74,4 +96,6 @@ export {
   LoginUseCaseResponse,
   VerifyTokenUseCaseRequest,
   VerifyTokenUseCaseResponse,
+  UpdateUserUseCaseRequest,
+  UpdateUserUseCaseResponse,
 };

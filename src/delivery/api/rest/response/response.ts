@@ -9,7 +9,7 @@ class SuccessResponse {
 
 class InternalServerErrorResponse {
   internalServerError(res: Response, error: any) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 }
 
