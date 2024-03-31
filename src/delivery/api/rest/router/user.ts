@@ -1,6 +1,8 @@
 import { Router } from "express";
 import {
   CreateUserController,
+  DeleteUserController,
+  GetUserController,
   LoginController,
   UpdateUserController,
   VerifyTokenController,
@@ -11,15 +13,25 @@ class UserRouter {
 
   constructor() {
     this.router = Router();
-    const verifyTokenMiddleware = new VerifyTokenController(true);
-    const verifyToken = new VerifyTokenController(false);
+
+    const verifyTokenMiddleware = ((instance) =>
+      instance.verifyToken.bind(instance))(new VerifyTokenController(true));
+    const verifyToken = ((instance) => instance.verifyToken.bind(instance))(
+      new VerifyTokenController(false),
+    );
 
     this.router.post("/users", new CreateUserController().createUser);
+    this.router.get("/users/:id", new GetUserController().getUser);
+    this.router.delete(
+      "/users/:id",
+      verifyTokenMiddleware,
+      new DeleteUserController().deleteUser,
+    );
     this.router.post("/login", new LoginController().login);
-    this.router.get("/token", verifyToken.verifyToken.bind(verifyToken));
+    this.router.get("/token", verifyToken);
     this.router.put(
       "/users/:id",
-      verifyTokenMiddleware.verifyToken.bind(verifyTokenMiddleware),
+      verifyTokenMiddleware,
       new UpdateUserController().updateUser,
     );
   }

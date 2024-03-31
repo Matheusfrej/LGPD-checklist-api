@@ -140,13 +140,23 @@ class VerifyTokenUseCase {
 
         const user = await this.repository.getUser(userIsValid.id);
 
-        const newToken = await this.repository.createToken(user.id);
+        if (user) {
+          const newToken = await this.repository.createToken(user.id);
 
-        return new userUcioInterface.VerifyTokenUseCaseResponse(
-          user,
-          newToken,
-          null,
-        );
+          return new userUcioInterface.VerifyTokenUseCaseResponse(
+            user,
+            newToken,
+            null,
+          );
+        } else {
+          return new userUcioInterface.VerifyTokenUseCaseResponse(
+            null,
+            null,
+            newPreConditionalError(
+              "Houve um erro com sua sessão, por favor, faça login novamente",
+            ),
+          );
+        }
       } else {
         return new userUcioInterface.VerifyTokenUseCaseResponse(
           null,
@@ -201,9 +211,94 @@ class UpdateUserUseCase {
   }
 }
 
+class GetUserUseCase {
+  public validate: userValidateInterface.GetUserUseCaseValidateInterface;
+  public repository: userRepositoryInterface.GetUserUseCaseRepositoryInterface;
+
+  constructor(
+    validate: userValidateInterface.GetUserUseCaseValidateInterface,
+    repository: userRepositoryInterface.GetUserUseCaseRepositoryInterface,
+  ) {
+    this.validate = validate;
+    this.repository = repository;
+  }
+
+  async getUser(
+    req: userUcioInterface.GetUserUseCaseRequest,
+  ): Promise<userUcioInterface.GetUserUseCaseResponse> {
+    try {
+      const messageError = await this.validate.getUser(req);
+
+      if (!messageError) {
+        const user = await this.repository.getUser(req);
+
+        if (user) {
+          return new userUcioInterface.GetUserUseCaseResponse(user, null);
+        } else {
+          return new userUcioInterface.GetUserUseCaseResponse(
+            user,
+            newPreConditionalError("Usuário não encontrado"),
+          );
+        }
+      } else {
+        console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
+        return new userUcioInterface.GetUserUseCaseResponse(
+          null,
+          newPreConditionalError(messageError),
+        );
+      }
+    } catch (error: any) {
+      console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
+      return new userUcioInterface.GetUserUseCaseResponse(
+        null,
+        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      );
+    }
+  }
+}
+
+class DeleteUserUseCase {
+  public validate: userValidateInterface.DeleteUserUseCaseValidateInterface;
+  public repository: userRepositoryInterface.DeleteUserUseCaseRepositoryInterface;
+
+  constructor(
+    validate: userValidateInterface.DeleteUserUseCaseValidateInterface,
+    repository: userRepositoryInterface.DeleteUserUseCaseRepositoryInterface,
+  ) {
+    this.validate = validate;
+    this.repository = repository;
+  }
+
+  async deleteUser(
+    req: userUcioInterface.DeleteUserUseCaseRequest,
+  ): Promise<userUcioInterface.DeleteUserUseCaseResponse> {
+    try {
+      const messageError = await this.validate.deleteUser(req);
+
+      if (!messageError) {
+        await this.repository.deleteUser(req);
+
+        return new userUcioInterface.DeleteUserUseCaseResponse(null);
+      } else {
+        console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
+        return new userUcioInterface.DeleteUserUseCaseResponse(
+          newPreConditionalError(messageError),
+        );
+      }
+    } catch (error: any) {
+      console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
+      return new userUcioInterface.DeleteUserUseCaseResponse(
+        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      );
+    }
+  }
+}
+
 export {
   CreateUserUseCase,
   LoginUseCase,
   VerifyTokenUseCase,
   UpdateUserUseCase,
+  GetUserUseCase,
+  DeleteUserUseCase,
 };

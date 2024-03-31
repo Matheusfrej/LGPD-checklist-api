@@ -89,6 +89,42 @@ class UpdateUserUseCaseResponse {
   }
 }
 
+class GetUserUseCaseRequest {
+  public id: number;
+
+  constructor(id: number) {
+    this.id = id;
+  }
+}
+
+class GetUserUseCaseResponse {
+  public user: UserEntity;
+  public error: ErrorEntity;
+
+  constructor(user: UserEntity, error: ErrorEntity) {
+    this.user = user;
+    this.error = error;
+  }
+}
+
+class DeleteUserUseCaseRequest {
+  public tokenUserId: number;
+  public id: number;
+
+  constructor(tokenUserId: number, id: number) {
+    this.tokenUserId = tokenUserId;
+    this.id = id;
+  }
+}
+
+class DeleteUserUseCaseResponse {
+  public error: ErrorEntity;
+
+  constructor(error: ErrorEntity) {
+    this.error = error;
+  }
+}
+
 export {
   CreateUserUseCaseRequest,
   CreateUserUseCaseResponse,
@@ -98,4 +134,8 @@ export {
   VerifyTokenUseCaseResponse,
   UpdateUserUseCaseRequest,
   UpdateUserUseCaseResponse,
+  GetUserUseCaseRequest,
+  GetUserUseCaseResponse,
+  DeleteUserUseCaseRequest,
+  DeleteUserUseCaseResponse,
 };

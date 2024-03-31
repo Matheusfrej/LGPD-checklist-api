@@ -51,9 +51,27 @@ class UpdateUserUseCaseRepository
   }
 }
 
+class GetUserUseCaseRepository
+  implements userInterface.GetUserUseCaseRepositoryInterface
+{
+  getUser(req: userUcio.GetUserUseCaseRequest) {
+    return userService.getUser(req.id);
+  }
+}
+
+class DeleteUserUseCaseRepository
+  implements userInterface.DeleteUserUseCaseRepositoryInterface
+{
+  deleteUser(req: userUcio.DeleteUserUseCaseRequest) {
+    return userService.deleteUser(req.id);
+  }
+}
+
 export {
   CreateUserUseCaseRepository,
   LoginUseCaseRepository,
   VerifyTokenUseCaseRepository,
   UpdateUserUseCaseRepository,
+  GetUserUseCaseRepository,
+  DeleteUserUseCaseRepository,
 };

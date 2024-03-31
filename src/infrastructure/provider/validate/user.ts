@@ -1,6 +1,8 @@
 import * as userInterface from "@/domain/usecase/validate/user";
 import {
   CreateUserUseCaseRequest,
+  DeleteUserUseCaseRequest,
+  GetUserUseCaseRequest,
   LoginUseCaseRequest,
   UpdateUserUseCaseRequest,
   VerifyTokenUseCaseRequest,
@@ -95,9 +97,41 @@ class UpdateUserUseCaseValidate
   }
 }
 
+class GetUserUseCaseValidate
+  implements userInterface.GetUserUseCaseValidateInterface
+{
+  getUser(req: GetUserUseCaseRequest): string {
+    if (checkEmpty(req.id)) {
+      return "O id não pode ser vazio.";
+    }
+
+    return null;
+  }
+}
+
+class DeleteUserUseCaseValidate
+  implements userInterface.DeleteUserUseCaseValidateInterface
+{
+  async deleteUser(req: DeleteUserUseCaseRequest): Promise<string> {
+    if (checkEmpty(req.id)) {
+      return "O id não pode ser vazio.";
+    }
+    if (!(await getUser(req.id))) {
+      return "O usuário informado não existe";
+    }
+    if (req.tokenUserId !== req.id) {
+      return "Você não tem permissão para isso";
+    }
+
+    return null;
+  }
+}
+
 export {
   CreateUserUseCaseValidate,
   LoginUseCaseValidate,
   VerifyTokenUseCaseValidate,
   UpdateUserUseCaseValidate,
+  GetUserUseCaseValidate,
+  DeleteUserUseCaseValidate,
 };

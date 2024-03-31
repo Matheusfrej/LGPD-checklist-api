@@ -1,5 +1,7 @@
 import {
   CreateUserUseCaseRequest,
+  DeleteUserUseCaseRequest,
+  GetUserUseCaseRequest,
   LoginUseCaseRequest,
   UpdateUserUseCaseRequest,
   VerifyTokenUseCaseRequest,
@@ -21,9 +23,19 @@ interface UpdateUserUseCaseValidateInterface {
   updateUser(req: UpdateUserUseCaseRequest): Promise<string>;
 }
 
+interface GetUserUseCaseValidateInterface {
+  getUser(req: GetUserUseCaseRequest): string;
+}
+
+interface DeleteUserUseCaseValidateInterface {
+  deleteUser(req: DeleteUserUseCaseRequest): Promise<string>;
+}
+
 export {
   CreateUserUseCaseValidateInterface,
   LoginUseCaseValidateInterface,
   VerifyTokenUseCaseValidateInterface,
   UpdateUserUseCaseValidateInterface,
+  GetUserUseCaseValidateInterface,
+  DeleteUserUseCaseValidateInterface,
 };

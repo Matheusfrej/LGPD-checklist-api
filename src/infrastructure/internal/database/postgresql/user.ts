@@ -50,6 +50,14 @@ async function updateUser(req: UpdateUserUseCaseRequest): Promise<UserEntity> {
     : null;
 }
 
+async function deleteUser(id: number): Promise<void> {
+  await prisma.users.delete({
+    where: {
+      id,
+    },
+  });
+}
+
 async function checkUserByEmailExists(
   email: string,
   id: number,
@@ -81,4 +89,11 @@ async function login(req: LoginUseCaseRequest): Promise<UserEntity> {
   return null;
 }
 
-export { createUser, checkUserByEmailExists, login, getUser, updateUser };
+export {
+  createUser,
+  checkUserByEmailExists,
+  login,
+  getUser,
+  updateUser,
+  deleteUser,
+};

@@ -26,7 +26,7 @@ class CreateUserController {
     const ucRes = await usecase.createUser(ucReq);
 
     if (!ucRes.error) {
-      new SuccessResponse().success(res, ucRes.user);
+      new SuccessResponse().success(res, { user: ucRes.user });
     } else {
       new InternalServerErrorResponse().internalServerError(res, ucRes.error);
     }
@@ -120,9 +120,52 @@ class UpdateUserController {
   }
 }
 
+class GetUserController {
+  async getUser(req: Request, res: Response) {
+    const { id } = req.params;
+
+    const ucReq = new userUcio.GetUserUseCaseRequest(+id);
+
+    const validate = new userValidate.GetUserUseCaseValidate();
+    const repository = new userRepository.GetUserUseCaseRepository();
+    const usecase = new userUseCase.GetUserUseCase(validate, repository);
+
+    const ucRes = await usecase.getUser(ucReq);
+
+    if (!ucRes.error) {
+      new SuccessResponse().success(res, { user: ucRes.user });
+    } else {
+      new InternalServerErrorResponse().internalServerError(res, ucRes.error);
+    }
+  }
+}
+
+class DeleteUserController {
+  async deleteUser(req: Request, res: Response) {
+    const { id } = req.params;
+    const { tokenUserId } = req.body;
+
+    const ucReq = new userUcio.DeleteUserUseCaseRequest(tokenUserId, +id);
+
+    const validate = new userValidate.DeleteUserUseCaseValidate();
+    const repository = new userRepository.DeleteUserUseCaseRepository();
+    const usecase = new userUseCase.DeleteUserUseCase(validate, repository);
+
+    const ucRes = await usecase.deleteUser(ucReq);
+
+    if (!ucRes.error) {
+      new SuccessResponse().success(res, undefined);
+    } else {
+      new InternalServerErrorResponse().internalServerError(res, ucRes.error);
+    }
+  }
+}
+
 export {
   CreateUserController,
   LoginController,
   VerifyTokenController,
   UpdateUserController,
+  GetUserController,
+  DeleteUserController,
 };
