@@ -3,6 +3,7 @@ const PRE_CONDITIONAL_ERROR_CODE = 2;
 const TAG_INTERNAL_SERVER_ERROR = "[INTERNAL SERVER ERROR]";
 const TAG_PRE_CONDITIONAL_ERROR = "[PRE CONDITIONAL ERROR]";
 const INTERNAL_SERVER_ERROR_MESSAGE = "Erro interno do servidor";
+const NO_PERMISSION_MESSAGE = "Você não tem permissão para isso.";
 
 class ErrorEntity {
   private code: number;
@@ -29,4 +30,5 @@ export {
   TAG_INTERNAL_SERVER_ERROR,
   TAG_PRE_CONDITIONAL_ERROR,
   INTERNAL_SERVER_ERROR_MESSAGE,
+  NO_PERMISSION_MESSAGE,
 };

@@ -12,6 +12,7 @@ import {
   checkUserByEmailExists,
   getUser,
 } from "../../internal/database/postgresql/user";
+import { NO_PERMISSION_MESSAGE } from "../../../domain/entity/error";
 
 class CreateUserUseCaseValidate
   implements userInterface.CreateUserUseCaseValidateInterface
@@ -90,7 +91,7 @@ class UpdateUserUseCaseValidate
       return "O usuário informado não existe";
     }
     if (req.tokenUserId !== req.id) {
-      return "Você não tem permissão para isso";
+      return NO_PERMISSION_MESSAGE;
     }
 
     return null;
@@ -120,7 +121,7 @@ class DeleteUserUseCaseValidate
       return "O usuário informado não existe";
     }
     if (req.tokenUserId !== req.id) {
-      return "Você não tem permissão para isso";
+      return NO_PERMISSION_MESSAGE;
     }
 
     return null;

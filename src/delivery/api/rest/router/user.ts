@@ -7,6 +7,7 @@ import {
   UpdateUserController,
   VerifyTokenController,
 } from "../controller/user";
+import { verifyTokenMiddleware } from "../middleware/verifyToken";
 
 class UserRouter {
   private router: Router;
@@ -14,10 +15,13 @@ class UserRouter {
   constructor() {
     this.router = Router();
 
-    const verifyTokenMiddleware = ((instance) =>
-      instance.verifyToken.bind(instance))(new VerifyTokenController(true));
-    const verifyToken = ((instance) => instance.verifyToken.bind(instance))(
-      new VerifyTokenController(false),
+    this.router.post("/login", new LoginController().login);
+
+    this.router.get(
+      "/token",
+      ((instance) => instance.verifyToken.bind(instance))(
+        new VerifyTokenController(false),
+      ),
     );
 
     this.router.post("/users", new CreateUserController().createUser);
@@ -27,8 +31,6 @@ class UserRouter {
       verifyTokenMiddleware,
       new DeleteUserController().deleteUser,
     );
-    this.router.post("/login", new LoginController().login);
-    this.router.get("/token", verifyToken);
     this.router.put(
       "/users/:id",
       verifyTokenMiddleware,

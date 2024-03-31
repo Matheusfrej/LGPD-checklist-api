@@ -103,7 +103,7 @@ class LoginUseCase {
       return new userUcioInterface.LoginUseCaseResponse(
         null,
         null,
-        newInternalServerError(error.message),
+        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
       );
     }
   }
@@ -168,7 +168,7 @@ class VerifyTokenUseCase {
       return new userUcioInterface.VerifyTokenUseCaseResponse(
         null,
         null,
-        newInternalServerError(err.message),
+        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
       );
     }
   }
