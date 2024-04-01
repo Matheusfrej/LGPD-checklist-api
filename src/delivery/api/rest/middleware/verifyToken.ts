@@ -1,6 +1,9 @@
 import { VerifyTokenController } from "../controller/user";
 
-const verifyTokenMiddleware = ((instance) =>
-  instance.verifyToken.bind(instance))(new VerifyTokenController(true));
+const verifyTokenMiddlewareBind = new VerifyTokenController(true);
+
+const verifyTokenMiddleware = verifyTokenMiddlewareBind.verifyToken.bind(
+  verifyTokenMiddlewareBind,
+);
 
 export { verifyTokenMiddleware };

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as userRepositoryInterface from "./repository/user";
 import * as userValidateInterface from "./validate/user";
 import * as userUcioInterface from "./ucio/user";
@@ -44,7 +43,7 @@ class CreateUserUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
       return new userUcioInterface.CreateUserUseCaseResponse(
         null,
@@ -98,7 +97,7 @@ class LoginUseCase {
         null,
         newPreConditionalError(messageError),
       );
-    } catch (error: any) {
+    } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
       return new userUcioInterface.LoginUseCaseResponse(
         null,
@@ -164,7 +163,7 @@ class VerifyTokenUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (err: any) {
+    } catch (err) {
       return new userUcioInterface.VerifyTokenUseCaseResponse(
         null,
         null,
@@ -202,7 +201,7 @@ class UpdateUserUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
       return new userUcioInterface.UpdateUserUseCaseResponse(
         newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
@@ -247,7 +246,7 @@ class GetUserUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
       return new userUcioInterface.GetUserUseCaseResponse(
         null,
@@ -285,7 +284,7 @@ class DeleteUserUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
       return new userUcioInterface.DeleteUserUseCaseResponse(
         newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as systemValidateInterface from "../usecase/validate/system";
 import * as systemRepositoryInterface from "../usecase/repository/system";
 import * as systemUcioInterface from "../usecase/ucio/system";
@@ -42,7 +41,7 @@ class CreateSystemUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
       return new systemUcioInterface.CreateSystemUseCaseResponse(
         null,
@@ -84,7 +83,7 @@ class ListSystemsByUserIdUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
       return new systemUcioInterface.ListSystemsByUserIdUseCaseResponse(
         null,
@@ -129,7 +128,7 @@ class GetSystemUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       return new systemUcioInterface.GetSystemUseCaseResponse(
         null,
@@ -165,7 +164,7 @@ class DeleteSystemUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       return new systemUcioInterface.DeleteSystemUseCaseResponse(
         newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
@@ -201,7 +200,7 @@ class UpdateSystemUseCase {
           newPreConditionalError(messageError),
         );
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       return new systemUcioInterface.UpdateSystemUseCaseResponse(
         newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),

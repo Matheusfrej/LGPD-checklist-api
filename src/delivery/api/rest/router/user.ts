@@ -15,14 +15,12 @@ class UserRouter {
   constructor() {
     this.router = Router();
 
+    const verifyTokenBind = new VerifyTokenController(false);
+    const verifyToken = verifyTokenBind.verifyToken.bind(verifyTokenBind);
+
     this.router.post("/login", new LoginController().login);
 
-    this.router.get(
-      "/token",
-      ((instance) => instance.verifyToken.bind(instance))(
-        new VerifyTokenController(false),
-      ),
-    );
+    this.router.get("/token", verifyToken);
 
     this.router.post("/users", new CreateUserController().createUser);
     this.router.get("/users/:id", new GetUserController().getUser);
