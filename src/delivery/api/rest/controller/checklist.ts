@@ -127,9 +127,69 @@ class UpdateChecklistController {
   }
 }
 
+class ListChecklistsByUserIdController {
+  async listChecklistsByUserId(req: Request, res: Response) {
+    const { userId } = req.params;
+    const { tokenUserId } = req.body;
+
+    const ucReq = new checklistUcio.ListChecklistsByUserIdUseCaseRequest(
+      tokenUserId,
+      +userId,
+    );
+
+    const validate =
+      new checklistValidate.ListChecklistsByUserIdUseCaseValidate();
+    const repository =
+      new checklistRepository.ListChecklistsByUserIdUseCaseRepository();
+    const usecase = new checklistUseCase.ListChecklistsByUserIdUseCase(
+      validate,
+      repository,
+    );
+
+    const ucRes = await usecase.listChecklistsByUserId(ucReq);
+
+    if (!ucRes.error) {
+      new SuccessResponse().success(res, { checklists: ucRes.checklists });
+    } else {
+      new InternalServerErrorResponse().internalServerError(res, ucRes.error);
+    }
+  }
+}
+
+class ListChecklistsBySystemIdController {
+  async listChecklistsBySystemId(req: Request, res: Response) {
+    const { systemId } = req.params;
+    const { tokenUserId } = req.body;
+
+    const ucReq = new checklistUcio.ListChecklistsBySystemIdUseCaseRequest(
+      tokenUserId,
+      +systemId,
+    );
+
+    const validate =
+      new checklistValidate.ListChecklistsBySystemIdUseCaseValidate();
+    const repository =
+      new checklistRepository.ListChecklistsBySystemIdUseCaseRepository();
+    const usecase = new checklistUseCase.ListChecklistsBySystemIdUseCase(
+      validate,
+      repository,
+    );
+
+    const ucRes = await usecase.listChecklistsBySystemId(ucReq);
+
+    if (!ucRes.error) {
+      new SuccessResponse().success(res, { checklists: ucRes.checklists });
+    } else {
+      new InternalServerErrorResponse().internalServerError(res, ucRes.error);
+    }
+  }
+}
+
 export {
   CreateChecklistController,
   GetChecklistController,
   DeleteChecklistController,
   UpdateChecklistController,
+  ListChecklistsByUserIdController,
+  ListChecklistsBySystemIdController,
 };

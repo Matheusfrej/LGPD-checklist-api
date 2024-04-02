@@ -170,9 +170,93 @@ class UpdateChecklistUseCase {
   }
 }
 
+class ListChecklistsByUserIdUseCase {
+  public validate: checklistValidateInterface.ListChecklistsByUserIdUseCaseValidateInterface;
+  public repository: checklistRepositoryInterface.ListChecklistsByUserIdUseCaseRepositoryInterface;
+
+  constructor(
+    validate: checklistValidateInterface.ListChecklistsByUserIdUseCaseValidateInterface,
+    repository: checklistRepositoryInterface.ListChecklistsByUserIdUseCaseRepositoryInterface,
+  ) {
+    this.validate = validate;
+    this.repository = repository;
+  }
+
+  async listChecklistsByUserId(
+    req: checklistUcioInterface.ListChecklistsByUserIdUseCaseRequest,
+  ): Promise<checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse> {
+    try {
+      const messageError = await this.validate.listChecklistsByUserId(req);
+
+      if (!messageError) {
+        const checklists = await this.repository.listChecklistsByUserId(req);
+
+        return new checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse(
+          checklists,
+          null,
+        );
+      } else {
+        return new checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse(
+          null,
+          newPreConditionalError(messageError),
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      return new checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse(
+        null,
+        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      );
+    }
+  }
+}
+
+class ListChecklistsBySystemIdUseCase {
+  public validate: checklistValidateInterface.ListChecklistsBySystemIdUseCaseValidateInterface;
+  public repository: checklistRepositoryInterface.ListChecklistsBySystemIdUseCaseRepositoryInterface;
+
+  constructor(
+    validate: checklistValidateInterface.ListChecklistsBySystemIdUseCaseValidateInterface,
+    repository: checklistRepositoryInterface.ListChecklistsBySystemIdUseCaseRepositoryInterface,
+  ) {
+    this.validate = validate;
+    this.repository = repository;
+  }
+
+  async listChecklistsBySystemId(
+    req: checklistUcioInterface.ListChecklistsBySystemIdUseCaseRequest,
+  ): Promise<checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse> {
+    try {
+      const messageError = await this.validate.listChecklistsBySystemId(req);
+
+      if (!messageError) {
+        const checklists = await this.repository.listChecklistsBySystemId(req);
+
+        return new checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse(
+          checklists,
+          null,
+        );
+      } else {
+        return new checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse(
+          null,
+          newPreConditionalError(messageError),
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      return new checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse(
+        null,
+        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      );
+    }
+  }
+}
+
 export {
   CreateChecklistUseCase,
   GetChecklistUseCase,
   DeleteChecklistUseCase,
   UpdateChecklistUseCase,
+  ListChecklistsByUserIdUseCase,
+  ListChecklistsBySystemIdUseCase,
 };

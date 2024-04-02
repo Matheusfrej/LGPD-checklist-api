@@ -4,6 +4,8 @@ import {
   CreateChecklistUseCaseRequest,
   DeleteChecklistUseCaseRequest,
   GetChecklistUseCaseRequest,
+  ListChecklistsBySystemIdUseCaseRequest,
+  ListChecklistsByUserIdUseCaseRequest,
   UpdateChecklistUseCaseRequest,
 } from "../../../domain/usecase/ucio/checklist";
 import { checkEmpty } from "./validate";
@@ -130,9 +132,58 @@ class UpdateChecklistUseCaseValidate
   }
 }
 
+class ListChecklistsByUserIdUseCaseValidate
+  implements checklistInterface.ListChecklistsByUserIdUseCaseValidateInterface
+{
+  async listChecklistsByUserId(
+    req: ListChecklistsByUserIdUseCaseRequest,
+  ): Promise<string> {
+    if (checkEmpty(req.userId)) {
+      return "O id do usuário não pode ser vazio.";
+    }
+
+    if (!(await getUser(req.userId))) {
+      return "O usuário informado não existe.";
+    }
+
+    if (req.userId !== req.tokenUserId) {
+      return NO_PERMISSION_MESSAGE;
+    }
+
+    return null;
+  }
+}
+
+class ListChecklistsBySystemIdUseCaseValidate
+  implements
+    checklistInterface.ListChecklistsBySystemIdUseCaseValidateInterface
+{
+  async listChecklistsBySystemId(
+    req: ListChecklistsBySystemIdUseCaseRequest,
+  ): Promise<string> {
+    if (checkEmpty(req.systemId)) {
+      return "O id do sistema não pode ser vazio.";
+    }
+
+    const system = await getSystem(req.systemId);
+
+    if (!system) {
+      return "O sistema não foi encontrado.";
+    }
+
+    if (system.userId !== req.tokenUserId) {
+      return NO_PERMISSION_MESSAGE;
+    }
+
+    return null;
+  }
+}
+
 export {
   CreateChecklistUseCaseValidate,
   GetChecklistUseCaseValidate,
   DeleteChecklistUseCaseValidate,
   UpdateChecklistUseCaseValidate,
+  ListChecklistsByUserIdUseCaseValidate,
+  ListChecklistsBySystemIdUseCaseValidate,
 };

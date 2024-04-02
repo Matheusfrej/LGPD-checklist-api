@@ -3,7 +3,6 @@ import { SystemEntity } from "@/domain/entity/system";
 import { prisma } from "../../connection/prisma";
 import {
   CreateSystemUseCaseRequest,
-  ListSystemsByUserIdUseCaseRequest,
   UpdateSystemUseCaseRequest,
 } from "../../../../domain/usecase/ucio/system";
 
@@ -26,12 +25,10 @@ async function createSystem(
   );
 }
 
-async function listSystemsByUserId(
-  req: ListSystemsByUserIdUseCaseRequest,
-): Promise<SystemEntity[]> {
+async function listSystemsByUserId(userId: number): Promise<SystemEntity[]> {
   const systems = await prisma.systems.findMany({
     where: {
-      userId: req.userId,
+      userId,
     },
   });
 

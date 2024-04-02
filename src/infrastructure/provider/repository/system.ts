@@ -23,7 +23,7 @@ class ListSystemsByUserIdUseCaseRepository
   async listSystemsByUserId(
     req: ListSystemsByUserIdUseCaseRequest,
   ): Promise<SystemEntity[]> {
-    return await systemService.listSystemsByUserId(req);
+    return await systemService.listSystemsByUserId(req.userId);
   }
 }
 

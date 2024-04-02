@@ -1,3 +1,4 @@
+import { Checklists } from "@prisma/client";
 import { ChecklistEntity } from "../../../../domain/entity/checklist";
 import {
   CreateChecklistUseCaseRequest,
@@ -73,4 +74,55 @@ async function updateChecklist(
   });
 }
 
-export { createChecklist, getChecklist, deleteChecklist, updateChecklist };
+async function listChecklistsByUserId(
+  userId: number,
+): Promise<ChecklistEntity[]> {
+  const checklists = await prisma.checklists.findMany({
+    where: {
+      userId,
+    },
+  });
+
+  return checklists.map(
+    (checklist: Checklists) =>
+      new ChecklistEntity(
+        checklist.id,
+        checklist.userId,
+        checklist.systemId,
+        null,
+        checklist.isGeneral,
+        checklist.isIot,
+      ),
+  );
+}
+
+async function listChecklistsBySystemId(
+  systemId: number,
+): Promise<ChecklistEntity[]> {
+  const checklists = await prisma.checklists.findMany({
+    where: {
+      systemId,
+    },
+  });
+
+  return checklists.map(
+    (checklist: Checklists) =>
+      new ChecklistEntity(
+        checklist.id,
+        checklist.userId,
+        checklist.systemId,
+        null,
+        checklist.isGeneral,
+        checklist.isIot,
+      ),
+  );
+}
+
+export {
+  createChecklist,
+  getChecklist,
+  deleteChecklist,
+  updateChecklist,
+  listChecklistsByUserId,
+  listChecklistsBySystemId,
+};

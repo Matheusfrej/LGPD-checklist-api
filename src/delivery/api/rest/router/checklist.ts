@@ -4,6 +4,8 @@ import {
   CreateChecklistController,
   DeleteChecklistController,
   GetChecklistController,
+  ListChecklistsBySystemIdController,
+  ListChecklistsByUserIdController,
   UpdateChecklistController,
 } from "../controller/checklist";
 
@@ -22,6 +24,16 @@ class ChecklistRouter {
       "/checklists/:id",
       verifyTokenMiddleware,
       new GetChecklistController().getChecklist,
+    );
+    this.router.get(
+      "/checklistsByUserId/:userId",
+      verifyTokenMiddleware,
+      new ListChecklistsByUserIdController().listChecklistsByUserId,
+    );
+    this.router.get(
+      "/checklistsBySystemId/:systemId",
+      verifyTokenMiddleware,
+      new ListChecklistsBySystemIdController().listChecklistsBySystemId,
     );
     this.router.delete(
       "/checklists/:id",

@@ -5,6 +5,8 @@ import {
   CreateChecklistUseCaseRequest,
   DeleteChecklistUseCaseRequest,
   GetChecklistUseCaseRequest,
+  ListChecklistsBySystemIdUseCaseRequest,
+  ListChecklistsByUserIdUseCaseRequest,
   UpdateChecklistUseCaseRequest,
 } from "../../../domain/usecase/ucio/checklist";
 
@@ -44,9 +46,33 @@ class UpdateChecklistUseCaseRepository
   }
 }
 
+class ListChecklistsByUserIdUseCaseRepository
+  implements
+    checklistInterface.ListChecklistsByUserIdUseCaseRepositoryInterface
+{
+  async listChecklistsByUserId(
+    req: ListChecklistsByUserIdUseCaseRequest,
+  ): Promise<ChecklistEntity[]> {
+    return await checklistService.listChecklistsByUserId(req.userId);
+  }
+}
+
+class ListChecklistsBySystemIdUseCaseRepository
+  implements
+    checklistInterface.ListChecklistsBySystemIdUseCaseRepositoryInterface
+{
+  async listChecklistsBySystemId(
+    req: ListChecklistsBySystemIdUseCaseRequest,
+  ): Promise<ChecklistEntity[]> {
+    return await checklistService.listChecklistsBySystemId(req.systemId);
+  }
+}
+
 export {
   CreateChecklistUseCaseRepository,
   GetChecklistUseCaseRepository,
   DeleteChecklistUseCaseRepository,
   UpdateChecklistUseCaseRepository,
+  ListChecklistsByUserIdUseCaseRepository,
+  ListChecklistsBySystemIdUseCaseRepository,
 };

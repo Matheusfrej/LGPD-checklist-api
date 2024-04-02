@@ -108,6 +108,46 @@ class UpdateChecklistUseCaseResponse {
   }
 }
 
+class ListChecklistsByUserIdUseCaseRequest {
+  public tokenUserId: number;
+  public userId: number;
+
+  constructor(tokenUserId: number, userId: number) {
+    this.tokenUserId = tokenUserId;
+    this.userId = userId;
+  }
+}
+
+class ListChecklistsByUserIdUseCaseResponse {
+  public checklists: ChecklistEntity[];
+  public error: ErrorEntity;
+
+  constructor(checklists: ChecklistEntity[], error: ErrorEntity) {
+    this.checklists = checklists;
+    this.error = error;
+  }
+}
+
+class ListChecklistsBySystemIdUseCaseRequest {
+  public tokenUserId: number;
+  public systemId: number;
+
+  constructor(tokenUserId: number, systemId: number) {
+    this.tokenUserId = tokenUserId;
+    this.systemId = systemId;
+  }
+}
+
+class ListChecklistsBySystemIdUseCaseResponse {
+  public checklists: ChecklistEntity[];
+  public error: ErrorEntity;
+
+  constructor(checklists: ChecklistEntity[], error: ErrorEntity) {
+    this.checklists = checklists;
+    this.error = error;
+  }
+}
+
 export {
   CreateChecklistUseCaseRequest,
   CreateChecklistUseCaseResponse,
@@ -117,4 +157,8 @@ export {
   DeleteChecklistUseCaseResponse,
   UpdateChecklistUseCaseRequest,
   UpdateChecklistUseCaseResponse,
+  ListChecklistsByUserIdUseCaseRequest,
+  ListChecklistsByUserIdUseCaseResponse,
+  ListChecklistsBySystemIdUseCaseRequest,
+  ListChecklistsBySystemIdUseCaseResponse,
 };
