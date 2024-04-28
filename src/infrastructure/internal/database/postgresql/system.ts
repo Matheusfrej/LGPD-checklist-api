@@ -31,7 +31,7 @@ async function listSystemsByUserId(userId: number): Promise<SystemEntity[]> {
       userId,
     },
     orderBy: {
-      updatedAt: "asc",
+      updatedAt: "desc",
     },
   });
 

@@ -82,7 +82,7 @@ async function listChecklistsByUserId(
       userId,
     },
     orderBy: {
-      updatedAt: "asc",
+      updatedAt: "desc",
     },
   });
 
@@ -109,7 +109,7 @@ async function listChecklistsBySystemId(
       systemId,
     },
     orderBy: {
-      updatedAt: "asc",
+      updatedAt: "desc",
     },
   });
 
