@@ -24,4 +24,17 @@ function validateEmail(email: string): boolean {
   return re.test(String(email).toLowerCase());
 }
 
-export { checkEmpty, checkStringEmpty, checkNumberEmpty, validateEmail };
+function validatePassword(password: string): boolean {
+  const passwordValidation =
+    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+
+  return passwordValidation.test(password);
+}
+
+export {
+  checkEmpty,
+  checkStringEmpty,
+  checkNumberEmpty,
+  validateEmail,
+  validatePassword,
+};

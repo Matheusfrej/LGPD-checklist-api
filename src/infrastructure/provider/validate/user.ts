@@ -7,7 +7,7 @@ import {
   UpdateUserUseCaseRequest,
   VerifyTokenUseCaseRequest,
 } from "../../../domain/usecase/ucio/user";
-import { checkEmpty, validateEmail } from "./validate";
+import { checkEmpty, validateEmail, validatePassword } from "./validate";
 import {
   checkUserByEmailExists,
   getUser,
@@ -36,6 +36,10 @@ class CreateUserUseCaseValidate
 
     if (!validateEmail(req.email)) {
       return "Insira o email no formato correto.";
+    }
+
+    if (!validatePassword(req.password)) {
+      return "A senha deve ter pelo menos um caractere maiúsculo, um minúsculo, um número e um caractere especial (#?!@$%^&*-)";
     }
 
     if (await checkUserByEmailExists(req.email, null)) {

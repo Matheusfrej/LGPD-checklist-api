@@ -30,6 +30,9 @@ async function listSystemsByUserId(userId: number): Promise<SystemEntity[]> {
     where: {
       userId,
     },
+    orderBy: {
+      updatedAt: "asc",
+    },
   });
 
   return systems.map(
