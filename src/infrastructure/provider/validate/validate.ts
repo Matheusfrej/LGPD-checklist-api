@@ -26,7 +26,7 @@ function validateEmail(email: string): boolean {
 
 function validatePassword(password: string): boolean {
   const passwordValidation =
-    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).*$/;
 
   return passwordValidation.test(password);
 }

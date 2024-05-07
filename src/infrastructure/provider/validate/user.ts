@@ -38,6 +38,10 @@ class CreateUserUseCaseValidate
       return "Insira o email no formato correto.";
     }
 
+    if (req.password.length < 6) {
+      return "A senha deve ter no mínimo 6 caracteres";
+    }
+
     if (!validatePassword(req.password)) {
       return "A senha deve ter pelo menos um caractere maiúsculo, um minúsculo, um número e um caractere especial (#?!@$%^&*-)";
     }

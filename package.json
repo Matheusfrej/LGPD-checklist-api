@@ -46,5 +46,8 @@
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

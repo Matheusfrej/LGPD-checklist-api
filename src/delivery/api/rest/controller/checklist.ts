@@ -10,7 +10,7 @@ import {
 
 class CreateChecklistController {
   async createChecklist(req: Request, res: Response) {
-    const { tokenUserId, userId, systemId, checklistData, isGeneral, isIot } =
+    const { tokenUserId, userId, systemId, checklistData, isGeneral, isIoT } =
       req.body;
 
     const ucReq = new checklistUcio.CreateChecklistUseCaseRequest(
@@ -19,7 +19,7 @@ class CreateChecklistController {
       systemId,
       checklistData,
       isGeneral,
-      isIot,
+      isIoT,
     );
 
     const validate = new checklistValidate.CreateChecklistUseCaseValidate();
@@ -98,7 +98,7 @@ class DeleteChecklistController {
 class UpdateChecklistController {
   async updateChecklist(req: Request, res: Response) {
     const { id } = req.params;
-    const { tokenUserId, systemId, checklistData, isGeneral, isIot } = req.body;
+    const { tokenUserId, systemId, checklistData, isGeneral, isIoT } = req.body;
 
     const ucReq = new checklistUcio.UpdateChecklistUseCaseRequest(
       +id,
@@ -106,7 +106,7 @@ class UpdateChecklistController {
       systemId,
       checklistData,
       isGeneral,
-      isIot,
+      isIoT,
     );
 
     const validate = new checklistValidate.UpdateChecklistUseCaseValidate();
