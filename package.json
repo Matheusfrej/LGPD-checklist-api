@@ -12,8 +12,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev src/main.ts",
-    "start": "node dist/main.js",
-    "build": "npm install && tsc && tsc-alias",
+    "start": "node dist/src/main.js",
+    "build": "tsc && tsc-alias",
     "prisma:format": "npx prisma format",
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:studio": "npx prisma studio"
