@@ -8,7 +8,7 @@ import { NextFunction, Request, Response } from "express";
 import { UserPrismaRepository } from "../../../../infrastructure/provider/repository/user";
 
 class CreateUserController {
-  async createUser(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { name, office, email, password } = req.body;
 
     const ucReq = new userUcio.CreateUserUseCaseRequest(
@@ -32,7 +32,7 @@ class CreateUserController {
 }
 
 class LoginController {
-  async login(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { email, password } = req.body;
 
     const ucReq = new userUcio.LoginUseCaseRequest(email, password);
@@ -60,7 +60,7 @@ class VerifyTokenController {
     this.isMiddleware = isMiddleware;
   }
 
-  async verifyToken(req: Request, res: Response, next: NextFunction) {
+  async execute(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.authorization;
 
     const ucReq = new userUcio.VerifyTokenUseCaseRequest(token);
@@ -100,7 +100,7 @@ class VerifyTokenController {
 }
 
 class UpdateUserController {
-  async updateUser(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId, name, office } = req.body;
 
@@ -125,7 +125,7 @@ class UpdateUserController {
 }
 
 class GetUserController {
-  async getUser(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
 
     const ucReq = new userUcio.GetUserUseCaseRequest(+id);
@@ -144,7 +144,7 @@ class GetUserController {
 }
 
 class DeleteUserController {
-  async deleteUser(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 

@@ -17,23 +17,23 @@ class SystemRouter {
     this.router.post(
       "/systems",
       verifyTokenMiddleware,
-      new CreateSystemController().createSystem,
+      new CreateSystemController().execute,
     );
-    this.router.get("/systems/:id", new GetSystemController().getSystem);
+    this.router.get("/systems/:id", new GetSystemController().execute);
     this.router.get(
       "/systemsByUserId/:userId",
       verifyTokenMiddleware,
-      new ListSystemsByUserIdController().listSystemsByUserId,
+      new ListSystemsByUserIdController().execute,
     );
     this.router.delete(
       "/systems/:id",
       verifyTokenMiddleware,
-      new DeleteSystemController().deleteSystem,
+      new DeleteSystemController().execute,
     );
     this.router.put(
       "/systems/:id",
       verifyTokenMiddleware,
-      new UpdateSystemController().updateSystem,
+      new UpdateSystemController().execute,
     );
   }
 

@@ -12,13 +12,13 @@ import { UserRepositoryInterface } from "./repository/user";
 
 class CreateUserUseCase {
   public validate: userValidateInterface.CreateUserUseCaseValidate;
-  public repository: UserRepositoryInterface;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(repository: UserRepositoryInterface) {
+  constructor(userRepository: UserRepositoryInterface) {
     this.validate = new userValidateInterface.CreateUserUseCaseValidate(
-      repository,
+      userRepository,
     );
-    this.repository = repository;
+    this.userRepository = userRepository;
   }
 
   async execute(
@@ -32,7 +32,7 @@ class CreateUserUseCase {
         const passwordEncrypt = hashSync(req.password, salt);
         req.password = passwordEncrypt;
 
-        const userResp = await this.repository.createUser(req);
+        const userResp = await this.userRepository.createUser(req);
 
         return new userUcioInterface.CreateUserUseCaseResponse(userResp, null);
       } else {
@@ -54,11 +54,11 @@ class CreateUserUseCase {
 
 class LoginUseCase {
   public validate: userValidateInterface.LoginUseCaseValidate;
-  public repository: UserRepositoryInterface;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(repository: UserRepositoryInterface) {
+  constructor(userRepository: UserRepositoryInterface) {
     this.validate = new userValidateInterface.LoginUseCaseValidate();
-    this.repository = repository;
+    this.userRepository = userRepository;
   }
 
   async execute(
@@ -68,10 +68,10 @@ class LoginUseCase {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const userResp = await this.repository.login(req);
+        const userResp = await this.userRepository.login(req);
 
         if (userResp) {
-          const token = this.repository.createToken(userResp.id);
+          const token = this.userRepository.createToken(userResp.id);
 
           return new userUcioInterface.LoginUseCaseResponse(
             userResp,
@@ -106,12 +106,12 @@ class LoginUseCase {
 
 class VerifyTokenUseCase {
   public validate: userValidateInterface.VerifyTokenUseCaseValidate;
-  public repository: UserRepositoryInterface;
+  public userRepository: UserRepositoryInterface;
   public req: userUcioInterface.VerifyTokenUseCaseRequest;
 
-  constructor(repository: UserRepositoryInterface) {
+  constructor(userRepository: UserRepositoryInterface) {
     this.validate = new userValidateInterface.VerifyTokenUseCaseValidate();
-    this.repository = repository;
+    this.userRepository = userRepository;
   }
 
   async execute(
@@ -121,7 +121,7 @@ class VerifyTokenUseCase {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const userIsValid = await this.repository.verifyToken(req.token);
+        const userIsValid = await this.userRepository.verifyToken(req.token);
 
         if (userIsValid === "jwt expired" || userIsValid === "invalid token")
           return new userUcioInterface.VerifyTokenUseCaseResponse(
@@ -130,10 +130,10 @@ class VerifyTokenUseCase {
             newPreConditionalError("Sua sessão expirou"),
           );
 
-        const user = await this.repository.getUser(userIsValid.id);
+        const user = await this.userRepository.getUser(userIsValid.id);
 
         if (user) {
-          const newToken = await this.repository.createToken(user.id);
+          const newToken = await this.userRepository.createToken(user.id);
 
           return new userUcioInterface.VerifyTokenUseCaseResponse(
             user,
@@ -168,13 +168,13 @@ class VerifyTokenUseCase {
 
 class UpdateUserUseCase {
   public validate: userValidateInterface.UpdateUserUseCaseValidate;
-  public repository: UserRepositoryInterface;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(repository: UserRepositoryInterface) {
+  constructor(userRepository: UserRepositoryInterface) {
     this.validate = new userValidateInterface.UpdateUserUseCaseValidate(
-      repository,
+      userRepository,
     );
-    this.repository = repository;
+    this.userRepository = userRepository;
   }
 
   async execute(
@@ -184,7 +184,7 @@ class UpdateUserUseCase {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        await this.repository.updateUser(req);
+        await this.userRepository.updateUser(req);
 
         return new userUcioInterface.UpdateUserUseCaseResponse(null);
       } else {
@@ -204,11 +204,11 @@ class UpdateUserUseCase {
 
 class GetUserUseCase {
   public validate: userValidateInterface.GetUserUseCaseValidate;
-  public repository: UserRepositoryInterface;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(repository: UserRepositoryInterface) {
+  constructor(userRepository: UserRepositoryInterface) {
     this.validate = new userValidateInterface.GetUserUseCaseValidate();
-    this.repository = repository;
+    this.userRepository = userRepository;
   }
 
   async execute(
@@ -218,7 +218,7 @@ class GetUserUseCase {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const user = await this.repository.getUser(req.id);
+        const user = await this.userRepository.getUser(req.id);
 
         if (user) {
           return new userUcioInterface.GetUserUseCaseResponse(user, null);
@@ -247,13 +247,13 @@ class GetUserUseCase {
 
 class DeleteUserUseCase {
   public validate: userValidateInterface.DeleteUserUseCaseValidate;
-  public repository: UserRepositoryInterface;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(repository: UserRepositoryInterface) {
+  constructor(userRepository: UserRepositoryInterface) {
     this.validate = new userValidateInterface.DeleteUserUseCaseValidate(
-      repository,
+      userRepository,
     );
-    this.repository = repository;
+    this.userRepository = userRepository;
   }
 
   async execute(
@@ -263,7 +263,7 @@ class DeleteUserUseCase {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        await this.repository.deleteUser(req);
+        await this.userRepository.deleteUser(req);
 
         return new userUcioInterface.DeleteUserUseCaseResponse(null);
       } else {

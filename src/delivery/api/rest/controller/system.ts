@@ -1,15 +1,15 @@
 import * as systemUseCase from "@/domain/usecase/system";
 import * as systemUcio from "@/domain/usecase/ucio/system";
-import * as systemValidate from "@/infrastructure/provider/validate/system";
-import * as systemRepository from "@/infrastructure/provider/repository/system";
 import { Request, Response } from "express";
 import {
   InternalServerErrorResponse,
   SuccessResponse,
 } from "../response/response";
+import { SystemPrismaRepository } from "../../../../infrastructure/provider/repository/system";
+import { UserPrismaRepository } from "../../../../infrastructure/provider/repository/user";
 
 class CreateSystemController {
-  async createSystem(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { name, description, userId, tokenUserId } = req.body;
 
     const ucReq = new systemUcio.CreateSystemUseCaseRequest(
@@ -19,11 +19,14 @@ class CreateSystemController {
       tokenUserId,
     );
 
-    const validate = new systemValidate.CreateSystemUseCaseValidate();
-    const repository = new systemRepository.CreateSystemUseCaseRepository();
-    const usecase = new systemUseCase.CreateSystemUseCase(validate, repository);
+    const systemRepository = new SystemPrismaRepository();
+    const userRepository = new UserPrismaRepository();
+    const usecase = new systemUseCase.CreateSystemUseCase(
+      systemRepository,
+      userRepository,
+    );
 
-    const ucRes = await usecase.createSystem(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { system: ucRes.system });
@@ -34,7 +37,7 @@ class CreateSystemController {
 }
 
 class ListSystemsByUserIdController {
-  async listSystemsByUserId(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { userId } = req.params;
     const { tokenUserId } = req.body;
 
@@ -43,15 +46,14 @@ class ListSystemsByUserIdController {
       +userId,
     );
 
-    const validate = new systemValidate.ListSystemsByUserIdUseCaseValidate();
-    const repository =
-      new systemRepository.ListSystemsByUserIdUseCaseRepository();
+    const systemRepository = new SystemPrismaRepository();
+    const userRepository = new UserPrismaRepository();
     const usecase = new systemUseCase.ListSystemsByUserIdUseCase(
-      validate,
-      repository,
+      systemRepository,
+      userRepository,
     );
 
-    const ucRes = await usecase.listSystemsByUserId(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { systems: ucRes.systems });
@@ -62,16 +64,15 @@ class ListSystemsByUserIdController {
 }
 
 class GetSystemController {
-  async getSystem(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
 
     const ucReq = new systemUcio.GetSystemUseCaseRequest(+id);
 
-    const validate = new systemValidate.GetSystemUseCaseValidate();
-    const repository = new systemRepository.GetSystemUseCaseRepository();
-    const usecase = new systemUseCase.GetSystemUseCase(validate, repository);
+    const systemRepository = new SystemPrismaRepository();
+    const usecase = new systemUseCase.GetSystemUseCase(systemRepository);
 
-    const ucRes = await usecase.getSystem(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { system: ucRes.system });
@@ -82,17 +83,16 @@ class GetSystemController {
 }
 
 class DeleteSystemController {
-  async deleteSystem(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
     const ucReq = new systemUcio.DeleteSystemUseCaseRequest(+id, tokenUserId);
 
-    const validate = new systemValidate.DeleteSystemUseCaseValidate();
-    const repository = new systemRepository.DeleteSystemUseCaseRepository();
-    const usecase = new systemUseCase.DeleteSystemUseCase(validate, repository);
+    const systemRepository = new SystemPrismaRepository();
+    const usecase = new systemUseCase.DeleteSystemUseCase(systemRepository);
 
-    const ucRes = await usecase.deleteSystem(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);
@@ -103,7 +103,7 @@ class DeleteSystemController {
 }
 
 class UpdateSystemController {
-  async updateSystem(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId, name, description } = req.body;
 
@@ -114,11 +114,10 @@ class UpdateSystemController {
       tokenUserId,
     );
 
-    const validate = new systemValidate.UpdateSystemUseCaseValidate();
-    const repository = new systemRepository.UpdateSystemUseCaseRepository();
-    const usecase = new systemUseCase.UpdateSystemUseCase(validate, repository);
+    const systemRepository = new SystemPrismaRepository();
+    const usecase = new systemUseCase.UpdateSystemUseCase(systemRepository);
 
-    const ucRes = await usecase.updateSystem(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);

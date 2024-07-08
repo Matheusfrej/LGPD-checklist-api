@@ -16,23 +16,23 @@ class UserRouter {
     this.router = Router();
 
     const verifyTokenBind = new VerifyTokenController(false);
-    const verifyToken = verifyTokenBind.verifyToken.bind(verifyTokenBind);
+    const verifyToken = verifyTokenBind.execute.bind(verifyTokenBind);
 
-    this.router.post("/login", new LoginController().login);
+    this.router.post("/login", new LoginController().execute);
 
     this.router.get("/token", verifyToken);
 
-    this.router.post("/users", new CreateUserController().createUser);
-    this.router.get("/users/:id", new GetUserController().getUser);
+    this.router.post("/users", new CreateUserController().execute);
+    this.router.get("/users/:id", new GetUserController().execute);
     this.router.delete(
       "/users/:id",
       verifyTokenMiddleware,
-      new DeleteUserController().deleteUser,
+      new DeleteUserController().execute,
     );
     this.router.put(
       "/users/:id",
       verifyTokenMiddleware,
-      new UpdateUserController().updateUser,
+      new UpdateUserController().execute,
     );
   }
 

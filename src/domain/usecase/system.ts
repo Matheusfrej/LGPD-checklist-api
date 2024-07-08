@@ -1,5 +1,4 @@
 import * as systemValidateInterface from "../usecase/validate/system";
-import * as systemRepositoryInterface from "../usecase/repository/system";
 import * as systemUcioInterface from "../usecase/ucio/system";
 import {
   INTERNAL_SERVER_ERROR_MESSAGE,
@@ -8,27 +7,31 @@ import {
   TAG_INTERNAL_SERVER_ERROR,
   TAG_PRE_CONDITIONAL_ERROR,
 } from "../entity/error";
+import { SystemRepositoryInterface } from "./repository/system";
+import { UserRepositoryInterface } from "./repository/user";
 
 class CreateSystemUseCase {
-  public validate: systemValidateInterface.CreateSystemUseCaseValidateInterface;
-  public repository: systemRepositoryInterface.CreateSystemUseCaseRepositoryInterface;
+  public validate: systemValidateInterface.CreateSystemUseCaseValidate;
+  public systemRepository: SystemRepositoryInterface;
 
   constructor(
-    validate: systemValidateInterface.CreateSystemUseCaseValidateInterface,
-    repository: systemRepositoryInterface.CreateSystemUseCaseRepositoryInterface,
+    systemRepository: SystemRepositoryInterface,
+    userRepository: UserRepositoryInterface,
   ) {
-    this.validate = validate;
-    this.repository = repository;
+    this.validate = new systemValidateInterface.CreateSystemUseCaseValidate(
+      userRepository,
+    );
+    this.systemRepository = systemRepository;
   }
 
-  async createSystem(
+  async execute(
     req: systemUcioInterface.CreateSystemUseCaseRequest,
   ): Promise<systemUcioInterface.CreateSystemUseCaseResponse> {
     try {
-      const messageError = await this.validate.createSystem(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const systemResp = await this.repository.createSystem(req);
+        const systemResp = await this.systemRepository.createSystem(req);
 
         return new systemUcioInterface.CreateSystemUseCaseResponse(
           systemResp,
@@ -52,25 +55,29 @@ class CreateSystemUseCase {
 }
 
 class ListSystemsByUserIdUseCase {
-  public validate: systemValidateInterface.ListSystemsByUserIdUseCaseValidateInterface;
-  public repository: systemRepositoryInterface.ListSystemsByUserIdUseCaseRepositoryInterface;
+  public validate: systemValidateInterface.ListSystemsByUserIdUseCaseValidate;
+  public systemRepository: SystemRepositoryInterface;
 
   constructor(
-    validate: systemValidateInterface.ListSystemsByUserIdUseCaseValidateInterface,
-    repository: systemRepositoryInterface.ListSystemsByUserIdUseCaseRepositoryInterface,
+    systemRepository: SystemRepositoryInterface,
+    userRepository: UserRepositoryInterface,
   ) {
-    this.validate = validate;
-    this.repository = repository;
+    this.validate =
+      new systemValidateInterface.ListSystemsByUserIdUseCaseValidate(
+        userRepository,
+      );
+    this.systemRepository = systemRepository;
   }
 
-  async listSystemsByUserId(
+  async execute(
     req: systemUcioInterface.ListSystemsByUserIdUseCaseRequest,
   ): Promise<systemUcioInterface.ListSystemsByUserIdUseCaseResponse> {
     try {
-      const messageError = await this.validate.listSystemsByUserId(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const systemsResp = await this.repository.listSystemsByUserId(req);
+        const systemsResp =
+          await this.systemRepository.listSystemsByUserId(req);
 
         return new systemUcioInterface.ListSystemsByUserIdUseCaseResponse(
           systemsResp,
@@ -94,25 +101,22 @@ class ListSystemsByUserIdUseCase {
 }
 
 class GetSystemUseCase {
-  public validate: systemValidateInterface.GetSystemUseCaseValidateInterface;
-  public repository: systemRepositoryInterface.GetSystemUseCaseRepositoryInterface;
+  public validate: systemValidateInterface.GetSystemUseCaseValidate;
+  public systemRepository: SystemRepositoryInterface;
 
-  constructor(
-    validate: systemValidateInterface.GetSystemUseCaseValidateInterface,
-    repository: systemRepositoryInterface.GetSystemUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(systemRepository: SystemRepositoryInterface) {
+    this.validate = new systemValidateInterface.GetSystemUseCaseValidate();
+    this.systemRepository = systemRepository;
   }
 
-  async getSystem(
+  async execute(
     req: systemUcioInterface.GetSystemUseCaseRequest,
   ): Promise<systemUcioInterface.GetSystemUseCaseResponse> {
     try {
-      const messageError = await this.validate.getSystem(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const system = await this.repository.getSystem(req);
+        const system = await this.systemRepository.getSystem(req);
 
         if (system) {
           return new systemUcioInterface.GetSystemUseCaseResponse(system, null);
@@ -139,24 +143,23 @@ class GetSystemUseCase {
 }
 
 class DeleteSystemUseCase {
-  public validate: systemValidateInterface.DeleteSystemUseCaseValidateInterface;
-  public repository: systemRepositoryInterface.DeleteSystemUseCaseRepositoryInterface;
+  public validate: systemValidateInterface.DeleteSystemUseCaseValidate;
+  public systemRepository: SystemRepositoryInterface;
 
-  constructor(
-    validate: systemValidateInterface.DeleteSystemUseCaseValidateInterface,
-    repository: systemRepositoryInterface.DeleteSystemUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(systemRepository: SystemRepositoryInterface) {
+    this.validate = new systemValidateInterface.DeleteSystemUseCaseValidate(
+      systemRepository,
+    );
+    this.systemRepository = systemRepository;
   }
 
-  async deleteSystem(
+  async execute(
     req: systemUcioInterface.DeleteSystemUseCaseRequest,
   ): Promise<systemUcioInterface.DeleteSystemUseCaseResponse> {
     try {
-      const messageError = await this.validate.deleteSystem(req);
+      const messageError = await this.validate.validate(req);
       if (!messageError) {
-        await this.repository.deleteSystem(req);
+        await this.systemRepository.deleteSystem(req);
 
         return new systemUcioInterface.DeleteSystemUseCaseResponse(null);
       } else {
@@ -174,25 +177,24 @@ class DeleteSystemUseCase {
 }
 
 class UpdateSystemUseCase {
-  public validate: systemValidateInterface.UpdateSystemUseCaseValidateInterface;
-  public repository: systemRepositoryInterface.UpdateSystemUseCaseRepositoryInterface;
+  public validate: systemValidateInterface.UpdateSystemUseCaseValidate;
+  public systemRepository: SystemRepositoryInterface;
 
-  constructor(
-    validate: systemValidateInterface.UpdateSystemUseCaseValidateInterface,
-    repository: systemRepositoryInterface.UpdateSystemUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(systemRepository: SystemRepositoryInterface) {
+    this.validate = new systemValidateInterface.UpdateSystemUseCaseValidate(
+      systemRepository,
+    );
+    this.systemRepository = systemRepository;
   }
 
-  async updateSystem(
+  async execute(
     req: systemUcioInterface.UpdateSystemUseCaseRequest,
   ): Promise<systemUcioInterface.UpdateSystemUseCaseResponse> {
     try {
-      const messageError = await this.validate.updateSystem(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        await this.repository.updateSystem(req);
+        await this.systemRepository.updateSystem(req);
 
         return new systemUcioInterface.UpdateSystemUseCaseResponse(null);
       } else {
