@@ -1,4 +1,3 @@
-import * as userRepositoryInterface from "./repository/user";
 import * as userValidateInterface from "./validate/user";
 import * as userUcioInterface from "./ucio/user";
 import { genSaltSync, hashSync } from "bcryptjs";
@@ -9,24 +8,24 @@ import {
   newInternalServerError,
   newPreConditionalError,
 } from "../entity/error";
+import { UserRepositoryInterface } from "./repository/user";
 
 class CreateUserUseCase {
-  public validate: userValidateInterface.CreateUserUseCaseValidateInterface;
-  public repository: userRepositoryInterface.CreateUserUseCaseRepositoryInterface;
+  public validate: userValidateInterface.CreateUserUseCaseValidate;
+  public repository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.CreateUserUseCaseValidateInterface,
-    repository: userRepositoryInterface.CreateUserUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
+  constructor(repository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.CreateUserUseCaseValidate(
+      repository,
+    );
     this.repository = repository;
   }
 
-  async createUser(
+  async execute(
     req: userUcioInterface.CreateUserUseCaseRequest,
   ): Promise<userUcioInterface.CreateUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.createUser(this.repository, req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         const salt = genSaltSync(11);
@@ -54,22 +53,19 @@ class CreateUserUseCase {
 }
 
 class LoginUseCase {
-  public validate: userValidateInterface.LoginUseCaseValidateInterface;
-  public repository: userRepositoryInterface.LoginUseCaseRepositoryInterface;
+  public validate: userValidateInterface.LoginUseCaseValidate;
+  public repository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.LoginUseCaseValidateInterface,
-    repository: userRepositoryInterface.LoginUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
+  constructor(repository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.LoginUseCaseValidate();
     this.repository = repository;
   }
 
-  async login(
+  async execute(
     req: userUcioInterface.LoginUseCaseRequest,
   ): Promise<userUcioInterface.LoginUseCaseResponse> {
     try {
-      const messageError = await this.validate.login(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         const userResp = await this.repository.login(req);
@@ -109,23 +105,20 @@ class LoginUseCase {
 }
 
 class VerifyTokenUseCase {
-  public validate: userValidateInterface.VerifyTokenUseCaseValidateInterface;
-  public repository: userRepositoryInterface.VerifyTokenUseCaseRepositoryInterface;
+  public validate: userValidateInterface.VerifyTokenUseCaseValidate;
+  public repository: UserRepositoryInterface;
   public req: userUcioInterface.VerifyTokenUseCaseRequest;
 
-  constructor(
-    validate: userValidateInterface.VerifyTokenUseCaseValidateInterface,
-    repository: userRepositoryInterface.VerifyTokenUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
+  constructor(repository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.VerifyTokenUseCaseValidate();
     this.repository = repository;
   }
 
-  async verifyToken(
+  async execute(
     req: userUcioInterface.VerifyTokenUseCaseRequest,
   ): Promise<userUcioInterface.VerifyTokenUseCaseResponse> {
     try {
-      const messageError = await this.validate.verifyToken(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         const userIsValid = await this.repository.verifyToken(req.token);
@@ -174,22 +167,21 @@ class VerifyTokenUseCase {
 }
 
 class UpdateUserUseCase {
-  public validate: userValidateInterface.UpdateUserUseCaseValidateInterface;
-  public repository: userRepositoryInterface.UpdateUserUseCaseRepositoryInterface;
+  public validate: userValidateInterface.UpdateUserUseCaseValidate;
+  public repository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.UpdateUserUseCaseValidateInterface,
-    repository: userRepositoryInterface.UpdateUserUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
+  constructor(repository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.UpdateUserUseCaseValidate(
+      repository,
+    );
     this.repository = repository;
   }
 
-  async updateUser(
+  async execute(
     req: userUcioInterface.UpdateUserUseCaseRequest,
   ): Promise<userUcioInterface.UpdateUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.updateUser(this.repository, req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         await this.repository.updateUser(req);
@@ -211,25 +203,22 @@ class UpdateUserUseCase {
 }
 
 class GetUserUseCase {
-  public validate: userValidateInterface.GetUserUseCaseValidateInterface;
-  public repository: userRepositoryInterface.GetUserUseCaseRepositoryInterface;
+  public validate: userValidateInterface.GetUserUseCaseValidate;
+  public repository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.GetUserUseCaseValidateInterface,
-    repository: userRepositoryInterface.GetUserUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
+  constructor(repository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.GetUserUseCaseValidate();
     this.repository = repository;
   }
 
-  async getUser(
+  async execute(
     req: userUcioInterface.GetUserUseCaseRequest,
   ): Promise<userUcioInterface.GetUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.getUser(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const user = await this.repository.getUser(req);
+        const user = await this.repository.getUser(req.id);
 
         if (user) {
           return new userUcioInterface.GetUserUseCaseResponse(user, null);
@@ -257,22 +246,21 @@ class GetUserUseCase {
 }
 
 class DeleteUserUseCase {
-  public validate: userValidateInterface.DeleteUserUseCaseValidateInterface;
-  public repository: userRepositoryInterface.DeleteUserUseCaseRepositoryInterface;
+  public validate: userValidateInterface.DeleteUserUseCaseValidate;
+  public repository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.DeleteUserUseCaseValidateInterface,
-    repository: userRepositoryInterface.DeleteUserUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
+  constructor(repository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.DeleteUserUseCaseValidate(
+      repository,
+    );
     this.repository = repository;
   }
 
-  async deleteUser(
+  async execute(
     req: userUcioInterface.DeleteUserUseCaseRequest,
   ): Promise<userUcioInterface.DeleteUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.deleteUser(this.repository, req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         await this.repository.deleteUser(req);

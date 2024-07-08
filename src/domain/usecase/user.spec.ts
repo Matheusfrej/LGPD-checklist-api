@@ -3,24 +3,19 @@ import { CreateUserUseCase, LoginUseCase } from "./user";
 import { compareSync, genSaltSync, hashSync } from "bcryptjs";
 import { ErrorEntity, PRE_CONDITIONAL_ERROR_CODE } from "../entity/error";
 import { UserInMemoryRepository } from "../../../test/repository/user";
-import {
-  CreateUserUseCaseValidate,
-  LoginUseCaseValidate,
-} from "../../infrastructure/provider/validate/user";
+
+let repository: UserInMemoryRepository;
 
 describe("Create User Use Case", () => {
-  let repository: UserInMemoryRepository;
-  let validate: CreateUserUseCaseValidate;
   let useCase: CreateUserUseCase;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
-    validate = new CreateUserUseCaseValidate();
-    useCase = new CreateUserUseCase(validate, repository);
+    useCase = new CreateUserUseCase(repository);
   });
 
   it("should create user", async () => {
-    const result = await useCase.createUser({
+    const result = await useCase.execute({
       name: "Fulano",
       email: "fulano@exemplo.com",
       office: "Desenvolvedor",
@@ -33,7 +28,7 @@ describe("Create User Use Case", () => {
   });
 
   it("should hash user password uppon user creation", async () => {
-    const result = await useCase.createUser({
+    const result = await useCase.execute({
       name: "Fulano",
       email: "fulano@exemplo.com",
       office: "Desenvolvedor",
@@ -51,14 +46,14 @@ describe("Create User Use Case", () => {
   it("should not be able to create user with same email twice", async () => {
     const email = "fulano@exemplo.com";
 
-    await useCase.createUser({
+    await useCase.execute({
       name: "Fulano",
       email,
       office: "Desenvolvedor",
       password: "Teste123!",
     });
 
-    const result = await useCase.createUser({
+    const result = await useCase.execute({
       name: "John Doe",
       email,
       office: "Desenvolvedor",
@@ -70,7 +65,7 @@ describe("Create User Use Case", () => {
   });
 
   it("should not be able to create user with weak password", async () => {
-    const result = await useCase.createUser({
+    const result = await useCase.execute({
       name: "Fulano",
       email: "fulano@exemplo.com",
       office: "Desenvolvedor",
@@ -83,14 +78,11 @@ describe("Create User Use Case", () => {
 });
 
 describe("Login Use Case", () => {
-  let repository: UserInMemoryRepository;
-  let validate: LoginUseCaseValidate;
   let useCase: LoginUseCase;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
-    validate = new LoginUseCaseValidate();
-    useCase = new LoginUseCase(validate, repository);
+    useCase = new LoginUseCase(repository);
   });
 
   it("should be able to authenticate", async () => {
@@ -101,7 +93,7 @@ describe("Login Use Case", () => {
       password: hashSync("Teste123!", genSaltSync(11)),
     });
 
-    const result = await useCase.login({
+    const result = await useCase.execute({
       email: "fulano@exemplo.com",
       password: "Teste123!",
     });
@@ -110,7 +102,7 @@ describe("Login Use Case", () => {
   });
 
   it("should not be able to authenticate with wrong email", async () => {
-    const result = await useCase.login({
+    const result = await useCase.execute({
       email: "fulano@exemplo.com",
       password: "Teste123!",
     });
@@ -127,7 +119,7 @@ describe("Login Use Case", () => {
       password: hashSync("Teste123!", genSaltSync(11)),
     });
 
-    const result = await useCase.login({
+    const result = await useCase.execute({
       email: "fulano@exemplo.com",
       password: "123Teste!",
     });
@@ -144,7 +136,7 @@ describe("Login Use Case", () => {
       password: hashSync("Teste123!", genSaltSync(11)),
     });
 
-    const result = await useCase.login({
+    const result = await useCase.execute({
       email: "fulano@exemplo.com",
       password: "Teste123!",
     });

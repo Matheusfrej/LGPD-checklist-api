@@ -1,12 +1,11 @@
 import * as userUseCase from "@/domain/usecase/user";
 import * as userUcio from "@/domain/usecase/ucio/user";
-import * as userValidate from "@/infrastructure/provider/validate/user";
-import * as userRepository from "@/infrastructure/provider/repository/user";
 import {
   InternalServerErrorResponse,
   SuccessResponse,
 } from "../response/response";
 import { NextFunction, Request, Response } from "express";
+import { UserPrismaRepository } from "../../../../infrastructure/provider/repository/user";
 
 class CreateUserController {
   async createUser(req: Request, res: Response) {
@@ -19,11 +18,10 @@ class CreateUserController {
       password,
     );
 
-    const validate = new userValidate.CreateUserUseCaseValidate();
-    const repository = new userRepository.CreateUserUseCaseRepository();
-    const usecase = new userUseCase.CreateUserUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.CreateUserUseCase(repository);
 
-    const ucRes = await usecase.createUser(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { user: ucRes.user });
@@ -39,11 +37,10 @@ class LoginController {
 
     const ucReq = new userUcio.LoginUseCaseRequest(email, password);
 
-    const validate = new userValidate.LoginUseCaseValidate();
-    const repository = new userRepository.LoginUseCaseRepository();
-    const usecase = new userUseCase.LoginUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.LoginUseCase(repository);
 
-    const ucRes = await usecase.login(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, {
@@ -68,12 +65,20 @@ class VerifyTokenController {
 
     const ucReq = new userUcio.VerifyTokenUseCaseRequest(token);
 
-    const validate = new userValidate.VerifyTokenUseCaseValidate();
-    const repository = new userRepository.VerifyTokenUseCaseRepository();
-    const usecase = new userUseCase.VerifyTokenUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.VerifyTokenUseCase(repository);
 
-    const ucRes = await usecase.verifyToken(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
+    this.checkIfItIsMiddleware(req, res, next, ucRes);
+  }
+
+  checkIfItIsMiddleware(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    ucRes: userUcio.VerifyTokenUseCaseResponse,
+  ) {
     if (this.isMiddleware) {
       if (!ucRes.error) {
         req.body.tokenUserId = ucRes.user.id;
@@ -106,11 +111,10 @@ class UpdateUserController {
       office,
     );
 
-    const validate = new userValidate.UpdateUserUseCaseValidate();
-    const repository = new userRepository.UpdateUserUseCaseRepository();
-    const usecase = new userUseCase.UpdateUserUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.UpdateUserUseCase(repository);
 
-    const ucRes = await usecase.updateUser(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);
@@ -126,11 +130,10 @@ class GetUserController {
 
     const ucReq = new userUcio.GetUserUseCaseRequest(+id);
 
-    const validate = new userValidate.GetUserUseCaseValidate();
-    const repository = new userRepository.GetUserUseCaseRepository();
-    const usecase = new userUseCase.GetUserUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.GetUserUseCase(repository);
 
-    const ucRes = await usecase.getUser(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { user: ucRes.user });
@@ -147,11 +150,10 @@ class DeleteUserController {
 
     const ucReq = new userUcio.DeleteUserUseCaseRequest(tokenUserId, +id);
 
-    const validate = new userValidate.DeleteUserUseCaseValidate();
-    const repository = new userRepository.DeleteUserUseCaseRepository();
-    const usecase = new userUseCase.DeleteUserUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.DeleteUserUseCase(repository);
 
-    const ucRes = await usecase.deleteUser(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);
