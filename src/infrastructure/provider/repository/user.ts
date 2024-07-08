@@ -7,6 +7,10 @@ import { encrypt, verifyToken } from "../../internal/crypto/jwt/jwt";
 class CreateUserUseCaseRepository
   implements userInterface.CreateUserUseCaseRepositoryInterface
 {
+  async checkUserByEmailExists(email: string, id: number): Promise<boolean> {
+    return await userService.checkUserByEmailExists(email, id);
+  }
+
   async createUser(
     user: userUcio.CreateUserUseCaseRequest,
   ): Promise<UserEntity> {
@@ -46,7 +50,11 @@ class VerifyTokenUseCaseRepository
 class UpdateUserUseCaseRepository
   implements userInterface.UpdateUserUseCaseRepositoryInterface
 {
-  updateUser(req: userUcio.UpdateUserUseCaseRequest) {
+  async getUser(id: number): Promise<UserEntity> {
+    return userService.getUser(id);
+  }
+
+  async updateUser(req: userUcio.UpdateUserUseCaseRequest) {
     return userService.updateUser(req);
   }
 }
@@ -62,6 +70,10 @@ class GetUserUseCaseRepository
 class DeleteUserUseCaseRepository
   implements userInterface.DeleteUserUseCaseRepositoryInterface
 {
+  async getUser(id: number): Promise<UserEntity> {
+    return userService.getUser(id);
+  }
+
   deleteUser(req: userUcio.DeleteUserUseCaseRequest) {
     return userService.deleteUser(req.id);
   }

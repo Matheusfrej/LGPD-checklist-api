@@ -1,4 +1,9 @@
 import {
+  CreateUserUseCaseRepositoryInterface,
+  DeleteUserUseCaseRepositoryInterface,
+  UpdateUserUseCaseRepositoryInterface,
+} from "../repository/user";
+import {
   CreateUserUseCaseRequest,
   DeleteUserUseCaseRequest,
   GetUserUseCaseRequest,
@@ -8,7 +13,10 @@ import {
 } from "../ucio/user";
 
 interface CreateUserUseCaseValidateInterface {
-  createUser(user: CreateUserUseCaseRequest): Promise<string>;
+  createUser(
+    repository: CreateUserUseCaseRepositoryInterface,
+    user: CreateUserUseCaseRequest,
+  ): Promise<string>;
 }
 
 interface LoginUseCaseValidateInterface {
@@ -20,7 +28,10 @@ interface VerifyTokenUseCaseValidateInterface {
 }
 
 interface UpdateUserUseCaseValidateInterface {
-  updateUser(req: UpdateUserUseCaseRequest): Promise<string>;
+  updateUser(
+    repository: UpdateUserUseCaseRepositoryInterface,
+    req: UpdateUserUseCaseRequest,
+  ): Promise<string>;
 }
 
 interface GetUserUseCaseValidateInterface {
@@ -28,7 +39,10 @@ interface GetUserUseCaseValidateInterface {
 }
 
 interface DeleteUserUseCaseValidateInterface {
-  deleteUser(req: DeleteUserUseCaseRequest): Promise<string>;
+  deleteUser(
+    repository: DeleteUserUseCaseRepositoryInterface,
+    req: DeleteUserUseCaseRequest,
+  ): Promise<string>;
 }
 
 export {

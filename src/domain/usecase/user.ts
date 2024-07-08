@@ -26,7 +26,7 @@ class CreateUserUseCase {
     req: userUcioInterface.CreateUserUseCaseRequest,
   ): Promise<userUcioInterface.CreateUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.createUser(req);
+      const messageError = await this.validate.createUser(this.repository, req);
 
       if (!messageError) {
         const salt = genSaltSync(11);
@@ -189,7 +189,7 @@ class UpdateUserUseCase {
     req: userUcioInterface.UpdateUserUseCaseRequest,
   ): Promise<userUcioInterface.UpdateUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.updateUser(req);
+      const messageError = await this.validate.updateUser(this.repository, req);
 
       if (!messageError) {
         await this.repository.updateUser(req);
@@ -272,7 +272,7 @@ class DeleteUserUseCase {
     req: userUcioInterface.DeleteUserUseCaseRequest,
   ): Promise<userUcioInterface.DeleteUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.deleteUser(req);
+      const messageError = await this.validate.deleteUser(this.repository, req);
 
       if (!messageError) {
         await this.repository.deleteUser(req);

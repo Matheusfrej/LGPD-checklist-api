@@ -8,16 +8,20 @@ import {
   VerifyTokenUseCaseRequest,
 } from "../../../domain/usecase/ucio/user";
 import { checkEmpty, validateEmail, validatePassword } from "./validate";
-import {
-  checkUserByEmailExists,
-  getUser,
-} from "../../internal/database/postgresql/user";
 import { NO_PERMISSION_MESSAGE } from "../../../domain/entity/error";
+import {
+  CreateUserUseCaseRepositoryInterface,
+  DeleteUserUseCaseRepositoryInterface,
+  UpdateUserUseCaseRepositoryInterface,
+} from "../../../domain/usecase/repository/user";
 
 class CreateUserUseCaseValidate
   implements userInterface.CreateUserUseCaseValidateInterface
 {
-  async createUser(req: CreateUserUseCaseRequest): Promise<string> {
+  async createUser(
+    repository: CreateUserUseCaseRepositoryInterface,
+    req: CreateUserUseCaseRequest,
+  ): Promise<string> {
     if (checkEmpty(req.name)) {
       return "O nome do usuário não pode ser vazio.";
     }
@@ -46,7 +50,7 @@ class CreateUserUseCaseValidate
       return "A senha deve ter pelo menos um caractere maiúsculo, um minúsculo, um número e um caractere especial (#?!@$%^&*-)";
     }
 
-    if (await checkUserByEmailExists(req.email, null)) {
+    if (await repository.checkUserByEmailExists(req.email, null)) {
       return "O email informado já existe.";
     }
 
@@ -85,7 +89,10 @@ class VerifyTokenUseCaseValidate
 class UpdateUserUseCaseValidate
   implements userInterface.UpdateUserUseCaseValidateInterface
 {
-  async updateUser(req: UpdateUserUseCaseRequest): Promise<string> {
+  async updateUser(
+    repository: UpdateUserUseCaseRepositoryInterface,
+    req: UpdateUserUseCaseRequest,
+  ): Promise<string> {
     if (checkEmpty(req.id)) {
       return "O id não pode ser vazio.";
     }
@@ -95,7 +102,7 @@ class UpdateUserUseCaseValidate
     if (checkEmpty(req.office)) {
       return "O cargo/função não pode ser vazio.";
     }
-    if (!(await getUser(req.id))) {
+    if (!(await repository.getUser(req.id))) {
       return "O usuário informado não existe";
     }
     if (req.tokenUserId !== req.id) {
@@ -121,11 +128,14 @@ class GetUserUseCaseValidate
 class DeleteUserUseCaseValidate
   implements userInterface.DeleteUserUseCaseValidateInterface
 {
-  async deleteUser(req: DeleteUserUseCaseRequest): Promise<string> {
+  async deleteUser(
+    repository: DeleteUserUseCaseRepositoryInterface,
+    req: DeleteUserUseCaseRequest,
+  ): Promise<string> {
     if (checkEmpty(req.id)) {
       return "O id não pode ser vazio.";
     }
-    if (!(await getUser(req.id))) {
+    if (!(await repository.getUser(req.id))) {
       return "O usuário informado não existe";
     }
     if (req.tokenUserId !== req.id) {

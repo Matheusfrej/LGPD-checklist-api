@@ -8,6 +8,7 @@ import {
 } from "../ucio/user";
 
 interface CreateUserUseCaseRepositoryInterface {
+  checkUserByEmailExists(email: string, id: number): Promise<boolean>;
   createUser(req: CreateUserUseCaseRequest): Promise<UserEntity>;
 }
 
@@ -27,6 +28,8 @@ interface VerifyTokenUseCaseRepositoryInterface {
 }
 
 interface UpdateUserUseCaseRepositoryInterface {
+  getUser(id: number): Promise<UserEntity>;
+
   updateUser(req: UpdateUserUseCaseRequest): Promise<UserEntity>;
 }
 
@@ -35,6 +38,8 @@ interface GetUserUseCaseRepositoryInterface {
 }
 
 interface DeleteUserUseCaseRepositoryInterface {
+  getUser(id: number): Promise<UserEntity>;
+
   deleteUser(req: DeleteUserUseCaseRequest): Promise<void>;
 }
 
