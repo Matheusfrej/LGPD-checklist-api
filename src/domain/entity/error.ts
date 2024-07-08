@@ -6,8 +6,8 @@ const INTERNAL_SERVER_ERROR_MESSAGE = "Erro interno do servidor";
 const NO_PERMISSION_MESSAGE = "Você não tem permissão para isso.";
 
 class ErrorEntity {
-  private code: number;
-  private message: string;
+  public code: number;
+  public message: string;
 
   constructor(code: number, message: string) {
     this.code = code;
@@ -30,5 +30,7 @@ export {
   TAG_INTERNAL_SERVER_ERROR,
   TAG_PRE_CONDITIONAL_ERROR,
   INTERNAL_SERVER_ERROR_MESSAGE,
+  PRE_CONDITIONAL_ERROR_CODE,
+  INTERNAL_SERVER_ERROR_CODE,
   NO_PERMISSION_MESSAGE,
 };
