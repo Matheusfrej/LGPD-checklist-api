@@ -1,15 +1,16 @@
 import * as checklistUseCase from "@/domain/usecase/checklist";
 import * as checklistUcio from "@/domain/usecase/ucio/checklist";
-import * as checklistValidate from "@/infrastructure/provider/validate/checklist";
-import * as checklistRepository from "@/infrastructure/provider/repository/checklist";
 import { Request, Response } from "express";
 import {
   InternalServerErrorResponse,
   SuccessResponse,
 } from "../response/response";
+import { ChecklistPrismaRepository } from "@/infrastructure/provider/repository/checklist";
+import { SystemPrismaRepository } from "@/infrastructure/provider/repository/system";
+import { UserPrismaRepository } from "@/infrastructure/provider/repository/user";
 
 class CreateChecklistController {
-  async createChecklist(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { tokenUserId, userId, systemId, checklistData, isGeneral, isIoT } =
       req.body;
 
@@ -22,15 +23,16 @@ class CreateChecklistController {
       isIoT,
     );
 
-    const validate = new checklistValidate.CreateChecklistUseCaseValidate();
-    const repository =
-      new checklistRepository.CreateChecklistUseCaseRepository();
+    const checklistRepository = new ChecklistPrismaRepository();
+    const systemRepository = new SystemPrismaRepository();
+    const userRepository = new UserPrismaRepository();
     const usecase = new checklistUseCase.CreateChecklistUseCase(
-      validate,
-      repository,
+      checklistRepository,
+      systemRepository,
+      userRepository,
     );
 
-    const ucRes = await usecase.createChecklist(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { checklist: ucRes.checklist });
@@ -41,7 +43,7 @@ class CreateChecklistController {
 }
 
 class GetChecklistController {
-  async getChecklist(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
@@ -50,14 +52,12 @@ class GetChecklistController {
       +id,
     );
 
-    const validate = new checklistValidate.GetChecklistUseCaseValidate();
-    const repository = new checklistRepository.GetChecklistUseCaseRepository();
+    const checklistRepository = new ChecklistPrismaRepository();
     const usecase = new checklistUseCase.GetChecklistUseCase(
-      validate,
-      repository,
+      checklistRepository,
     );
 
-    const ucRes = await usecase.getChecklist(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { checklist: ucRes.checklist });
@@ -68,7 +68,7 @@ class GetChecklistController {
 }
 
 class DeleteChecklistController {
-  async deleteChecklist(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
@@ -77,15 +77,12 @@ class DeleteChecklistController {
       +id,
     );
 
-    const validate = new checklistValidate.DeleteChecklistUseCaseValidate();
-    const repository =
-      new checklistRepository.DeleteChecklistUseCaseRepository();
+    const checklistRepository = new ChecklistPrismaRepository();
     const usecase = new checklistUseCase.DeleteChecklistUseCase(
-      validate,
-      repository,
+      checklistRepository,
     );
 
-    const ucRes = await usecase.deleteChecklist(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);
@@ -96,7 +93,7 @@ class DeleteChecklistController {
 }
 
 class UpdateChecklistController {
-  async updateChecklist(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId, systemId, checklistData, isGeneral, isIoT } = req.body;
 
@@ -109,15 +106,14 @@ class UpdateChecklistController {
       isIoT,
     );
 
-    const validate = new checklistValidate.UpdateChecklistUseCaseValidate();
-    const repository =
-      new checklistRepository.UpdateChecklistUseCaseRepository();
+    const checklistRepository = new ChecklistPrismaRepository();
+    const systemRepository = new SystemPrismaRepository();
     const usecase = new checklistUseCase.UpdateChecklistUseCase(
-      validate,
-      repository,
+      checklistRepository,
+      systemRepository,
     );
 
-    const ucRes = await usecase.updateChecklist(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);
@@ -128,7 +124,7 @@ class UpdateChecklistController {
 }
 
 class ListChecklistsByUserIdController {
-  async listChecklistsByUserId(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { userId } = req.params;
     const { tokenUserId } = req.body;
 
@@ -137,16 +133,14 @@ class ListChecklistsByUserIdController {
       +userId,
     );
 
-    const validate =
-      new checklistValidate.ListChecklistsByUserIdUseCaseValidate();
-    const repository =
-      new checklistRepository.ListChecklistsByUserIdUseCaseRepository();
+    const checklistRepository = new ChecklistPrismaRepository();
+    const userRepository = new UserPrismaRepository();
     const usecase = new checklistUseCase.ListChecklistsByUserIdUseCase(
-      validate,
-      repository,
+      checklistRepository,
+      userRepository,
     );
 
-    const ucRes = await usecase.listChecklistsByUserId(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { checklists: ucRes.checklists });
@@ -157,7 +151,7 @@ class ListChecklistsByUserIdController {
 }
 
 class ListChecklistsBySystemIdController {
-  async listChecklistsBySystemId(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { systemId } = req.params;
     const { tokenUserId } = req.body;
 
@@ -166,16 +160,14 @@ class ListChecklistsBySystemIdController {
       +systemId,
     );
 
-    const validate =
-      new checklistValidate.ListChecklistsBySystemIdUseCaseValidate();
-    const repository =
-      new checklistRepository.ListChecklistsBySystemIdUseCaseRepository();
+    const checklistRepository = new ChecklistPrismaRepository();
+    const systemRepository = new SystemPrismaRepository();
     const usecase = new checklistUseCase.ListChecklistsBySystemIdUseCase(
-      validate,
-      repository,
+      checklistRepository,
+      systemRepository,
     );
 
-    const ucRes = await usecase.listChecklistsBySystemId(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { checklists: ucRes.checklists });

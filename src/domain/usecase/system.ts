@@ -116,7 +116,7 @@ class GetSystemUseCase {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const system = await this.systemRepository.getSystem(req);
+        const system = await this.systemRepository.getSystem(req.id);
 
         if (system) {
           return new systemUcioInterface.GetSystemUseCaseResponse(system, null);

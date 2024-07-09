@@ -82,7 +82,7 @@ class DeleteSystemUseCaseValidate {
       return "O id do sistema não pode ser vazio.";
     }
 
-    const system = await this.systemRepository.getSystem(req);
+    const system = await this.systemRepository.getSystem(req.id);
 
     if (!system) {
       return "O sistema informado não existe.";
@@ -114,7 +114,7 @@ class UpdateSystemUseCaseValidate {
       return "A descrição do sistema não pode ser vazia.";
     }
 
-    const system = await this.systemRepository.getSystem(req);
+    const system = await this.systemRepository.getSystem(req.id);
 
     if (!system) {
       return "O sistema informado não existe.";

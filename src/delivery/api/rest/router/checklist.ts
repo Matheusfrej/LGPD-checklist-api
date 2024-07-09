@@ -18,32 +18,32 @@ class ChecklistRouter {
     this.router.post(
       "/checklists",
       verifyTokenMiddleware,
-      new CreateChecklistController().createChecklist,
+      new CreateChecklistController().execute,
     );
     this.router.get(
       "/checklists/:id",
       verifyTokenMiddleware,
-      new GetChecklistController().getChecklist,
+      new GetChecklistController().execute,
     );
     this.router.get(
       "/checklistsByUserId/:userId",
       verifyTokenMiddleware,
-      new ListChecklistsByUserIdController().listChecklistsByUserId,
+      new ListChecklistsByUserIdController().execute,
     );
     this.router.get(
       "/checklistsBySystemId/:systemId",
       verifyTokenMiddleware,
-      new ListChecklistsBySystemIdController().listChecklistsBySystemId,
+      new ListChecklistsBySystemIdController().execute,
     );
     this.router.delete(
       "/checklists/:id",
       verifyTokenMiddleware,
-      new DeleteChecklistController().deleteChecklist,
+      new DeleteChecklistController().execute,
     );
     this.router.put(
       "/checklists/:id",
       verifyTokenMiddleware,
-      new UpdateChecklistController().updateChecklist,
+      new UpdateChecklistController().execute,
     );
   }
 

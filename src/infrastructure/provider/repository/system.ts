@@ -3,7 +3,6 @@ import { SystemEntity } from "@/domain/entity/system";
 import {
   CreateSystemUseCaseRequest,
   DeleteSystemUseCaseRequest,
-  GetSystemUseCaseRequest,
   ListSystemsByUserIdUseCaseRequest,
   UpdateSystemUseCaseRequest,
 } from "../../../domain/usecase/ucio/system";
@@ -20,8 +19,8 @@ class SystemPrismaRepository implements SystemRepositoryInterface {
     return await systemService.listSystemsByUserId(req.userId);
   }
 
-  async getSystem(req: GetSystemUseCaseRequest): Promise<SystemEntity> {
-    return await systemService.getSystem(req.id);
+  async getSystem(id: number): Promise<SystemEntity> {
+    return await systemService.getSystem(id);
   }
 
   async deleteSystem(req: DeleteSystemUseCaseRequest): Promise<void> {
