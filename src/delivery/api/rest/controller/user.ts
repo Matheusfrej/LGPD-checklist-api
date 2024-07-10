@@ -6,6 +6,7 @@ import {
 } from "../response/response";
 import { NextFunction, Request, Response } from "express";
 import { UserPrismaRepository } from "../../../../infrastructure/provider/repository/user";
+import { AuthJWTRepository } from "../../../../infrastructure/provider/repository/auth";
 
 class CreateUserController {
   async execute(req: Request, res: Response) {
@@ -37,8 +38,12 @@ class LoginController {
 
     const ucReq = new userUcio.LoginUseCaseRequest(email, password);
 
-    const repository = new UserPrismaRepository();
-    const usecase = new userUseCase.LoginUseCase(repository);
+    const userRepository = new UserPrismaRepository();
+    const authRepository = new AuthJWTRepository();
+    const usecase = new userUseCase.LoginUseCase(
+      userRepository,
+      authRepository,
+    );
 
     const ucRes = await usecase.execute(ucReq);
 
@@ -65,8 +70,12 @@ class VerifyTokenController {
 
     const ucReq = new userUcio.VerifyTokenUseCaseRequest(token);
 
-    const repository = new UserPrismaRepository();
-    const usecase = new userUseCase.VerifyTokenUseCase(repository);
+    const userRepository = new UserPrismaRepository();
+    const authRepository = new AuthJWTRepository();
+    const usecase = new userUseCase.VerifyTokenUseCase(
+      userRepository,
+      authRepository,
+    );
 
     const ucRes = await usecase.execute(ucReq);
 

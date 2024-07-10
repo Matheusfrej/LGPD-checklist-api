@@ -1,4 +1,6 @@
-function checkEmpty(paramether: string | number | number[]): boolean {
+import { Json } from "../../@types";
+
+function checkEmpty(paramether: string | number | number[] | Json): boolean {
   if (typeof paramether === "string") {
     paramether = paramether.trim();
   }

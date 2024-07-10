@@ -9,6 +9,7 @@ import {
   newPreConditionalError,
 } from "../entity/error";
 import { UserRepositoryInterface } from "./repository/user";
+import { AuthRepositoryInterface } from "./repository/auth";
 
 class CreateUserUseCase {
   public validate: userValidateInterface.CreateUserUseCaseValidate;
@@ -55,10 +56,15 @@ class CreateUserUseCase {
 class LoginUseCase {
   public validate: userValidateInterface.LoginUseCaseValidate;
   public userRepository: UserRepositoryInterface;
+  public authRepository: AuthRepositoryInterface;
 
-  constructor(userRepository: UserRepositoryInterface) {
+  constructor(
+    userRepository: UserRepositoryInterface,
+    authRepository: AuthRepositoryInterface,
+  ) {
     this.validate = new userValidateInterface.LoginUseCaseValidate();
     this.userRepository = userRepository;
+    this.authRepository = authRepository;
   }
 
   async execute(
@@ -71,7 +77,7 @@ class LoginUseCase {
         const userResp = await this.userRepository.login(req);
 
         if (userResp) {
-          const token = this.userRepository.createToken(userResp.id);
+          const token = this.authRepository.createToken(userResp.id);
 
           return new userUcioInterface.LoginUseCaseResponse(
             userResp,
@@ -107,11 +113,15 @@ class LoginUseCase {
 class VerifyTokenUseCase {
   public validate: userValidateInterface.VerifyTokenUseCaseValidate;
   public userRepository: UserRepositoryInterface;
-  public req: userUcioInterface.VerifyTokenUseCaseRequest;
+  public authRepository: AuthRepositoryInterface;
 
-  constructor(userRepository: UserRepositoryInterface) {
+  constructor(
+    userRepository: UserRepositoryInterface,
+    authRepository: AuthRepositoryInterface,
+  ) {
     this.validate = new userValidateInterface.VerifyTokenUseCaseValidate();
     this.userRepository = userRepository;
+    this.authRepository = authRepository;
   }
 
   async execute(
@@ -121,9 +131,9 @@ class VerifyTokenUseCase {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const userIsValid = await this.userRepository.verifyToken(req.token);
+        const userIsValid = await this.authRepository.verifyToken(req.token);
 
-        if (userIsValid === "jwt expired" || userIsValid === "invalid token")
+        if (typeof userIsValid === "string")
           return new userUcioInterface.VerifyTokenUseCaseResponse(
             null,
             null,
@@ -133,7 +143,7 @@ class VerifyTokenUseCase {
         const user = await this.userRepository.getUser(userIsValid.id);
 
         if (user) {
-          const newToken = await this.userRepository.createToken(user.id);
+          const newToken = await this.authRepository.createToken(user.id);
 
           return new userUcioInterface.VerifyTokenUseCaseResponse(
             user,

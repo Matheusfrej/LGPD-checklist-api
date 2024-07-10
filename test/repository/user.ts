@@ -5,22 +5,6 @@ import { compareSync } from "bcryptjs";
 import { UserRepositoryInterface } from "../domain/usecase/repository/user";
 
 class UserInMemoryRepository implements UserRepositoryInterface {
-  getUser(id: number): Promise<UserEntity> {
-    throw new Error("Method not implemented.");
-  }
-
-  updateUser(req: userUcio.UpdateUserUseCaseRequest): Promise<UserEntity> {
-    throw new Error("Method not implemented.");
-  }
-
-  deleteUser(req: userUcio.DeleteUserUseCaseRequest): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
-  verifyToken(token: string) {
-    throw new Error("Method not implemented.");
-  }
-
   public items: UserEntity[] = [];
   private counter = 0;
 
@@ -67,8 +51,16 @@ class UserInMemoryRepository implements UserRepositoryInterface {
     return null;
   }
 
-  createToken(id: number): string {
-    return `${id}`;
+  getUser(id: number): Promise<UserEntity> {
+    throw new Error("Method not implemented.");
+  }
+
+  updateUser(req: userUcio.UpdateUserUseCaseRequest): Promise<UserEntity> {
+    throw new Error("Method not implemented.");
+  }
+
+  deleteUser(req: userUcio.DeleteUserUseCaseRequest): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 }
 

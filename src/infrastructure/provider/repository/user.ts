@@ -1,7 +1,6 @@
 import * as userService from "@/internal/database/postgresql/user";
 import * as userUcio from "@/domain/usecase/ucio/user";
 import { UserEntity } from "../../../domain/entity/user";
-import { encrypt, verifyToken } from "../../internal/crypto/jwt/jwt";
 import { UserRepositoryInterface } from "../../../domain/usecase/repository/user";
 
 class UserPrismaRepository implements UserRepositoryInterface {
@@ -17,15 +16,6 @@ class UserPrismaRepository implements UserRepositoryInterface {
 
   async login(req: userUcio.LoginUseCaseRequest): Promise<UserEntity> {
     return await userService.login(req);
-  }
-
-  createToken(id: number): string {
-    return encrypt(id);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  verifyToken(token: string): any {
-    return verifyToken(token);
   }
 
   getUser(id: number): Promise<UserEntity> {

@@ -3,15 +3,17 @@ import { CreateUserUseCase, LoginUseCase } from "./user";
 import { compareSync, genSaltSync, hashSync } from "bcryptjs";
 import { ErrorEntity, PRE_CONDITIONAL_ERROR_CODE } from "../entity/error";
 import { UserInMemoryRepository } from "../../../test/repository/user";
+import { AuthFakeRepository } from "../../../test/repository/auth";
 
-let repository: UserInMemoryRepository;
+let userRepository: UserInMemoryRepository;
+let authRepository: AuthFakeRepository;
 
 describe("Create User Use Case", () => {
   let useCase: CreateUserUseCase;
 
   beforeEach(() => {
-    repository = new UserInMemoryRepository();
-    useCase = new CreateUserUseCase(repository);
+    userRepository = new UserInMemoryRepository();
+    useCase = new CreateUserUseCase(userRepository);
   });
 
   it("should create user", async () => {
@@ -24,7 +26,7 @@ describe("Create User Use Case", () => {
 
     expect(result.error).toBe(null);
     expect(result.user.id).toEqual(expect.any(Number));
-    expect(repository.items[0]).toEqual(result.user);
+    expect(userRepository.items[0]).toEqual(result.user);
   });
 
   it("should hash user password uppon user creation", async () => {
@@ -81,12 +83,13 @@ describe("Login Use Case", () => {
   let useCase: LoginUseCase;
 
   beforeEach(() => {
-    repository = new UserInMemoryRepository();
-    useCase = new LoginUseCase(repository);
+    userRepository = new UserInMemoryRepository();
+    authRepository = new AuthFakeRepository();
+    useCase = new LoginUseCase(userRepository, authRepository);
   });
 
   it("should be able to authenticate", async () => {
-    await repository.createUser({
+    await userRepository.createUser({
       name: "Fulano",
       email: "fulano@exemplo.com",
       office: "Desenvolvedor",
@@ -112,7 +115,7 @@ describe("Login Use Case", () => {
   });
 
   it("should not be able to authenticate with wrong password", async () => {
-    await repository.createUser({
+    await userRepository.createUser({
       name: "Fulano",
       email: "fulano@exemplo.com",
       office: "Desenvolvedor",
@@ -129,7 +132,7 @@ describe("Login Use Case", () => {
   });
 
   it("should create token when authenticate", async () => {
-    await repository.createUser({
+    await userRepository.createUser({
       name: "Fulano",
       email: "fulano@exemplo.com",
       office: "Desenvolvedor",

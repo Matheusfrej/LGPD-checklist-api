@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Json } from "../../@types";
 import { ChecklistEntity } from "../../entity/checklist";
 import { ErrorEntity } from "../../entity/error";
 
@@ -6,7 +7,7 @@ class CreateChecklistUseCaseRequest {
   public tokenUserId: number;
   public userId: number;
   public systemId: number;
-  public checklistData: any;
+  public checklistData: Json;
   public isGeneral?: boolean;
   public isIot?: boolean;
 
@@ -14,7 +15,7 @@ class CreateChecklistUseCaseRequest {
     tokenUserId: number,
     userId: number,
     systemId: number,
-    checklistData: any,
+    checklistData: Json,
     isGeneral?: boolean,
     isIot?: boolean,
   ) {
@@ -79,7 +80,7 @@ class UpdateChecklistUseCaseRequest {
   public id: number;
   public tokenUserId: number;
   public systemId: number;
-  public checklistData: any;
+  public checklistData: Json;
   public isGeneral?: boolean;
   public isIot?: boolean;
 
@@ -87,7 +88,7 @@ class UpdateChecklistUseCaseRequest {
     id: number,
     tokenUserId: number,
     systemId: number,
-    checklistData: any,
+    checklistData: Json,
     isGeneral?: boolean,
     isIot?: boolean,
   ) {
