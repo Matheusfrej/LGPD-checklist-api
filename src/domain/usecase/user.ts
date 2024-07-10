@@ -241,6 +241,7 @@ class GetUserUseCase {
         if (user) {
           return new userUcioInterface.GetUserUseCaseResponse(user, null);
         } else {
+          console.log(`${TAG_PRE_CONDITIONAL_ERROR} Usuário não encontrado`);
           return new userUcioInterface.GetUserUseCaseResponse(
             user,
             newPreConditionalError("Usuário não encontrado"),

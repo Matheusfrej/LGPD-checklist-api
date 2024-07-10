@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as userUcio from "@/domain/usecase/ucio/user";
 import { UserEntity } from "../../src/domain/entity/user";
 import { compareSync } from "bcryptjs";
@@ -35,8 +34,6 @@ class UserInMemoryRepository implements UserRepositoryInterface {
     const userFound = this.items.find((item) => item.email === user.email);
 
     if (userFound && compareSync(user.password, userFound.password)) {
-      delete userFound.password;
-
       return userFound
         ? new UserEntity(
             userFound.id,
@@ -61,12 +58,23 @@ class UserInMemoryRepository implements UserRepositoryInterface {
     return user;
   }
 
-  updateUser(req: userUcio.UpdateUserUseCaseRequest): Promise<UserEntity> {
-    throw new Error("Method not implemented.");
+  async updateUser(
+    req: userUcio.UpdateUserUseCaseRequest,
+  ): Promise<UserEntity> {
+    const index = this.items.findIndex((item) => item.id === req.id);
+
+    if (index === -1) {
+      return null;
+    }
+
+    this.items[index].name = req.name;
+    this.items[index].office = req.office;
+
+    return this.items[index];
   }
 
-  deleteUser(req: userUcio.DeleteUserUseCaseRequest): Promise<void> {
-    throw new Error("Method not implemented.");
+  async deleteUser(req: userUcio.DeleteUserUseCaseRequest): Promise<void> {
+    this.items = this.items.filter((item) => item.id !== req.id);
   }
 }
 
