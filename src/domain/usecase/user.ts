@@ -86,6 +86,9 @@ class LoginUseCase {
           );
         }
 
+        console.log(
+          `${TAG_PRE_CONDITIONAL_ERROR} E-mail e/ou Senha incorretos.`,
+        );
         return new userUcioInterface.LoginUseCaseResponse(
           null,
           null,
@@ -133,12 +136,14 @@ class VerifyTokenUseCase {
       if (!messageError) {
         const userIsValid = await this.authRepository.verifyToken(req.token);
 
-        if (typeof userIsValid === "string")
+        if (typeof userIsValid === "string") {
+          console.log(`${TAG_PRE_CONDITIONAL_ERROR} Sua sessão expirou`);
           return new userUcioInterface.VerifyTokenUseCaseResponse(
             null,
             null,
             newPreConditionalError("Sua sessão expirou"),
           );
+        }
 
         const user = await this.userRepository.getUser(userIsValid.id);
 
@@ -151,6 +156,9 @@ class VerifyTokenUseCase {
             null,
           );
         } else {
+          console.log(
+            `${TAG_PRE_CONDITIONAL_ERROR} Houve um erro com sua sessão, por favor, faça login novamente`,
+          );
           return new userUcioInterface.VerifyTokenUseCaseResponse(
             null,
             null,

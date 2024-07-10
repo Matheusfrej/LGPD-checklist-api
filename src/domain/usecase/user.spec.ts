@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { CreateUserUseCase, LoginUseCase } from "./user";
+import { CreateUserUseCase, LoginUseCase, VerifyTokenUseCase } from "./user";
 import { compareSync, genSaltSync, hashSync } from "bcryptjs";
 import { ErrorEntity, PRE_CONDITIONAL_ERROR_CODE } from "../entity/error";
 import { UserInMemoryRepository } from "../../../test/repository/user";
 import { AuthFakeRepository } from "../../../test/repository/auth";
+import { UserEntity } from "../entity/user";
 
 let userRepository: UserInMemoryRepository;
 let authRepository: AuthFakeRepository;
@@ -145,5 +146,50 @@ describe("Login Use Case", () => {
     });
 
     expect(result.token).toEqual(expect.any(String));
+  });
+});
+
+describe("Verify Token Use Case", () => {
+  let useCase: VerifyTokenUseCase;
+
+  beforeEach(() => {
+    userRepository = new UserInMemoryRepository();
+    authRepository = new AuthFakeRepository();
+    useCase = new VerifyTokenUseCase(userRepository, authRepository);
+  });
+
+  it("should verify token and authenticate", async () => {
+    await userRepository.createUser({
+      name: "Fulano",
+      email: "fulano@exemplo.com",
+      office: "Desenvolvedor",
+      password: hashSync("Teste123!", genSaltSync(11)),
+    });
+
+    const token = "1";
+
+    const result = await useCase.execute({ token });
+
+    expect(result.token).toEqual(expect.any(String));
+    expect(result.user).toBeInstanceOf(UserEntity);
+    expect(result.user.id).toBe(+token);
+  });
+
+  it("should fail to authenticate when user doesn't exist", async () => {
+    const token = "1";
+
+    const result = await useCase.execute({ token });
+
+    expect(result.error).toBeInstanceOf(ErrorEntity);
+    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+  });
+
+  it("should fail to authenticate with invalid token", async () => {
+    const token = "invalid token";
+
+    const result = await useCase.execute({ token });
+
+    expect(result.error).toBeInstanceOf(ErrorEntity);
+    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
   });
 });

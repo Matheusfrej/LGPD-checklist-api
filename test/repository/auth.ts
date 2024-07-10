@@ -6,6 +6,10 @@ class AuthFakeRepository implements AuthRepositoryInterface {
   }
 
   verifyToken(token: string) {
+    if (token === "invalid token") {
+      return token;
+    }
+
     return {
       id: +token,
       iat: 1,

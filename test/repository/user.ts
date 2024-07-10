@@ -17,13 +17,13 @@ class UserInMemoryRepository implements UserRepositoryInterface {
   async createUser(
     user: userUcio.CreateUserUseCaseRequest,
   ): Promise<UserEntity> {
-    const newUser: UserEntity = {
-      id: this.counter + 1,
-      name: user.name,
-      email: user.email,
-      office: user.office,
-      password: user.password,
-    };
+    const newUser = new UserEntity(
+      this.counter + 1,
+      user.name,
+      user.office,
+      user.email,
+      user.password,
+    );
     this.counter += 1;
 
     this.items.push(newUser);
@@ -51,8 +51,14 @@ class UserInMemoryRepository implements UserRepositoryInterface {
     return null;
   }
 
-  getUser(id: number): Promise<UserEntity> {
-    throw new Error("Method not implemented.");
+  async getUser(id: number): Promise<UserEntity> {
+    const user: UserEntity = this.items.find((item) => item.id === id);
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
   }
 
   updateUser(req: userUcio.UpdateUserUseCaseRequest): Promise<UserEntity> {
