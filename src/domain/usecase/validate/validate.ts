@@ -13,14 +13,30 @@ function checkEmpty(paramether: string | number | number[] | Json): boolean {
 const requiredErrorMessage = (fieldName: string) =>
   `${fieldName} não pode ser vazio.`;
 
-const zodStringSchema = (fieldName: string, minLength?: number) => {
+const zodStringSchema = (
+  fieldName: string,
+  minLength?: number,
+  maxLength?: number,
+) => {
   let schema = z.string({
     invalid_type_error: `${fieldName} deve ser uma string`,
     required_error: requiredErrorMessage(fieldName),
   });
 
   if (minLength) {
-    schema = schema.min(minLength, requiredErrorMessage(fieldName));
+    schema = schema.min(
+      minLength,
+      minLength === 1
+        ? requiredErrorMessage(fieldName)
+        : `${fieldName} deve ter no mínimo ${minLength} caracteres`,
+    );
+  }
+
+  if (maxLength) {
+    schema = schema.max(
+      maxLength,
+      `${fieldName} deve ter no máximo ${maxLength} caracteres`,
+    );
   }
 
   return schema;
