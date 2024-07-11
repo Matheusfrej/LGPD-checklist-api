@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { NO_PERMISSION_MESSAGE } from "../../entity/error";
 import { UserRepositoryInterface } from "../repository/user";
 import {
@@ -8,133 +9,129 @@ import {
   UpdateUserUseCaseRequest,
   VerifyTokenUseCaseRequest,
 } from "../ucio/user";
-import { checkEmpty, validateEmail, validatePassword } from "./validate";
+import { validateWithZod, zodNumberSchema, zodStringSchema } from "./validate";
 
 class CreateUserUseCaseValidate {
   private userRepository: UserRepositoryInterface;
+  private validationSchema = z.object({
+    name: zodStringSchema("Nome de usuário", 1),
+    office: zodStringSchema("Função/cargo", 1),
+    email: zodStringSchema("Email", 1).email(
+      "Insira o email no formato correto.",
+    ),
+    password: zodStringSchema("Senha", 6).regex(
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).*$/,
+      "A senha deve ter pelo menos um caractere maiúsculo, um minúsculo, um número e um caractere especial (#?!@$%^&*-).",
+    ),
+  });
 
   constructor(userRepository: UserRepositoryInterface) {
     this.userRepository = userRepository;
   }
 
   async validate(req: CreateUserUseCaseRequest): Promise<string> {
-    if (checkEmpty(req.name)) {
-      return "O nome do usuário não pode ser vazio.";
-    }
+    return await validateWithZod(
+      () => this.validationSchema.parse(req),
+      async () => {
+        if (await this.userRepository.checkUserByEmailExists(req.email)) {
+          return "O email informado já existe.";
+        }
 
-    if (checkEmpty(req.office)) {
-      return "A função/cargo não pode ser vazia";
-    }
-
-    if (checkEmpty(req.email)) {
-      return "O email não pode ser vazio.";
-    }
-
-    if (checkEmpty(req.password)) {
-      return "A senha não pode ser vazia.";
-    }
-
-    if (!validateEmail(req.email)) {
-      return "Insira o email no formato correto.";
-    }
-
-    if (req.password.length < 6) {
-      return "A senha deve ter no mínimo 6 caracteres";
-    }
-
-    if (!validatePassword(req.password)) {
-      return "A senha deve ter pelo menos um caractere maiúsculo, um minúsculo, um número e um caractere especial (#?!@$%^&*-)";
-    }
-
-    if (await this.userRepository.checkUserByEmailExists(req.email, null)) {
-      return "O email informado já existe.";
-    }
-
-    return null;
+        return null;
+      },
+    );
   }
 }
 
 class LoginUseCaseValidate {
-  validate(req: LoginUseCaseRequest): string {
-    if (checkEmpty(req.email)) {
-      return "O email não pode ser vazio.";
-    }
+  private validationSchema = z.object({
+    email: zodStringSchema("Email", 1).email(
+      "Insira o email no formato correto.",
+    ),
+    password: zodStringSchema("Senha", 1),
+  });
 
-    if (checkEmpty(req.password)) {
-      return "A senha não pode ser vazia.";
-    }
-
-    return null;
+  async validate(req: LoginUseCaseRequest): Promise<string> {
+    return await validateWithZod(() => this.validationSchema.parse(req));
   }
 }
 
 class VerifyTokenUseCaseValidate {
-  validate(req: VerifyTokenUseCaseRequest): string {
-    if (checkEmpty(req.token)) {
-      return "O token não pode ser vazio.";
-    }
+  private validationSchema = z.object({
+    token: zodStringSchema("Token", 1),
+  });
 
-    return null;
+  async validate(req: VerifyTokenUseCaseRequest): Promise<string> {
+    return await validateWithZod(() => this.validationSchema.parse(req));
   }
 }
 
 class UpdateUserUseCaseValidate {
   private userRepository: UserRepositoryInterface;
+  private validationSchema = z.object({
+    name: zodStringSchema("Nome de usuário", 1),
+    office: zodStringSchema("Função/cargo", 1),
+    id: zodNumberSchema("Id"),
+    tokenUserId: zodNumberSchema("Id do token"),
+  });
 
   constructor(userRepository: UserRepositoryInterface) {
     this.userRepository = userRepository;
   }
 
   async validate(req: UpdateUserUseCaseRequest): Promise<string> {
-    if (checkEmpty(req.id)) {
-      return "O id não pode ser vazio.";
-    }
-    if (checkEmpty(req.name)) {
-      return "O nome não pode ser vazio.";
-    }
-    if (checkEmpty(req.office)) {
-      return "O cargo/função não pode ser vazio.";
-    }
-    if (!(await this.userRepository.getUser(req.id))) {
-      return "O usuário informado não existe";
-    }
-    if (req.tokenUserId !== req.id) {
-      return NO_PERMISSION_MESSAGE;
-    }
+    return await validateWithZod(
+      () => this.validationSchema.parse(req),
+      async () => {
+        if (req.tokenUserId !== req.id) {
+          return NO_PERMISSION_MESSAGE;
+        }
 
-    return null;
+        if (!(await this.userRepository.getUser(req.id))) {
+          return "O usuário informado não existe";
+        }
+
+        return null;
+      },
+    );
   }
 }
 
 class GetUserUseCaseValidate {
-  validate(req: GetUserUseCaseRequest): string {
-    if (checkEmpty(req.id)) {
-      return "O id não pode ser vazio.";
-    }
+  private validationSchema = z.object({
+    id: zodNumberSchema("Id"),
+  });
 
-    return null;
+  async validate(req: GetUserUseCaseRequest): Promise<string> {
+    return await validateWithZod(() => this.validationSchema.parse(req));
   }
 }
 
 class DeleteUserUseCaseValidate {
   private userRepository: UserRepositoryInterface;
+  private validationSchema = z.object({
+    id: zodNumberSchema("Id"),
+    tokenUserId: zodNumberSchema("Id do token"),
+  });
 
   constructor(userRepository: UserRepositoryInterface) {
     this.userRepository = userRepository;
   }
 
   async validate(req: DeleteUserUseCaseRequest): Promise<string> {
-    if (checkEmpty(req.id)) {
-      return "O id não pode ser vazio.";
-    }
-    if (!(await this.userRepository.getUser(req.id))) {
-      return "O usuário informado não existe";
-    }
-    if (req.tokenUserId !== req.id) {
-      return NO_PERMISSION_MESSAGE;
-    }
+    return await validateWithZod(
+      () => this.validationSchema.parse(req),
+      async () => {
+        if (!(await this.userRepository.getUser(req.id))) {
+          return "O usuário informado não existe";
+        }
 
-    return null;
+        if (req.tokenUserId !== req.id) {
+          return NO_PERMISSION_MESSAGE;
+        }
+        return null;
+      },
+    );
   }
 }
 

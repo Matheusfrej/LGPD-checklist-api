@@ -4,7 +4,7 @@ import { UserEntity } from "../../../domain/entity/user";
 import { UserRepositoryInterface } from "../../../domain/usecase/repository/user";
 
 class UserPrismaRepository implements UserRepositoryInterface {
-  async checkUserByEmailExists(email: string, id: number): Promise<boolean> {
+  async checkUserByEmailExists(email: string, id?: number): Promise<boolean> {
     return await userService.checkUserByEmailExists(email, id);
   }
 

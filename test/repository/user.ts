@@ -7,7 +7,7 @@ class UserInMemoryRepository implements UserRepositoryInterface {
   public items: UserEntity[] = [];
   private counter = 0;
 
-  async checkUserByEmailExists(email: string, id: number): Promise<boolean> {
+  async checkUserByEmailExists(email: string, id?: number): Promise<boolean> {
     const user = this.items.find((item) => item.email === email);
 
     return user && user.id !== id;
