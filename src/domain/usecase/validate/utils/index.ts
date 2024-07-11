@@ -1,6 +1,6 @@
-import { Json } from "../../@types";
+import { Json } from "../../../@types";
 import * as z from "zod";
-import { DEFAULT_VALIDATION_MESSAGE } from "../../entity/error";
+import { DEFAULT_VALIDATION_MESSAGE } from "../../../entity/error";
 
 function checkEmpty(paramether: string | number | number[] | Json): boolean {
   if (typeof paramether === "string") {
@@ -77,10 +77,10 @@ function zodErrorTreatment(error: unknown): string {
   return DEFAULT_VALIDATION_MESSAGE;
 }
 
-export const validateWithZod = async (
+const validateWithZod = async (
   validationSchemaParse: () => void,
   customValidation?: () => Promise<string | null>,
-): Promise<string> => {
+): Promise<string | null> => {
   try {
     validationSchemaParse();
 
@@ -97,4 +97,4 @@ export const validateWithZod = async (
   }
 };
 
-export { checkEmpty, zodStringSchema, zodNumberSchema };
+export { checkEmpty, zodStringSchema, zodNumberSchema, validateWithZod };

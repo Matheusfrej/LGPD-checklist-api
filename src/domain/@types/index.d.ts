@@ -1,9 +1,11 @@
 import { JsonValue } from "@prisma/client/runtime/library";
 
-export type Json = JsonValue;
+type Json = JsonValue;
 
-export type AuthTokenType = {
+type AuthTokenType = {
   id: number;
   iat: number;
   exp: number;
 };
+
+export type { Json, AuthTokenType };

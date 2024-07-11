@@ -1,3 +1,4 @@
+import { ValidateInterface } from ".";
 import { NO_PERMISSION_MESSAGE } from "../../../domain/entity/error";
 import {
   CreateChecklistUseCaseRequest,
@@ -10,9 +11,9 @@ import {
 import { ChecklistRepositoryInterface } from "../repository/checklist";
 import { SystemRepositoryInterface } from "../repository/system";
 import { UserRepositoryInterface } from "../repository/user";
-import { checkEmpty } from "./validate";
+import { checkEmpty } from "./utils";
 
-class CreateChecklistUseCaseValidate {
+class CreateChecklistUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
   private userRepository: UserRepositoryInterface;
 
@@ -24,7 +25,7 @@ class CreateChecklistUseCaseValidate {
     this.userRepository = userRepository;
   }
 
-  async validate(req: CreateChecklistUseCaseRequest): Promise<string> {
+  async validate(req: CreateChecklistUseCaseRequest): Promise<string | null> {
     if (checkEmpty(req.userId)) {
       return "O id do usuário não pode ser vazio.";
     }
@@ -55,14 +56,14 @@ class CreateChecklistUseCaseValidate {
   }
 }
 
-class GetChecklistUseCaseValidate {
+class GetChecklistUseCaseValidate implements ValidateInterface {
   private checklistRepository: ChecklistRepositoryInterface;
 
   constructor(checklistRepository: ChecklistRepositoryInterface) {
     this.checklistRepository = checklistRepository;
   }
 
-  async validate(req: GetChecklistUseCaseRequest): Promise<string> {
+  async validate(req: GetChecklistUseCaseRequest): Promise<string | null> {
     if (checkEmpty(req.id)) {
       return "O id não pode ser vazio.";
     }
@@ -81,14 +82,14 @@ class GetChecklistUseCaseValidate {
   }
 }
 
-class DeleteChecklistUseCaseValidate {
+class DeleteChecklistUseCaseValidate implements ValidateInterface {
   private checklistRepository: ChecklistRepositoryInterface;
 
   constructor(checklistRepository: ChecklistRepositoryInterface) {
     this.checklistRepository = checklistRepository;
   }
 
-  async validate(req: DeleteChecklistUseCaseRequest): Promise<string> {
+  async validate(req: DeleteChecklistUseCaseRequest): Promise<string | null> {
     if (checkEmpty(req.id)) {
       return "O id não pode ser vazio.";
     }
@@ -107,7 +108,7 @@ class DeleteChecklistUseCaseValidate {
   }
 }
 
-class UpdateChecklistUseCaseValidate {
+class UpdateChecklistUseCaseValidate implements ValidateInterface {
   private checklistRepository: ChecklistRepositoryInterface;
   private systemRepository: SystemRepositoryInterface;
 
@@ -119,7 +120,7 @@ class UpdateChecklistUseCaseValidate {
     this.systemRepository = systemRepository;
   }
 
-  async validate(req: UpdateChecklistUseCaseRequest): Promise<string> {
+  async validate(req: UpdateChecklistUseCaseRequest): Promise<string | null> {
     if (checkEmpty(req.id)) {
       return "O id não pode ser vazio.";
     }
@@ -157,14 +158,16 @@ class UpdateChecklistUseCaseValidate {
   }
 }
 
-class ListChecklistsByUserIdUseCaseValidate {
+class ListChecklistsByUserIdUseCaseValidate implements ValidateInterface {
   private userRepository: UserRepositoryInterface;
 
   constructor(userRepository: UserRepositoryInterface) {
     this.userRepository = userRepository;
   }
 
-  async validate(req: ListChecklistsByUserIdUseCaseRequest): Promise<string> {
+  async validate(
+    req: ListChecklistsByUserIdUseCaseRequest,
+  ): Promise<string | null> {
     if (checkEmpty(req.userId)) {
       return "O id do usuário não pode ser vazio.";
     }
@@ -181,14 +184,16 @@ class ListChecklistsByUserIdUseCaseValidate {
   }
 }
 
-class ListChecklistsBySystemIdUseCaseValidate {
+class ListChecklistsBySystemIdUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
 
   constructor(systemRepository: SystemRepositoryInterface) {
     this.systemRepository = systemRepository;
   }
 
-  async validate(req: ListChecklistsBySystemIdUseCaseRequest): Promise<string> {
+  async validate(
+    req: ListChecklistsBySystemIdUseCaseRequest,
+  ): Promise<string | null> {
     if (checkEmpty(req.systemId)) {
       return "O id do sistema não pode ser vazio.";
     }

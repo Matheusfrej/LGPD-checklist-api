@@ -9,9 +9,10 @@ import {
   UpdateUserUseCaseRequest,
   VerifyTokenUseCaseRequest,
 } from "../ucio/user";
-import { validateWithZod, zodNumberSchema, zodStringSchema } from "./validate";
+import { validateWithZod, zodNumberSchema, zodStringSchema } from "./utils";
+import { ValidateInterface } from ".";
 
-class CreateUserUseCaseValidate {
+class CreateUserUseCaseValidate implements ValidateInterface {
   private userRepository: UserRepositoryInterface;
   private validationSchema = z.object({
     name: zodStringSchema("Nome de usuário", 1),
@@ -29,7 +30,7 @@ class CreateUserUseCaseValidate {
     this.userRepository = userRepository;
   }
 
-  async validate(req: CreateUserUseCaseRequest): Promise<string> {
+  async validate(req: CreateUserUseCaseRequest): Promise<string | null> {
     return await validateWithZod(
       () => this.validationSchema.parse(req),
       async () => {
@@ -43,7 +44,7 @@ class CreateUserUseCaseValidate {
   }
 }
 
-class LoginUseCaseValidate {
+class LoginUseCaseValidate implements ValidateInterface {
   private validationSchema = z.object({
     email: zodStringSchema("Email", 1).email(
       "Insira o email no formato correto.",
@@ -51,22 +52,22 @@ class LoginUseCaseValidate {
     password: zodStringSchema("Senha", 1),
   });
 
-  async validate(req: LoginUseCaseRequest): Promise<string> {
+  async validate(req: LoginUseCaseRequest): Promise<string | null> {
     return await validateWithZod(() => this.validationSchema.parse(req));
   }
 }
 
-class VerifyTokenUseCaseValidate {
+class VerifyTokenUseCaseValidate implements ValidateInterface {
   private validationSchema = z.object({
     token: zodStringSchema("Token", 1),
   });
 
-  async validate(req: VerifyTokenUseCaseRequest): Promise<string> {
+  async validate(req: VerifyTokenUseCaseRequest): Promise<string | null> {
     return await validateWithZod(() => this.validationSchema.parse(req));
   }
 }
 
-class UpdateUserUseCaseValidate {
+class UpdateUserUseCaseValidate implements ValidateInterface {
   private userRepository: UserRepositoryInterface;
   private validationSchema = z.object({
     name: zodStringSchema("Nome de usuário", 1),
@@ -79,7 +80,7 @@ class UpdateUserUseCaseValidate {
     this.userRepository = userRepository;
   }
 
-  async validate(req: UpdateUserUseCaseRequest): Promise<string> {
+  async validate(req: UpdateUserUseCaseRequest): Promise<string | null> {
     return await validateWithZod(
       () => this.validationSchema.parse(req),
       async () => {
@@ -97,17 +98,17 @@ class UpdateUserUseCaseValidate {
   }
 }
 
-class GetUserUseCaseValidate {
+class GetUserUseCaseValidate implements ValidateInterface {
   private validationSchema = z.object({
     id: zodNumberSchema("Id"),
   });
 
-  async validate(req: GetUserUseCaseRequest): Promise<string> {
+  async validate(req: GetUserUseCaseRequest): Promise<string | null> {
     return await validateWithZod(() => this.validationSchema.parse(req));
   }
 }
 
-class DeleteUserUseCaseValidate {
+class DeleteUserUseCaseValidate implements ValidateInterface {
   private userRepository: UserRepositoryInterface;
   private validationSchema = z.object({
     id: zodNumberSchema("Id"),
@@ -118,7 +119,7 @@ class DeleteUserUseCaseValidate {
     this.userRepository = userRepository;
   }
 
-  async validate(req: DeleteUserUseCaseRequest): Promise<string> {
+  async validate(req: DeleteUserUseCaseRequest): Promise<string | null> {
     return await validateWithZod(
       () => this.validationSchema.parse(req),
       async () => {

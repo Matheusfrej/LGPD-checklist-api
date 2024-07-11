@@ -1,3 +1,4 @@
+import * as z from "zod";
 import {
   CreateSystemUseCaseRequest,
   DeleteSystemUseCaseRequest,
@@ -5,79 +6,95 @@ import {
   ListSystemsByUserIdUseCaseRequest,
   UpdateSystemUseCaseRequest,
 } from "../../../domain/usecase/ucio/system";
-import { checkEmpty } from "./validate";
+import {
+  checkEmpty,
+  validateWithZod,
+  zodNumberSchema,
+  zodStringSchema,
+} from "./utils";
 import { NO_PERMISSION_MESSAGE } from "../../../domain/entity/error";
 import { UserRepositoryInterface } from "../repository/user";
 import { SystemRepositoryInterface } from "../repository/system";
+import { ValidateInterface } from ".";
 
-class CreateSystemUseCaseValidate {
+class CreateSystemUseCaseValidate implements ValidateInterface {
   private userRepository: UserRepositoryInterface;
+  private validationSchema = z.object({
+    name: zodStringSchema("Nome", 1),
+    description: zodStringSchema("Descrição", 1),
+    userId: zodNumberSchema("UserId"),
+    tokenUserId: zodNumberSchema("Id do token"),
+  });
 
   constructor(userRepository: UserRepositoryInterface) {
     this.userRepository = userRepository;
   }
 
-  async validate(req: CreateSystemUseCaseRequest): Promise<string> {
-    if (checkEmpty(req.name)) {
-      return "O nome não pode ser vazio.";
-    }
-    if (checkEmpty(req.description)) {
-      return "A descrição não pode ser vazia.";
-    }
-    if (checkEmpty(req.userId)) {
-      return "O id do usuário não pode ser vazio.";
-    }
-    if (!(await this.userRepository.getUser(req.userId))) {
-      return "O usuário informado não existe.";
-    }
-    if (req.tokenUserId !== req.userId) {
-      return NO_PERMISSION_MESSAGE;
-    }
+  async validate(req: CreateSystemUseCaseRequest): Promise<string | null> {
+    return await validateWithZod(
+      () => this.validationSchema.parse(req),
+      async () => {
+        if (!(await this.userRepository.getUser(req.userId))) {
+          return "O usuário informado não existe.";
+        }
+        if (req.tokenUserId !== req.userId) {
+          return NO_PERMISSION_MESSAGE;
+        }
 
-    return null;
+        return null;
+      },
+    );
   }
 }
 
-class ListSystemsByUserIdUseCaseValidate {
+class ListSystemsByUserIdUseCaseValidate implements ValidateInterface {
   private userRepository: UserRepositoryInterface;
+  private validationSchema = z.object({
+    userId: zodNumberSchema("UserId"),
+    tokenUserId: zodNumberSchema("Id do token"),
+  });
 
   constructor(userRepository: UserRepositoryInterface) {
     this.userRepository = userRepository;
   }
 
-  async validate(req: ListSystemsByUserIdUseCaseRequest): Promise<string> {
-    if (checkEmpty(req.userId)) {
-      return "O id do usuário não pode ser vazio.";
-    }
-    if (!(await this.userRepository.getUser(req.userId))) {
-      return "O usuário informado não existe.";
-    }
-    if (req.tokenUserId !== req.userId) {
-      return NO_PERMISSION_MESSAGE;
-    }
+  async validate(
+    req: ListSystemsByUserIdUseCaseRequest,
+  ): Promise<string | null> {
+    return await validateWithZod(
+      () => this.validationSchema.parse(req),
+      async () => {
+        if (!(await this.userRepository.getUser(req.userId))) {
+          return "O usuário informado não existe.";
+        }
+        if (req.tokenUserId !== req.userId) {
+          return NO_PERMISSION_MESSAGE;
+        }
 
-    return null;
+        return null;
+      },
+    );
   }
 }
 
-class GetSystemUseCaseValidate {
-  validate(req: GetSystemUseCaseRequest): string {
-    if (checkEmpty(req.id)) {
-      return "O id do sistema não pode ser vazio.";
-    }
+class GetSystemUseCaseValidate implements ValidateInterface {
+  private validationSchema = z.object({
+    id: zodNumberSchema("Id"),
+  });
 
-    return null;
+  async validate(req: GetSystemUseCaseRequest): Promise<string | null> {
+    return await validateWithZod(() => this.validationSchema.parse(req));
   }
 }
 
-class DeleteSystemUseCaseValidate {
+class DeleteSystemUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
 
   constructor(systemRepository: SystemRepositoryInterface) {
     this.systemRepository = systemRepository;
   }
 
-  async validate(req: DeleteSystemUseCaseRequest): Promise<string> {
+  async validate(req: DeleteSystemUseCaseRequest): Promise<string | null> {
     if (checkEmpty(req.id)) {
       return "O id do sistema não pode ser vazio.";
     }
@@ -96,14 +113,14 @@ class DeleteSystemUseCaseValidate {
   }
 }
 
-class UpdateSystemUseCaseValidate {
+class UpdateSystemUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
 
   constructor(systemRepository: SystemRepositoryInterface) {
     this.systemRepository = systemRepository;
   }
 
-  async validate(req: UpdateSystemUseCaseRequest): Promise<string> {
+  async validate(req: UpdateSystemUseCaseRequest): Promise<string | null> {
     if (checkEmpty(req.id)) {
       return "O id do sistema não pode ser vazio.";
     }
