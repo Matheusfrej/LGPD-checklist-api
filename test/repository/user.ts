@@ -1,7 +1,7 @@
 import * as userUcio from "@/domain/usecase/ucio/user";
 import { UserEntity } from "../../src/domain/entity/user";
 import { compareSync } from "bcryptjs";
-import { UserRepositoryInterface } from "../domain/usecase/repository/user";
+import { UserRepositoryInterface } from "../../src/domain/usecase/repository/user";
 
 class UserInMemoryRepository implements UserRepositoryInterface {
   public items: UserEntity[] = [];

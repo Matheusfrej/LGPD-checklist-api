@@ -8,14 +8,10 @@ import {
   VerifyTokenUseCase,
 } from "./user";
 import { compareSync, genSaltSync, hashSync } from "bcryptjs";
-import {
-  ErrorEntity,
-  NO_PERMISSION_MESSAGE,
-  PRE_CONDITIONAL_ERROR_CODE,
-} from "../entity/error";
 import { UserInMemoryRepository } from "../../../test/repository/user";
 import { AuthFakeRepository } from "../../../test/repository/auth";
 import { UserEntity } from "../entity/user";
+import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
 
 let userRepository: UserInMemoryRepository;
 let authRepository: AuthFakeRepository;
@@ -78,8 +74,7 @@ describe("Create User Use Case", () => {
       password: "Teste123!",
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
   });
 
   it("should not create user with weak password", async () => {
@@ -90,8 +85,7 @@ describe("Create User Use Case", () => {
       password: "123456",
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
   });
 });
 
@@ -127,8 +121,7 @@ describe("Login Use Case", () => {
       password: "Teste123!",
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
   });
 
   it("should not authenticate with wrong password", async () => {
@@ -144,8 +137,7 @@ describe("Login Use Case", () => {
       password: "123Teste!",
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
   });
 
   it("should create token when authenticate", async () => {
@@ -198,8 +190,7 @@ describe("Verify Token Use Case", () => {
 
     const result = await useCase.execute({ token });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
   });
 
   it("should not authenticate with invalid token", async () => {
@@ -207,8 +198,7 @@ describe("Verify Token Use Case", () => {
 
     const result = await useCase.execute({ token });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
   });
 });
 
@@ -339,9 +329,7 @@ describe("Update User Use Case", () => {
       office: "Analista de Tecnologia",
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
-    expect(result.error.message).toBe(NO_PERMISSION_MESSAGE);
+    expectPreConditionalError(result.error, true);
     expect(oldUser).toEqual({
       ...userRepository.items[0],
       id: undefined,
@@ -356,8 +344,7 @@ describe("Update User Use Case", () => {
       office: "Cicrano",
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
   });
 });
 
@@ -396,8 +383,7 @@ describe("Get User Use Case", () => {
       id,
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
     expect(result.user).toBe(null);
   });
 });
@@ -441,8 +427,7 @@ describe("Delete User Use Case", () => {
       tokenUserId: id,
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
+    expectPreConditionalError(result.error);
     expect(userRepository.items.length).toBe(0);
   });
 
@@ -461,9 +446,7 @@ describe("Delete User Use Case", () => {
       tokenUserId: 2,
     });
 
-    expect(result.error).toBeInstanceOf(ErrorEntity);
-    expect(result.error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
-    expect(result.error.message).toBe(NO_PERMISSION_MESSAGE);
+    expectPreConditionalError(result.error, true);
     expect(userRepository.items.length).toBe(1);
   });
 });
