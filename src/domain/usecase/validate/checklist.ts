@@ -138,7 +138,6 @@ class UpdateChecklistUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
   private validationSchema = z.object({
     id: zodNumberSchema("Id"),
-    userId: zodNumberSchema("UserId"),
     systemId: zodNumberSchema("SystemId"),
     tokenUserId: zodNumberSchema("Id do token"),
     isGeneral: zodBooleanSchema("isGeneral").refine((val) => val === true, {
