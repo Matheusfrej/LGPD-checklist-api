@@ -6,12 +6,7 @@ import {
   ListSystemsByUserIdUseCaseRequest,
   UpdateSystemUseCaseRequest,
 } from "../../../domain/usecase/ucio/system";
-import {
-  checkEmpty,
-  validateWithZod,
-  zodNumberSchema,
-  zodStringSchema,
-} from "./utils";
+import { validateWithZod, zodNumberSchema, zodStringSchema } from "./utils";
 import { NO_PERMISSION_MESSAGE } from "../../../domain/entity/error";
 import { UserRepositoryInterface } from "../repository/user";
 import { SystemRepositoryInterface } from "../repository/system";
@@ -89,59 +84,65 @@ class GetSystemUseCaseValidate implements ValidateInterface {
 
 class DeleteSystemUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
+  private validationSchema = z.object({
+    userId: zodNumberSchema("UserId"),
+    tokenUserId: zodNumberSchema("Id do token"),
+  });
 
   constructor(systemRepository: SystemRepositoryInterface) {
     this.systemRepository = systemRepository;
   }
 
   async validate(req: DeleteSystemUseCaseRequest): Promise<string | null> {
-    if (checkEmpty(req.id)) {
-      return "O id do sistema não pode ser vazio.";
-    }
+    return await validateWithZod(
+      () => this.validationSchema.parse(req),
+      async () => {
+        const system = await this.systemRepository.getSystem(req.id);
 
-    const system = await this.systemRepository.getSystem(req.id);
+        if (!system) {
+          return "O sistema informado não existe.";
+        }
 
-    if (!system) {
-      return "O sistema informado não existe.";
-    }
+        if (system.userId !== req.tokenUserId) {
+          return NO_PERMISSION_MESSAGE;
+        }
 
-    if (system.userId !== req.tokenUserId) {
-      return NO_PERMISSION_MESSAGE;
-    }
-
-    return null;
+        return null;
+      },
+    );
   }
 }
 
 class UpdateSystemUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
+  private validationSchema = z.object({
+    id: zodNumberSchema("Id"),
+    name: zodStringSchema("Nome", 1),
+    description: zodStringSchema("Descrição", 1),
+    tokenUserId: zodNumberSchema("Id do token"),
+  });
 
   constructor(systemRepository: SystemRepositoryInterface) {
     this.systemRepository = systemRepository;
   }
 
   async validate(req: UpdateSystemUseCaseRequest): Promise<string | null> {
-    if (checkEmpty(req.id)) {
-      return "O id do sistema não pode ser vazio.";
-    }
-    if (checkEmpty(req.name)) {
-      return "O nome do sistema não pode ser vazio.";
-    }
-    if (checkEmpty(req.description)) {
-      return "A descrição do sistema não pode ser vazia.";
-    }
+    return await validateWithZod(
+      () => this.validationSchema.parse(req),
+      async () => {
+        const system = await this.systemRepository.getSystem(req.id);
 
-    const system = await this.systemRepository.getSystem(req.id);
+        if (!system) {
+          return "O sistema informado não existe.";
+        }
 
-    if (!system) {
-      return "O sistema informado não existe.";
-    }
+        if (system.userId !== req.tokenUserId) {
+          return NO_PERMISSION_MESSAGE;
+        }
 
-    if (system.userId !== req.tokenUserId) {
-      return NO_PERMISSION_MESSAGE;
-    }
-
-    return null;
+        return null;
+      },
+    );
   }
 }
 

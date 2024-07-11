@@ -2,14 +2,6 @@ import { Json } from "../../../@types";
 import * as z from "zod";
 import { DEFAULT_VALIDATION_MESSAGE } from "../../../entity/error";
 
-function checkEmpty(paramether: string | number | number[] | Json): boolean {
-  if (typeof paramether === "string") {
-    paramether = paramether.trim();
-  }
-
-  return paramether === "" || paramether === undefined || paramether === null;
-}
-
 const requiredErrorMessage = (fieldName: string) =>
   `${fieldName} não pode ser vazio.`;
 
@@ -40,6 +32,13 @@ const zodStringSchema = (
   }
 
   return schema;
+};
+
+const zodBooleanSchema = (fieldName: string) => {
+  return z.boolean({
+    invalid_type_error: `${fieldName} deve ser um boolean`,
+    required_error: requiredErrorMessage(fieldName),
+  });
 };
 
 const zodNumberSchema = (
@@ -97,4 +96,25 @@ const validateWithZod = async (
   }
 };
 
-export { checkEmpty, zodStringSchema, zodNumberSchema, validateWithZod };
+const isNonEmptyJson = (val: unknown): val is Json => {
+  try {
+    const parsed = JSON.parse(JSON.stringify(val));
+    return (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      (Array.isArray(parsed)
+        ? parsed.length > 0
+        : Object.keys(parsed).length > 0)
+    );
+  } catch (e) {
+    return false;
+  }
+};
+
+export {
+  zodStringSchema,
+  zodNumberSchema,
+  zodBooleanSchema,
+  validateWithZod,
+  isNonEmptyJson,
+};
