@@ -13,7 +13,7 @@ async function createMockUser({
   email = "fulano@exemplo.com",
   office = "Desenvolvedor",
   password = "Teste123!",
-}) {
+} = {}) {
   return await userRepository.createUser({
     name,
     email,
@@ -27,7 +27,7 @@ async function createMockSystem({
   description = "Descrição do sistema LGPD",
   userId = 1,
   tokenUserId = 1,
-}) {
+} = {}) {
   return await systemRepository.createSystem({
     name,
     description,
@@ -37,8 +37,8 @@ async function createMockSystem({
 }
 
 async function createMockUserAndSystem() {
-  await createMockUser({});
-  await createMockSystem({});
+  await createMockUser();
+  await createMockSystem();
 }
 
 describe("Create System Use Case", () => {
@@ -53,7 +53,7 @@ describe("Create System Use Case", () => {
   it("should create system", async () => {
     const userId = 1;
 
-    await createMockUser({});
+    await createMockUser();
 
     const oldSize = systemRepository.items.length;
 
@@ -91,7 +91,7 @@ describe("Create System Use Case", () => {
   it("should not create system for user different from authenticated user", async () => {
     const oldSize = systemRepository.items.length;
 
-    await createMockUser({});
+    await createMockUser();
 
     const result = await useCase.execute({
       name: "Sistema LGPD",
@@ -108,7 +108,7 @@ describe("Create System Use Case", () => {
   it("should not create system for no user", async () => {
     const oldSize = systemRepository.items.length;
 
-    await createMockUser({});
+    await createMockUser();
 
     const result = await useCase.execute({
       name: "Sistema LGPD",
@@ -136,8 +136,8 @@ describe("List User Systems Use Case", () => {
     const userId = 1;
 
     await createMockUserAndSystem();
-    await createMockUser({});
-    await createMockSystem({});
+    await createMockUser();
+    await createMockSystem();
     await createMockSystem({ userId: 2, tokenUserId: 2 });
 
     const result = await useCase.execute({
@@ -157,7 +157,7 @@ describe("List User Systems Use Case", () => {
   it("should list empty list when user doesnt have systems", async () => {
     const userId = 1;
 
-    await createMockUser({});
+    await createMockUser();
 
     const result = await useCase.execute({
       userId,
@@ -179,5 +179,18 @@ describe("List User Systems Use Case", () => {
     });
 
     expectPreConditionalError(result.error, true);
+  });
+
+  it("should not list systems from inexistent user", async () => {
+    const userId = 1;
+
+    await createMockSystem();
+
+    const result = await useCase.execute({
+      userId,
+      tokenUserId: userId,
+    });
+
+    expectPreConditionalError(result.error);
   });
 });
