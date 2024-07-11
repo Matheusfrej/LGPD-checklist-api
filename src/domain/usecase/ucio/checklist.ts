@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Json } from "../../@types";
 import { ChecklistEntity } from "../../entity/checklist";
 import { ErrorEntity } from "../../entity/error";
