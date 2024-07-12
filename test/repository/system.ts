@@ -39,16 +39,33 @@ class SystemInMemoryRepository implements SystemRepositoryInterface {
     });
   }
 
-  getSystem(id: number): Promise<SystemEntity> {
-    throw new Error("Method not implemented.");
+  async getSystem(id: number): Promise<SystemEntity> {
+    const system: SystemEntity = this.items.find((item) => item.id === id);
+
+    if (!system) {
+      return null;
+    }
+
+    return system;
   }
 
-  deleteSystem(req: systemUcio.DeleteSystemUseCaseRequest): Promise<void> {
-    throw new Error("Method not implemented.");
+  async deleteSystem(
+    req: systemUcio.DeleteSystemUseCaseRequest,
+  ): Promise<void> {
+    this.items = this.items.filter((item) => item.id !== req.id);
   }
 
-  updateSystem(req: systemUcio.UpdateSystemUseCaseRequest): Promise<void> {
-    throw new Error("Method not implemented.");
+  async updateSystem(
+    req: systemUcio.UpdateSystemUseCaseRequest,
+  ): Promise<void> {
+    const index = this.items.findIndex((item) => item.id === req.id);
+
+    if (index === -1) {
+      return null;
+    }
+
+    this.items[index].name = req.name;
+    this.items[index].description = req.description;
   }
 }
 

@@ -85,7 +85,7 @@ class GetSystemUseCaseValidate implements ValidateInterface {
 class DeleteSystemUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
   private validationSchema = z.object({
-    userId: zodNumberSchema("UserId"),
+    id: zodNumberSchema("Id"),
     tokenUserId: zodNumberSchema("Id do token"),
   });
 

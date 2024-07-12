@@ -2,8 +2,15 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { UserInMemoryRepository } from "../../../test/repository/user";
 import { SystemInMemoryRepository } from "../../../test/repository/system";
 import { genSaltSync, hashSync } from "bcryptjs";
-import { CreateSystemUseCase, ListSystemsByUserIdUseCase } from "./system";
+import {
+  CreateSystemUseCase,
+  DeleteSystemUseCase,
+  GetSystemUseCase,
+  ListSystemsByUserIdUseCase,
+  UpdateSystemUseCase,
+} from "./system";
 import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
+import { SystemEntity } from "../entity/system";
 
 let userRepository: UserInMemoryRepository;
 let systemRepository: SystemInMemoryRepository;
@@ -192,5 +199,219 @@ describe("List User Systems Use Case", () => {
     });
 
     expectPreConditionalError(result.error);
+  });
+});
+
+describe("Get System Use Case", () => {
+  let useCase: GetSystemUseCase;
+
+  beforeEach(() => {
+    systemRepository = new SystemInMemoryRepository();
+    useCase = new GetSystemUseCase(systemRepository);
+  });
+
+  it("should get system", async () => {
+    const id = 1;
+
+    const system = await createMockSystem();
+
+    const result = await useCase.execute({
+      id,
+    });
+
+    expect(result.error).toBe(null);
+    expect(result.system).toBeInstanceOf(SystemEntity);
+    expect(system).toEqual(result.system);
+  });
+
+  it("should not get inexistent system", async () => {
+    const id = 1;
+
+    const result = await useCase.execute({
+      id,
+    });
+
+    expectPreConditionalError(result.error);
+    expect(result.system).toBe(null);
+  });
+});
+
+describe("Update System Use Case", () => {
+  let useCase: UpdateSystemUseCase;
+
+  beforeEach(() => {
+    systemRepository = new SystemInMemoryRepository();
+    useCase = new UpdateSystemUseCase(systemRepository);
+  });
+
+  it("should update system", async () => {
+    const id = 1;
+    const newName = "Sistema LGPD Alterado";
+    const newDescription = "Descrição do sistema LGPD Alterado";
+
+    const oldSystem = { ...(await createMockSystem()) };
+
+    const oldSize = systemRepository.items.length;
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: id,
+      name: newName,
+      description: newDescription,
+    });
+
+    const systemUpdated = systemRepository.items.find((item) => item.id === id);
+
+    expect(result.error).toBe(null);
+    expect(systemUpdated).toBeInstanceOf(SystemEntity);
+    expect(systemUpdated.name).toBe(newName);
+    expect(systemUpdated.description).toBe(newDescription);
+    expect(oldSystem).not.toEqual(systemUpdated);
+    expect(oldSize).toBe(systemRepository.items.length);
+    expect(systemUpdated.id).toBe(oldSystem.id);
+    expect(systemUpdated.userId).toBe(oldSystem.userId);
+  });
+
+  it("should update only name of system", async () => {
+    const id = 1;
+    const newName = "Sistema LGPD Alterado";
+
+    const oldSystem = { ...(await createMockSystem()) };
+
+    const oldSize = systemRepository.items.length;
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: id,
+      name: newName,
+      description: oldSystem.description,
+    });
+
+    const systemUpdated = systemRepository.items.find((item) => item.id === id);
+
+    expect(result.error).toBe(null);
+    expect(systemUpdated).toBeInstanceOf(SystemEntity);
+    expect(systemUpdated.name).toBe(newName);
+    expect(systemUpdated.description).toBe(oldSystem.description);
+    expect(oldSystem).not.toEqual(systemUpdated);
+    expect(oldSize).toBe(systemRepository.items.length);
+    expect(systemUpdated.id).toBe(oldSystem.id);
+    expect(systemUpdated.userId).toBe(oldSystem.userId);
+  });
+
+  it("should update only description of system", async () => {
+    const id = 1;
+    const newDescription = "Descrição";
+
+    const oldSystem = {
+      ...(await createMockSystem()),
+    };
+
+    const oldSize = systemRepository.items.length;
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: id,
+      name: oldSystem.name,
+      description: newDescription,
+    });
+
+    const systemUpdated = systemRepository.items.find((item) => item.id === id);
+
+    expect(result.error).toBe(null);
+    expect(systemUpdated).toBeInstanceOf(SystemEntity);
+    expect(systemUpdated.name).toBe(oldSystem.name);
+    expect(systemUpdated.description).toBe(newDescription);
+    expect(oldSystem).not.toEqual(systemUpdated);
+    expect(oldSize).toBe(systemRepository.items.length);
+    expect(systemUpdated.id).toBe(oldSystem.id);
+    expect(systemUpdated.userId).toBe(oldSystem.userId);
+  });
+
+  it("should not update system with wrong id on token", async () => {
+    const id = 1;
+    const newName = "Sistema LGPD Alterado";
+    const newDescription = "Descrição";
+
+    const oldSystem = {
+      ...(await createMockSystem()),
+    };
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: 2,
+      name: newName,
+      description: newDescription,
+    });
+
+    expectPreConditionalError(result.error, true);
+    expect(oldSystem).toEqual(systemRepository.items[0]);
+  });
+
+  it("should not update inexistent system", async () => {
+    const id = 1;
+    const newName = "Sistema LGPD Alterado";
+    const newDescription = "Descrição";
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: 1,
+      name: newName,
+      description: newDescription,
+    });
+
+    expectPreConditionalError(result.error);
+  });
+});
+
+describe("Delete System Use Case", () => {
+  let useCase: DeleteSystemUseCase;
+
+  beforeEach(() => {
+    systemRepository = new SystemInMemoryRepository();
+    useCase = new DeleteSystemUseCase(systemRepository);
+  });
+
+  it("should delete system", async () => {
+    const id = 1;
+
+    await createMockSystem();
+
+    const oldSize = systemRepository.items.length;
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: id,
+    });
+
+    expect(result.error).toBe(null);
+    expect(systemRepository.items.length).toBe(0);
+    expect(systemRepository.items.length).toBe(oldSize - 1);
+  });
+
+  it("should not delete inexistent system", async () => {
+    const id = 1;
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: id,
+    });
+
+    expectPreConditionalError(result.error);
+    expect(systemRepository.items.length).toBe(0);
+  });
+
+  it("should not delete system whose userId is different from user id on token", async () => {
+    const id = 1;
+
+    await createMockSystem();
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: 2,
+    });
+
+    expectPreConditionalError(result.error, true);
+    expect(systemRepository.items.length).toBe(1);
   });
 });
