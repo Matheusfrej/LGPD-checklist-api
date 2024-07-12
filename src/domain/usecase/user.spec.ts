@@ -7,14 +7,16 @@ import {
   UpdateUserUseCase,
   VerifyTokenUseCase,
 } from "./user";
-import { compareSync, genSaltSync, hashSync } from "bcryptjs";
+import { compareSync } from "bcryptjs";
 import { UserInMemoryRepository } from "../../../test/repository/user";
 import { AuthFakeRepository } from "../../../test/repository/auth";
 import { UserEntity } from "../entity/user";
 import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
+import { MockGenerator } from "../../../test/utils/mockGenerator";
 
 let userRepository: UserInMemoryRepository;
 let authRepository: AuthFakeRepository;
+let mockGenerator: MockGenerator;
 
 describe("Create User Use Case", () => {
   let useCase: CreateUserUseCase;
@@ -96,15 +98,11 @@ describe("Login Use Case", () => {
     userRepository = new UserInMemoryRepository();
     authRepository = new AuthFakeRepository();
     useCase = new LoginUseCase(userRepository, authRepository);
+    mockGenerator = new MockGenerator(userRepository);
   });
 
   it("should authenticate", async () => {
-    await userRepository.createUser({
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    });
+    await mockGenerator.createUserMock();
 
     const result = await useCase.execute({
       email: "fulano@exemplo.com",
@@ -125,12 +123,7 @@ describe("Login Use Case", () => {
   });
 
   it("should not authenticate with wrong password", async () => {
-    await userRepository.createUser({
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    });
+    await mockGenerator.createUserMock();
 
     const result = await useCase.execute({
       email: "fulano@exemplo.com",
@@ -141,12 +134,7 @@ describe("Login Use Case", () => {
   });
 
   it("should create token when authenticate", async () => {
-    await userRepository.createUser({
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    });
+    await mockGenerator.createUserMock();
 
     const result = await useCase.execute({
       email: "fulano@exemplo.com",
@@ -165,15 +153,11 @@ describe("Verify Token Use Case", () => {
     userRepository = new UserInMemoryRepository();
     authRepository = new AuthFakeRepository();
     useCase = new VerifyTokenUseCase(userRepository, authRepository);
+    mockGenerator = new MockGenerator(userRepository);
   });
 
   it("should verify token and authenticate", async () => {
-    await userRepository.createUser({
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    });
+    await mockGenerator.createUserMock();
 
     const token = "1";
 
@@ -208,18 +192,13 @@ describe("Update User Use Case", () => {
   beforeEach(() => {
     userRepository = new UserInMemoryRepository();
     useCase = new UpdateUserUseCase(userRepository);
+    mockGenerator = new MockGenerator(userRepository);
   });
 
   it("should update user", async () => {
-    const oldUser = {
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    };
     const id = 1;
 
-    await userRepository.createUser(oldUser);
+    const oldUser = { ...(await mockGenerator.createUserMock()) };
 
     const oldSize = userRepository.items.length;
 
@@ -247,14 +226,7 @@ describe("Update User Use Case", () => {
     const newName = "Cicrano";
     const id = 1;
 
-    const oldUser = {
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office,
-      password: hashSync("Teste123!", genSaltSync(11)),
-    };
-
-    await userRepository.createUser(oldUser);
+    const oldUser = { ...(await mockGenerator.createUserMock({ office })) };
 
     const oldSize = userRepository.items.length;
 
@@ -282,14 +254,7 @@ describe("Update User Use Case", () => {
     const newOffice = "Analista de Tecnologia";
     const id = 1;
 
-    const oldUser = {
-      name,
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    };
-
-    await userRepository.createUser(oldUser);
+    const oldUser = { ...(await mockGenerator.createUserMock({ name })) };
 
     const oldSize = userRepository.items.length;
 
@@ -313,14 +278,7 @@ describe("Update User Use Case", () => {
   });
 
   it("should not update user with wrong id in token", async () => {
-    const oldUser = {
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    };
-
-    await userRepository.createUser(oldUser);
+    const oldUser = { ...(await mockGenerator.createUserMock()) };
 
     const result = await useCase.execute({
       id: 1,
@@ -330,10 +288,7 @@ describe("Update User Use Case", () => {
     });
 
     expectPreConditionalError(result.error, true);
-    expect(oldUser).toEqual({
-      ...userRepository.items[0],
-      id: undefined,
-    });
+    expect(oldUser).toEqual(userRepository.items[0]);
   });
 
   it("should not update inexistent user", async () => {
@@ -354,18 +309,13 @@ describe("Get User Use Case", () => {
   beforeEach(() => {
     userRepository = new UserInMemoryRepository();
     useCase = new GetUserUseCase(userRepository);
+    mockGenerator = new MockGenerator(userRepository);
   });
 
   it("should get user", async () => {
-    const user = {
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    };
-    const id = 1;
+    const user = await mockGenerator.createUserMock();
 
-    await userRepository.createUser(user);
+    const id = 1;
 
     const result = await useCase.execute({
       id,
@@ -373,7 +323,7 @@ describe("Get User Use Case", () => {
 
     expect(result.error).toBe(null);
     expect(result.user).toBeInstanceOf(UserEntity);
-    expect(user).toEqual({ ...result.user, id: undefined });
+    expect(user).toEqual(result.user);
   });
 
   it("should not get inexistent user", async () => {
@@ -394,18 +344,13 @@ describe("Delete User Use Case", () => {
   beforeEach(() => {
     userRepository = new UserInMemoryRepository();
     useCase = new DeleteUserUseCase(userRepository);
+    mockGenerator = new MockGenerator(userRepository);
   });
 
   it("should delete user", async () => {
-    const user = {
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    };
     const id = 1;
 
-    await userRepository.createUser(user);
+    await mockGenerator.createUserMock();
 
     const oldSize = userRepository.items.length;
 
@@ -432,14 +377,7 @@ describe("Delete User Use Case", () => {
   });
 
   it("should not delete user with wrong id on token", async () => {
-    const user = {
-      name: "Fulano",
-      email: "fulano@exemplo.com",
-      office: "Desenvolvedor",
-      password: hashSync("Teste123!", genSaltSync(11)),
-    };
-
-    await userRepository.createUser(user);
+    await mockGenerator.createUserMock();
 
     const result = await useCase.execute({
       id: 1,
