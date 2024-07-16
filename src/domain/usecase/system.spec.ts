@@ -27,22 +27,20 @@ describe("Create System Use Case", () => {
   });
 
   it("should create system", async () => {
-    const userId = 1;
-
-    await mockGenerator.createUserMock();
+    const user = await mockGenerator.createUserMock();
 
     const oldSize = systemRepository.items.length;
 
     const result = await useCase.execute({
       name: "Sistema LGPD",
       description: "Descrição do sistema LGPD",
-      userId,
-      tokenUserId: userId,
+      userId: user.id,
+      tokenUserId: user.id,
     });
 
     expect(result.error).toBe(null);
     expect(result.system.id).toEqual(expect.any(Number));
-    expect(result.system.userId).toEqual(userId);
+    expect(result.system.userId).toEqual(user.id);
     expect(systemRepository.items[0]).toEqual(result.system);
     expect(oldSize).toBe(systemRepository.items.length - 1);
   });
@@ -67,13 +65,13 @@ describe("Create System Use Case", () => {
   it("should not create system for user different from authenticated user", async () => {
     const oldSize = systemRepository.items.length;
 
-    await mockGenerator.createUserMock();
+    const user = await mockGenerator.createUserMock();
 
     const result = await useCase.execute({
       name: "Sistema LGPD",
       description: "Descrição do sistema LGPD",
-      userId: 1,
-      tokenUserId: 2,
+      userId: user.id,
+      tokenUserId: user.id + 1,
     });
 
     expectPreConditionalError(result.error, true);
@@ -84,13 +82,13 @@ describe("Create System Use Case", () => {
   it("should not create system for no user", async () => {
     const oldSize = systemRepository.items.length;
 
-    await mockGenerator.createUserMock();
+    const user = await mockGenerator.createUserMock();
 
     const result = await useCase.execute({
       name: "Sistema LGPD",
       description: "Descrição do sistema LGPD",
       userId: undefined,
-      tokenUserId: 1,
+      tokenUserId: user.id,
     });
 
     expectPreConditionalError(result.error);
@@ -110,35 +108,35 @@ describe("List User Systems Use Case", () => {
   });
 
   it("should list user systems", async () => {
-    const userId = 1;
-
-    await mockGenerator.createUserAndSystemMock();
-    await mockGenerator.createUserMock();
-    await mockGenerator.createSystemMock();
-    await mockGenerator.createSystemMock({ userId: 2, tokenUserId: 2 });
+    const { user: user1 } = await mockGenerator.createUserAndSystemMock();
+    const user2 = await mockGenerator.createUserMock();
+    const system2 = await mockGenerator.createSystemMock();
+    await mockGenerator.createSystemMock({
+      userId: user2.id,
+      tokenUserId: user2.id,
+    });
 
     const result = await useCase.execute({
-      userId,
-      tokenUserId: userId,
+      userId: user1.id,
+      tokenUserId: user1.id,
     });
 
     expect(result.error).toBe(null);
-    expect(result.systems[0].userId).toBe(userId);
+    expect(result.systems[0].userId).toBe(user1.id);
+    expect(result.systems[1]).toEqual(system2);
     expect(result.systems.length).toBe(systemRepository.items.length - 1);
 
     result.systems.forEach((system) => {
-      expect(system.userId).toBe(userId);
+      expect(system.userId).toBe(user1.id);
     });
   });
 
   it("should list empty list when user doesnt have systems", async () => {
-    const userId = 1;
-
-    await mockGenerator.createUserMock();
+    const user = await mockGenerator.createUserMock();
 
     const result = await useCase.execute({
-      userId,
-      tokenUserId: userId,
+      userId: user.id,
+      tokenUserId: user.id,
     });
 
     expect(result.error).toBe(null);
@@ -146,12 +144,10 @@ describe("List User Systems Use Case", () => {
   });
 
   it("should not list systems when user authenticated is different from user", async () => {
-    const userId = 1;
-
-    await mockGenerator.createUserAndSystemMock();
+    const { user } = await mockGenerator.createUserAndSystemMock();
 
     const result = await useCase.execute({
-      userId,
+      userId: user.id,
       tokenUserId: 2,
     });
 
@@ -182,12 +178,10 @@ describe("Get System Use Case", () => {
   });
 
   it("should get system", async () => {
-    const id = 1;
-
     const system = await mockGenerator.createSystemMock();
 
     const result = await useCase.execute({
-      id,
+      id: system.id,
     });
 
     expect(result.error).toBe(null);
@@ -217,7 +211,6 @@ describe("Update System Use Case", () => {
   });
 
   it("should update system", async () => {
-    const id = 1;
     const newName = "Sistema LGPD Alterado";
     const newDescription = "Descrição do sistema LGPD Alterado";
 
@@ -226,13 +219,15 @@ describe("Update System Use Case", () => {
     const oldSize = systemRepository.items.length;
 
     const result = await useCase.execute({
-      id,
-      tokenUserId: id,
+      id: oldSystem.id,
+      tokenUserId: oldSystem.userId,
       name: newName,
       description: newDescription,
     });
 
-    const systemUpdated = systemRepository.items.find((item) => item.id === id);
+    const systemUpdated = systemRepository.items.find(
+      (item) => item.id === oldSystem.id,
+    );
 
     expect(result.error).toBe(null);
     expect(systemUpdated).toBeInstanceOf(SystemEntity);
@@ -245,7 +240,6 @@ describe("Update System Use Case", () => {
   });
 
   it("should update only name of system", async () => {
-    const id = 1;
     const newName = "Sistema LGPD Alterado";
 
     const oldSystem = { ...(await mockGenerator.createSystemMock()) };
@@ -253,13 +247,15 @@ describe("Update System Use Case", () => {
     const oldSize = systemRepository.items.length;
 
     const result = await useCase.execute({
-      id,
-      tokenUserId: id,
+      id: oldSystem.id,
+      tokenUserId: oldSystem.userId,
       name: newName,
       description: oldSystem.description,
     });
 
-    const systemUpdated = systemRepository.items.find((item) => item.id === id);
+    const systemUpdated = systemRepository.items.find(
+      (item) => item.id === oldSystem.id,
+    );
 
     expect(result.error).toBe(null);
     expect(systemUpdated).toBeInstanceOf(SystemEntity);
@@ -272,7 +268,6 @@ describe("Update System Use Case", () => {
   });
 
   it("should update only description of system", async () => {
-    const id = 1;
     const newDescription = "Descrição";
 
     const oldSystem = {
@@ -282,13 +277,15 @@ describe("Update System Use Case", () => {
     const oldSize = systemRepository.items.length;
 
     const result = await useCase.execute({
-      id,
-      tokenUserId: id,
+      id: oldSystem.id,
+      tokenUserId: oldSystem.userId,
       name: oldSystem.name,
       description: newDescription,
     });
 
-    const systemUpdated = systemRepository.items.find((item) => item.id === id);
+    const systemUpdated = systemRepository.items.find(
+      (item) => item.id === oldSystem.id,
+    );
 
     expect(result.error).toBe(null);
     expect(systemUpdated).toBeInstanceOf(SystemEntity);
@@ -301,7 +298,6 @@ describe("Update System Use Case", () => {
   });
 
   it("should not update system with wrong id on token", async () => {
-    const id = 1;
     const newName = "Sistema LGPD Alterado";
     const newDescription = "Descrição";
 
@@ -310,8 +306,8 @@ describe("Update System Use Case", () => {
     };
 
     const result = await useCase.execute({
-      id,
-      tokenUserId: 2,
+      id: oldSystem.id,
+      tokenUserId: oldSystem.userId + 1,
       name: newName,
       description: newDescription,
     });
@@ -327,7 +323,7 @@ describe("Update System Use Case", () => {
 
     const result = await useCase.execute({
       id,
-      tokenUserId: 1,
+      tokenUserId: id,
       name: newName,
       description: newDescription,
     });
@@ -381,7 +377,7 @@ describe("Delete System Use Case", () => {
 
     const result = await useCase.execute({
       id,
-      tokenUserId: 2,
+      tokenUserId: id + 1,
     });
 
     expectPreConditionalError(result.error, true);

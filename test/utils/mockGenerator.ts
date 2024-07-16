@@ -19,6 +19,9 @@ class MockGenerator {
   private userRepository: UserRepositoryInterface;
   private systemRepository: SystemRepositoryInterface;
   private checklistRepository: ChecklistRepositoryInterface;
+  public checklistData = {
+    message: "hello",
+  };
 
   constructor(
     userRepository?: UserRepositoryInterface,
@@ -65,8 +68,13 @@ class MockGenerator {
   }
 
   async createUserAndSystemMock() {
-    await this.createUserMock();
-    await this.createSystemMock();
+    const user = await this.createUserMock();
+    const system = await this.createSystemMock();
+
+    return {
+      user,
+      system,
+    };
   }
 }
 
