@@ -76,7 +76,7 @@ describe("Create User Use Case", () => {
       password: "Teste123!",
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 
   it("should not create user with weak password", async () => {
@@ -87,7 +87,7 @@ describe("Create User Use Case", () => {
       password: "123456",
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 });
 
@@ -120,7 +120,7 @@ describe("Login Use Case", () => {
       password: "Teste123!",
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 
   it("should not authenticate with wrong password", async () => {
@@ -132,7 +132,7 @@ describe("Login Use Case", () => {
       password: wrongPassword,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 
   it("should create token when authenticate", async () => {
@@ -177,7 +177,7 @@ describe("Verify Token Use Case", () => {
 
     const result = await useCase.execute({ token });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 
   it("should not authenticate with invalid token", async () => {
@@ -185,7 +185,7 @@ describe("Verify Token Use Case", () => {
 
     const result = await useCase.execute({ token });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 });
 
@@ -292,7 +292,7 @@ describe("Update User Use Case", () => {
       office: "Analista de Tecnologia",
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
     expect(oldUser).toEqual(userRepository.items[0]);
   });
 
@@ -306,7 +306,7 @@ describe("Update User Use Case", () => {
       office: "Cicrano",
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 });
 
@@ -338,7 +338,7 @@ describe("Get User Use Case", () => {
       id,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.user).toBe(null);
   });
 });
@@ -375,7 +375,7 @@ describe("Delete User Use Case", () => {
       tokenUserId: id,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(userRepository.items.length).toBe(0);
   });
 
@@ -387,7 +387,7 @@ describe("Delete User Use Case", () => {
       tokenUserId: user.id + 1,
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
     expect(userRepository.items.length).toBe(1);
   });
 });

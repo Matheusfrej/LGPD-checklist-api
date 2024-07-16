@@ -5,7 +5,13 @@ import {
   PRE_CONDITIONAL_ERROR_CODE,
 } from "../../src/domain/entity/error";
 
-function expectPreConditionalError(error: ErrorEntity, noPermission?: boolean) {
+function expectPreConditionalError({
+  error,
+  noPermission,
+}: {
+  error: ErrorEntity;
+  noPermission?: boolean;
+}) {
   expect(error).toBeInstanceOf(ErrorEntity);
   expect(error.code).toBe(PRE_CONDITIONAL_ERROR_CODE);
   if (noPermission) {

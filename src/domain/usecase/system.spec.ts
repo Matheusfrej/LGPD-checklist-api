@@ -57,7 +57,7 @@ describe("Create System Use Case", () => {
       tokenUserId: userId,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.system).toBe(null);
     expect(oldSize).toBe(systemRepository.items.length);
   });
@@ -74,7 +74,7 @@ describe("Create System Use Case", () => {
       tokenUserId: user.id + 1,
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
     expect(result.system).toBe(null);
     expect(oldSize).toBe(systemRepository.items.length);
   });
@@ -91,7 +91,7 @@ describe("Create System Use Case", () => {
       tokenUserId: user.id,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.system).toBe(null);
     expect(oldSize).toBe(systemRepository.items.length);
   });
@@ -151,7 +151,7 @@ describe("List User Systems Use Case", () => {
       tokenUserId: 2,
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
   });
 
   it("should not list systems from inexistent user", async () => {
@@ -164,7 +164,7 @@ describe("List User Systems Use Case", () => {
       tokenUserId: userId,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 });
 
@@ -196,7 +196,7 @@ describe("Get System Use Case", () => {
       id,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.system).toBe(null);
   });
 });
@@ -312,7 +312,7 @@ describe("Update System Use Case", () => {
       description: newDescription,
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
     expect(oldSystem).toEqual(systemRepository.items[0]);
   });
 
@@ -328,7 +328,7 @@ describe("Update System Use Case", () => {
       description: newDescription,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
   });
 });
 
@@ -366,7 +366,7 @@ describe("Delete System Use Case", () => {
       tokenUserId: id,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(systemRepository.items.length).toBe(0);
   });
 
@@ -380,7 +380,7 @@ describe("Delete System Use Case", () => {
       tokenUserId: id + 1,
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
     expect(systemRepository.items.length).toBe(1);
   });
 });

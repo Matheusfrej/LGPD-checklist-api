@@ -67,7 +67,7 @@ describe("Create Checklist Use Case", () => {
       isIot: false,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
@@ -87,7 +87,7 @@ describe("Create Checklist Use Case", () => {
       isIot: false,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
@@ -107,7 +107,7 @@ describe("Create Checklist Use Case", () => {
       isIot: false,
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
@@ -127,7 +127,7 @@ describe("Create Checklist Use Case", () => {
       isIot: false,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
@@ -147,7 +147,7 @@ describe("Create Checklist Use Case", () => {
       isIot: false,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
@@ -168,7 +168,7 @@ describe("Create Checklist Use Case", () => {
       isIot: false,
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
@@ -188,7 +188,7 @@ describe("Create Checklist Use Case", () => {
       isIot: false,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
@@ -208,7 +208,7 @@ describe("Create Checklist Use Case", () => {
       isIot: false,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
@@ -248,7 +248,7 @@ describe("Get Checklist Use Case", () => {
       tokenUserId: 1,
     });
 
-    expectPreConditionalError(result.error);
+    expectPreConditionalError({ error: result.error });
     expect(result.checklist).toBe(null);
   });
 
@@ -260,7 +260,7 @@ describe("Get Checklist Use Case", () => {
       tokenUserId: 2,
     });
 
-    expectPreConditionalError(result.error, true);
+    expectPreConditionalError({ error: result.error, noPermission: true });
     expect(result.checklist).toBe(null);
   });
 });
