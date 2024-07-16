@@ -2,7 +2,7 @@ import { AuthRepositoryInterface } from "../domain/usecase/repository/auth";
 
 class AuthFakeRepository implements AuthRepositoryInterface {
   createToken(id: number): string {
-    return `${id}`;
+    return id.toString();
   }
 
   verifyToken(token: string) {

@@ -102,11 +102,12 @@ describe("Login Use Case", () => {
   });
 
   it("should authenticate", async () => {
-    await mockGenerator.createUserMock();
+    const password = "Teste123!";
+    const user = await mockGenerator.createUserMock({ password });
 
     const result = await useCase.execute({
-      email: "fulano@exemplo.com",
-      password: "Teste123!",
+      email: user.email,
+      password,
     });
 
     expect(result.error).toBe(null);
@@ -123,22 +124,24 @@ describe("Login Use Case", () => {
   });
 
   it("should not authenticate with wrong password", async () => {
-    await mockGenerator.createUserMock();
+    const user = await mockGenerator.createUserMock();
+    const wrongPassword = "123Teste!";
 
     const result = await useCase.execute({
-      email: "fulano@exemplo.com",
-      password: "123Teste!",
+      email: user.email,
+      password: wrongPassword,
     });
 
     expectPreConditionalError(result.error);
   });
 
   it("should create token when authenticate", async () => {
-    await mockGenerator.createUserMock();
+    const password = "Teste123!";
+    const user = await mockGenerator.createUserMock({ password });
 
     const result = await useCase.execute({
-      email: "fulano@exemplo.com",
-      password: "Teste123!",
+      email: user.email,
+      password,
     });
 
     expect(result.error).toBe(null);
@@ -157,9 +160,9 @@ describe("Verify Token Use Case", () => {
   });
 
   it("should verify token and authenticate", async () => {
-    await mockGenerator.createUserMock();
+    const user = await mockGenerator.createUserMock();
 
-    const token = "1";
+    const token = user.id.toString();
 
     const result = await useCase.execute({ token });
 
@@ -196,20 +199,20 @@ describe("Update User Use Case", () => {
   });
 
   it("should update user", async () => {
-    const id = 1;
-
     const oldUser = { ...(await mockGenerator.createUserMock()) };
 
     const oldSize = userRepository.items.length;
 
     const result = await useCase.execute({
-      id,
-      tokenUserId: id,
+      id: oldUser.id,
+      tokenUserId: oldUser.id,
       name: "Cicrano",
       office: "Analista de Tecnologia",
     });
 
-    const userUpdated = userRepository.items.find((item) => item.id === id);
+    const userUpdated = userRepository.items.find(
+      (item) => item.id === oldUser.id,
+    );
 
     expect(result.error).toBe(null);
     expect(userUpdated).toBeInstanceOf(UserEntity);
@@ -224,20 +227,21 @@ describe("Update User Use Case", () => {
   it("should update only name of user", async () => {
     const office = "Desenvolvedor";
     const newName = "Cicrano";
-    const id = 1;
 
     const oldUser = { ...(await mockGenerator.createUserMock({ office })) };
 
     const oldSize = userRepository.items.length;
 
     const result = await useCase.execute({
-      id,
-      tokenUserId: id,
+      id: oldUser.id,
+      tokenUserId: oldUser.id,
       name: newName,
       office,
     });
 
-    const userUpdated = userRepository.items.find((item) => item.id === 1);
+    const userUpdated = userRepository.items.find(
+      (item) => item.id === oldUser.id,
+    );
 
     expect(result.error).toBe(null);
     expect(userUpdated).toBeInstanceOf(UserEntity);
@@ -252,20 +256,21 @@ describe("Update User Use Case", () => {
   it("should update only office of user", async () => {
     const name = "Fulano";
     const newOffice = "Analista de Tecnologia";
-    const id = 1;
 
     const oldUser = { ...(await mockGenerator.createUserMock({ name })) };
 
     const oldSize = userRepository.items.length;
 
     const result = await useCase.execute({
-      id,
-      tokenUserId: id,
+      id: oldUser.id,
+      tokenUserId: oldUser.id,
       name,
       office: newOffice,
     });
 
-    const userUpdated = userRepository.items.find((item) => item.id === 1);
+    const userUpdated = userRepository.items.find(
+      (item) => item.id === oldUser.id,
+    );
 
     expect(result.error).toBe(null);
     expect(userUpdated).toBeInstanceOf(UserEntity);
@@ -281,8 +286,8 @@ describe("Update User Use Case", () => {
     const oldUser = { ...(await mockGenerator.createUserMock()) };
 
     const result = await useCase.execute({
-      id: 1,
-      tokenUserId: 2,
+      id: oldUser.id,
+      tokenUserId: oldUser.id + 1,
       name: "Cicrano",
       office: "Analista de Tecnologia",
     });
@@ -292,9 +297,11 @@ describe("Update User Use Case", () => {
   });
 
   it("should not update inexistent user", async () => {
+    const id = 1;
+
     const result = await useCase.execute({
-      id: 1,
-      tokenUserId: 1,
+      id,
+      tokenUserId: id,
       name: "Fulano",
       office: "Cicrano",
     });
@@ -315,10 +322,8 @@ describe("Get User Use Case", () => {
   it("should get user", async () => {
     const user = await mockGenerator.createUserMock();
 
-    const id = 1;
-
     const result = await useCase.execute({
-      id,
+      id: user.id,
     });
 
     expect(result.error).toBe(null);
@@ -348,15 +353,13 @@ describe("Delete User Use Case", () => {
   });
 
   it("should delete user", async () => {
-    const id = 1;
-
-    await mockGenerator.createUserMock();
+    const user = await mockGenerator.createUserMock();
 
     const oldSize = userRepository.items.length;
 
     const result = await useCase.execute({
-      id,
-      tokenUserId: id,
+      id: user.id,
+      tokenUserId: user.id,
     });
 
     expect(result.error).toBe(null);
@@ -377,11 +380,11 @@ describe("Delete User Use Case", () => {
   });
 
   it("should not delete user with wrong id on token", async () => {
-    await mockGenerator.createUserMock();
+    const user = await mockGenerator.createUserMock();
 
     const result = await useCase.execute({
-      id: 1,
-      tokenUserId: 2,
+      id: user.id,
+      tokenUserId: user.id + 1,
     });
 
     expectPreConditionalError(result.error, true);
