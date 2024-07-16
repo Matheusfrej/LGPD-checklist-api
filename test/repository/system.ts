@@ -25,18 +25,7 @@ class SystemInMemoryRepository implements SystemRepositoryInterface {
   async listSystemsByUserId(
     req: systemUcio.ListSystemsByUserIdUseCaseRequest,
   ): Promise<SystemEntity[]> {
-    const systemsFilteredByUserId = this.items.filter(
-      (item) => item.userId === req.userId,
-    );
-
-    return systemsFilteredByUserId.map((system) => {
-      return new SystemEntity(
-        system.id,
-        system.name,
-        system.description,
-        system.userId,
-      );
-    });
+    return this.items.filter((item) => item.userId === req.userId);
   }
 
   async getSystem(id: number): Promise<SystemEntity> {
