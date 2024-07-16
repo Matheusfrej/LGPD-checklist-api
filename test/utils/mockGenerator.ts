@@ -1,7 +1,8 @@
 import { genSaltSync, hashSync } from "bcryptjs";
-import { SystemRepositoryInterface } from "../domain/usecase/repository/system";
-import { UserRepositoryInterface } from "../domain/usecase/repository/user";
-import { ChecklistRepositoryInterface } from "../domain/usecase/repository/checklist";
+import { SystemRepositoryInterface } from "../../src/domain/usecase/repository/system";
+import { UserRepositoryInterface } from "../../src/domain/usecase/repository/user";
+import { ChecklistRepositoryInterface } from "../../src/domain/usecase/repository/checklist";
+import { Json } from "../../src/domain/@types";
 
 enum Repositories {
   "User" = "User",
@@ -19,7 +20,7 @@ class MockGenerator {
   private userRepository: UserRepositoryInterface;
   private systemRepository: SystemRepositoryInterface;
   private checklistRepository: ChecklistRepositoryInterface;
-  public checklistData = {
+  public checklistData: Json = {
     message: "hello",
   };
 

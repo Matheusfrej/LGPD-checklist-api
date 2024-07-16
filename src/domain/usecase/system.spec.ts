@@ -110,7 +110,7 @@ describe("List User Systems Use Case", () => {
   it("should list user systems", async () => {
     const { user: user1 } = await mockGenerator.createUserAndSystemMock();
     const user2 = await mockGenerator.createUserMock();
-    const system2 = await mockGenerator.createSystemMock();
+    const system2 = await mockGenerator.createSystemMock({ userId: user1.id });
     await mockGenerator.createSystemMock({
       userId: user2.id,
       tokenUserId: user2.id,
@@ -122,7 +122,6 @@ describe("List User Systems Use Case", () => {
     });
 
     expect(result.error).toBe(null);
-    expect(result.systems[0].userId).toBe(user1.id);
     expect(result.systems[1]).toEqual(system2);
     expect(result.systems.length).toBe(systemRepository.items.length - 1);
 
@@ -148,7 +147,7 @@ describe("List User Systems Use Case", () => {
 
     const result = await useCase.execute({
       userId: user.id,
-      tokenUserId: 2,
+      tokenUserId: user.id + 1,
     });
 
     expectPreConditionalError({ error: result.error, noPermission: true });
@@ -157,14 +156,12 @@ describe("List User Systems Use Case", () => {
   it("should not list systems from inexistent user", async () => {
     const userId = 1;
 
-    await mockGenerator.createSystemMock();
-
     const result = await useCase.execute({
       userId,
       tokenUserId: userId,
     });
 
-    expectPreConditionalError({ error: result.error });
+    expectPreConditionalError({ error: result.error, noPermission: false });
   });
 });
 
@@ -239,7 +236,7 @@ describe("Update System Use Case", () => {
     expect(systemUpdated.userId).toBe(oldSystem.userId);
   });
 
-  it("should update only name of system", async () => {
+  it("should be able to update only name of system", async () => {
     const newName = "Sistema LGPD Alterado";
 
     const oldSystem = { ...(await mockGenerator.createSystemMock()) };
@@ -267,7 +264,7 @@ describe("Update System Use Case", () => {
     expect(systemUpdated.userId).toBe(oldSystem.userId);
   });
 
-  it("should update only description of system", async () => {
+  it("should be able to update only description of system", async () => {
     const newDescription = "Descrição";
 
     const oldSystem = {
@@ -370,7 +367,7 @@ describe("Delete System Use Case", () => {
     expect(systemRepository.items.length).toBe(0);
   });
 
-  it("should not delete system whose userId is different from user id on token", async () => {
+  it("should not delete system if system doesnt belong to authenticated user", async () => {
     const id = 1;
 
     await mockGenerator.createSystemMock();

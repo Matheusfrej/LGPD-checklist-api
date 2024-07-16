@@ -17,6 +17,9 @@ function expectPreConditionalError({
   if (noPermission) {
     expect(error.message).toBe(NO_PERMISSION_MESSAGE);
   }
+  if (noPermission === false) {
+    expect(error.message).not.toBe(NO_PERMISSION_MESSAGE);
+  }
 }
 
 export { expectPreConditionalError };
