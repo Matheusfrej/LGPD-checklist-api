@@ -67,6 +67,27 @@ class MockGenerator {
     throw new NoRepositoryError(Repositories.System);
   }
 
+  async createChecklistMock({
+    userId = 1,
+    tokenUserId = 1,
+    systemId = 1,
+    isGeneral = true,
+    isIot = false,
+    checklistData = this.checklistData,
+  } = {}) {
+    if (this.checklistRepository) {
+      return await this.checklistRepository.createChecklist({
+        userId,
+        tokenUserId,
+        systemId,
+        checklistData,
+        isGeneral,
+        isIot,
+      });
+    }
+    throw new NoRepositoryError(Repositories.Checklist);
+  }
+
   async createUserAndSystemMock() {
     const user = await this.createUserMock();
     const system = await this.createSystemMock();
@@ -74,6 +95,18 @@ class MockGenerator {
     return {
       user,
       system,
+    };
+  }
+
+  async createUserSystemAndChecklistMock() {
+    const user = await this.createUserMock();
+    const system = await this.createSystemMock();
+    const checklist = await this.createChecklistMock();
+
+    return {
+      user,
+      system,
+      checklist,
     };
   }
 }

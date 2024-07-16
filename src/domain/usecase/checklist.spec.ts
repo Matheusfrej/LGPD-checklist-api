@@ -1,17 +1,18 @@
 import { UserInMemoryRepository } from "../../../test/repository/user";
 import { SystemInMemoryRepository } from "../../../test/repository/system";
-import { CreateChecklistUseCase } from "./checklist";
+import { CreateChecklistUseCase, GetChecklistUseCase } from "./checklist";
 import { MockGenerator } from "../../../test/utils/mockGenerator";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ChecklistInMemoryRepository } from "../../../test/repository/checklist";
 import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
+import { ChecklistEntity } from "../entity/checklist";
 
 let userRepository: UserInMemoryRepository;
 let systemRepository: SystemInMemoryRepository;
 let checklistRepository: ChecklistInMemoryRepository;
 let mockGenerator: MockGenerator;
 
-describe("Create System Use Case", () => {
+describe("Create Checklist Use Case", () => {
   let useCase: CreateChecklistUseCase;
 
   beforeEach(() => {
@@ -210,5 +211,56 @@ describe("Create System Use Case", () => {
     expectPreConditionalError(result.error);
     expect(result.checklist).toBe(null);
     expect(oldSize).toBe(checklistRepository.items.length);
+  });
+});
+
+describe("Get Checklist Use Case", () => {
+  let useCase: GetChecklistUseCase;
+
+  beforeEach(() => {
+    checklistRepository = new ChecklistInMemoryRepository();
+    useCase = new GetChecklistUseCase(checklistRepository);
+    mockGenerator = new MockGenerator(
+      undefined,
+      undefined,
+      checklistRepository,
+    );
+  });
+
+  it("should get checklist", async () => {
+    const checklist = await mockGenerator.createChecklistMock();
+
+    const result = await useCase.execute({
+      id: checklist.id,
+      tokenUserId: checklist.userId,
+    });
+
+    expect(result.error).toBe(null);
+    expect(result.checklist).toBeInstanceOf(ChecklistEntity);
+    expect(checklist).toEqual(result.checklist);
+  });
+
+  it("should not get inexistent checklist", async () => {
+    const id = 1;
+
+    const result = await useCase.execute({
+      id,
+      tokenUserId: 1,
+    });
+
+    expectPreConditionalError(result.error);
+    expect(result.checklist).toBe(null);
+  });
+
+  it("should not get checklist if checklist doesnt belong to authenticated user", async () => {
+    const checklist = await mockGenerator.createChecklistMock();
+
+    const result = await useCase.execute({
+      id: checklist.id,
+      tokenUserId: 2,
+    });
+
+    expectPreConditionalError(result.error, true);
+    expect(result.checklist).toBe(null);
   });
 });
