@@ -32,7 +32,7 @@ class CreateChecklistUseCaseValidate implements ValidateInterface {
     }),
     isIot: zodBooleanSchema("isIot"),
     checklistData: z.custom<Json>(isNonEmptyJson, {
-      message: "checklistData não podem ser vazio e deve ser no formato JSON",
+      message: "checklistData não podem ser vazio e deve estar no formato JSON",
     }),
   });
 
