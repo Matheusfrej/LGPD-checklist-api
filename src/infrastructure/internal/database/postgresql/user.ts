@@ -60,7 +60,7 @@ async function deleteUser(id: number): Promise<void> {
 
 async function checkUserByEmailExists(
   email: string,
-  id: number,
+  id?: number,
 ): Promise<boolean> {
   const user = await prisma.users.findFirst({
     where: {

@@ -5,14 +5,20 @@ import { CmdRest } from "./delivery/api/rest/cmd/server";
 const REST = "rest";
 
 class Main {
+  public restApp: CmdRest;
+
+  constructor() {
+    this.restApp = new CmdRest();
+  }
+
   public initDev(): void {
-    new CmdRest().server();
+    this.restApp.startServer();
   }
 
   public init(): void {
     if (this.checkEnvVar()) {
       if (process.env.SERVER === REST) {
-        new CmdRest().server();
+        this.restApp.startServer();
       }
     }
   }
@@ -33,10 +39,24 @@ class Main {
 
     return true;
   }
+
+  public waitUntilRestIsReady(): Promise<void> {
+    return this.restApp.waitUntilReady();
+  }
+
+  public closeRestServer(): Promise<void> {
+    return this.restApp.closeServer();
+  }
 }
 
+const main = new Main();
+
 if (process.env.NODE_ENV === "production") {
-  new Main().init();
+  main.init();
 } else {
-  new Main().initDev();
+  main.initDev();
 }
+
+export const restApp = main.restApp.app;
+export const waitUntilRestIsReady = main.waitUntilRestIsReady.bind(main);
+export const closeRestServer = main.closeRestServer.bind(main);

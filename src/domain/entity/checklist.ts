@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Json } from "../@types";
+
 class ChecklistEntity {
   public id: number;
   public userId: number;
   public systemId: number;
-  public checklistData: any;
+  public checklistData: Json;
   public isGeneral?: boolean;
   public isIot?: boolean;
   public createdAt?: Date;
@@ -13,7 +14,7 @@ class ChecklistEntity {
     id: number,
     userId: number,
     systemId: number,
-    checklistData: any,
+    checklistData: Json,
     isGeneral?: boolean,
     isIot?: boolean,
     createdAt?: Date,

@@ -1,15 +1,15 @@
 import * as userUseCase from "@/domain/usecase/user";
 import * as userUcio from "@/domain/usecase/ucio/user";
-import * as userValidate from "@/infrastructure/provider/validate/user";
-import * as userRepository from "@/infrastructure/provider/repository/user";
 import {
   InternalServerErrorResponse,
   SuccessResponse,
 } from "../response/response";
 import { NextFunction, Request, Response } from "express";
+import { UserPrismaRepository } from "../../../../infrastructure/provider/repository/user";
+import { AuthJWTRepository } from "../../../../infrastructure/provider/repository/auth";
 
 class CreateUserController {
-  async createUser(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { name, office, email, password } = req.body;
 
     const ucReq = new userUcio.CreateUserUseCaseRequest(
@@ -19,11 +19,10 @@ class CreateUserController {
       password,
     );
 
-    const validate = new userValidate.CreateUserUseCaseValidate();
-    const repository = new userRepository.CreateUserUseCaseRepository();
-    const usecase = new userUseCase.CreateUserUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.CreateUserUseCase(repository);
 
-    const ucRes = await usecase.createUser(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { user: ucRes.user });
@@ -34,16 +33,19 @@ class CreateUserController {
 }
 
 class LoginController {
-  async login(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { email, password } = req.body;
 
     const ucReq = new userUcio.LoginUseCaseRequest(email, password);
 
-    const validate = new userValidate.LoginUseCaseValidate();
-    const repository = new userRepository.LoginUseCaseRepository();
-    const usecase = new userUseCase.LoginUseCase(validate, repository);
+    const userRepository = new UserPrismaRepository();
+    const authRepository = new AuthJWTRepository();
+    const usecase = new userUseCase.LoginUseCase(
+      userRepository,
+      authRepository,
+    );
 
-    const ucRes = await usecase.login(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, {
@@ -63,17 +65,29 @@ class VerifyTokenController {
     this.isMiddleware = isMiddleware;
   }
 
-  async verifyToken(req: Request, res: Response, next: NextFunction) {
+  async execute(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.authorization;
 
     const ucReq = new userUcio.VerifyTokenUseCaseRequest(token);
 
-    const validate = new userValidate.VerifyTokenUseCaseValidate();
-    const repository = new userRepository.VerifyTokenUseCaseRepository();
-    const usecase = new userUseCase.VerifyTokenUseCase(validate, repository);
+    const userRepository = new UserPrismaRepository();
+    const authRepository = new AuthJWTRepository();
+    const usecase = new userUseCase.VerifyTokenUseCase(
+      userRepository,
+      authRepository,
+    );
 
-    const ucRes = await usecase.verifyToken(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
+    this.checkIfItIsMiddleware(req, res, next, ucRes);
+  }
+
+  checkIfItIsMiddleware(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    ucRes: userUcio.VerifyTokenUseCaseResponse,
+  ) {
     if (this.isMiddleware) {
       if (!ucRes.error) {
         req.body.tokenUserId = ucRes.user.id;
@@ -95,7 +109,7 @@ class VerifyTokenController {
 }
 
 class UpdateUserController {
-  async updateUser(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId, name, office } = req.body;
 
@@ -106,11 +120,10 @@ class UpdateUserController {
       office,
     );
 
-    const validate = new userValidate.UpdateUserUseCaseValidate();
-    const repository = new userRepository.UpdateUserUseCaseRepository();
-    const usecase = new userUseCase.UpdateUserUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.UpdateUserUseCase(repository);
 
-    const ucRes = await usecase.updateUser(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);
@@ -121,16 +134,15 @@ class UpdateUserController {
 }
 
 class GetUserController {
-  async getUser(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
 
     const ucReq = new userUcio.GetUserUseCaseRequest(+id);
 
-    const validate = new userValidate.GetUserUseCaseValidate();
-    const repository = new userRepository.GetUserUseCaseRepository();
-    const usecase = new userUseCase.GetUserUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.GetUserUseCase(repository);
 
-    const ucRes = await usecase.getUser(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { user: ucRes.user });
@@ -141,17 +153,16 @@ class GetUserController {
 }
 
 class DeleteUserController {
-  async deleteUser(req: Request, res: Response) {
+  async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
     const ucReq = new userUcio.DeleteUserUseCaseRequest(tokenUserId, +id);
 
-    const validate = new userValidate.DeleteUserUseCaseValidate();
-    const repository = new userRepository.DeleteUserUseCaseRepository();
-    const usecase = new userUseCase.DeleteUserUseCase(validate, repository);
+    const repository = new UserPrismaRepository();
+    const usecase = new userUseCase.DeleteUserUseCase(repository);
 
-    const ucRes = await usecase.deleteUser(ucReq);
+    const ucRes = await usecase.execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);

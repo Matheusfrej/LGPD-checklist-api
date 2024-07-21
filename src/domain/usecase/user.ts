@@ -1,4 +1,3 @@
-import * as userRepositoryInterface from "./repository/user";
 import * as userValidateInterface from "./validate/user";
 import * as userUcioInterface from "./ucio/user";
 import { genSaltSync, hashSync } from "bcryptjs";
@@ -9,31 +8,32 @@ import {
   newInternalServerError,
   newPreConditionalError,
 } from "../entity/error";
+import { UserRepositoryInterface } from "./repository/user";
+import { AuthRepositoryInterface } from "./repository/auth";
 
 class CreateUserUseCase {
-  public validate: userValidateInterface.CreateUserUseCaseValidateInterface;
-  public repository: userRepositoryInterface.CreateUserUseCaseRepositoryInterface;
+  public validate: userValidateInterface.CreateUserUseCaseValidate;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.CreateUserUseCaseValidateInterface,
-    repository: userRepositoryInterface.CreateUserUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(userRepository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.CreateUserUseCaseValidate(
+      userRepository,
+    );
+    this.userRepository = userRepository;
   }
 
-  async createUser(
+  async execute(
     req: userUcioInterface.CreateUserUseCaseRequest,
   ): Promise<userUcioInterface.CreateUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.createUser(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         const salt = genSaltSync(11);
         const passwordEncrypt = hashSync(req.password, salt);
         req.password = passwordEncrypt;
 
-        const userResp = await this.repository.createUser(req);
+        const userResp = await this.userRepository.createUser(req);
 
         return new userUcioInterface.CreateUserUseCaseResponse(userResp, null);
       } else {
@@ -54,28 +54,30 @@ class CreateUserUseCase {
 }
 
 class LoginUseCase {
-  public validate: userValidateInterface.LoginUseCaseValidateInterface;
-  public repository: userRepositoryInterface.LoginUseCaseRepositoryInterface;
+  public validate: userValidateInterface.LoginUseCaseValidate;
+  public userRepository: UserRepositoryInterface;
+  public authRepository: AuthRepositoryInterface;
 
   constructor(
-    validate: userValidateInterface.LoginUseCaseValidateInterface,
-    repository: userRepositoryInterface.LoginUseCaseRepositoryInterface,
+    userRepository: UserRepositoryInterface,
+    authRepository: AuthRepositoryInterface,
   ) {
-    this.validate = validate;
-    this.repository = repository;
+    this.validate = new userValidateInterface.LoginUseCaseValidate();
+    this.userRepository = userRepository;
+    this.authRepository = authRepository;
   }
 
-  async login(
+  async execute(
     req: userUcioInterface.LoginUseCaseRequest,
   ): Promise<userUcioInterface.LoginUseCaseResponse> {
     try {
-      const messageError = await this.validate.login(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const userResp = await this.repository.login(req);
+        const userResp = await this.userRepository.login(req);
 
         if (userResp) {
-          const token = this.repository.createToken(userResp.id);
+          const token = this.authRepository.createToken(userResp.id);
 
           return new userUcioInterface.LoginUseCaseResponse(
             userResp,
@@ -84,6 +86,9 @@ class LoginUseCase {
           );
         }
 
+        console.log(
+          `${TAG_PRE_CONDITIONAL_ERROR} E-mail e/ou Senha incorretos.`,
+        );
         return new userUcioInterface.LoginUseCaseResponse(
           null,
           null,
@@ -109,38 +114,41 @@ class LoginUseCase {
 }
 
 class VerifyTokenUseCase {
-  public validate: userValidateInterface.VerifyTokenUseCaseValidateInterface;
-  public repository: userRepositoryInterface.VerifyTokenUseCaseRepositoryInterface;
-  public req: userUcioInterface.VerifyTokenUseCaseRequest;
+  public validate: userValidateInterface.VerifyTokenUseCaseValidate;
+  public userRepository: UserRepositoryInterface;
+  public authRepository: AuthRepositoryInterface;
 
   constructor(
-    validate: userValidateInterface.VerifyTokenUseCaseValidateInterface,
-    repository: userRepositoryInterface.VerifyTokenUseCaseRepositoryInterface,
+    userRepository: UserRepositoryInterface,
+    authRepository: AuthRepositoryInterface,
   ) {
-    this.validate = validate;
-    this.repository = repository;
+    this.validate = new userValidateInterface.VerifyTokenUseCaseValidate();
+    this.userRepository = userRepository;
+    this.authRepository = authRepository;
   }
 
-  async verifyToken(
+  async execute(
     req: userUcioInterface.VerifyTokenUseCaseRequest,
   ): Promise<userUcioInterface.VerifyTokenUseCaseResponse> {
     try {
-      const messageError = await this.validate.verifyToken(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const userIsValid = await this.repository.verifyToken(req.token);
+        const userIsValid = await this.authRepository.verifyToken(req.token);
 
-        if (userIsValid === "jwt expired" || userIsValid === "invalid token")
+        if (typeof userIsValid === "string") {
+          console.log(`${TAG_PRE_CONDITIONAL_ERROR} Sua sessão expirou`);
           return new userUcioInterface.VerifyTokenUseCaseResponse(
             null,
             null,
             newPreConditionalError("Sua sessão expirou"),
           );
+        }
 
-        const user = await this.repository.getUser(userIsValid.id);
+        const user = await this.userRepository.getUser(userIsValid.id);
 
         if (user) {
-          const newToken = await this.repository.createToken(user.id);
+          const newToken = await this.authRepository.createToken(user.id);
 
           return new userUcioInterface.VerifyTokenUseCaseResponse(
             user,
@@ -148,6 +156,9 @@ class VerifyTokenUseCase {
             null,
           );
         } else {
+          console.log(
+            `${TAG_PRE_CONDITIONAL_ERROR} Houve um erro com sua sessão, por favor, faça login novamente`,
+          );
           return new userUcioInterface.VerifyTokenUseCaseResponse(
             null,
             null,
@@ -174,25 +185,24 @@ class VerifyTokenUseCase {
 }
 
 class UpdateUserUseCase {
-  public validate: userValidateInterface.UpdateUserUseCaseValidateInterface;
-  public repository: userRepositoryInterface.UpdateUserUseCaseRepositoryInterface;
+  public validate: userValidateInterface.UpdateUserUseCaseValidate;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.UpdateUserUseCaseValidateInterface,
-    repository: userRepositoryInterface.UpdateUserUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(userRepository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.UpdateUserUseCaseValidate(
+      userRepository,
+    );
+    this.userRepository = userRepository;
   }
 
-  async updateUser(
+  async execute(
     req: userUcioInterface.UpdateUserUseCaseRequest,
   ): Promise<userUcioInterface.UpdateUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.updateUser(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        await this.repository.updateUser(req);
+        await this.userRepository.updateUser(req);
 
         return new userUcioInterface.UpdateUserUseCaseResponse(null);
       } else {
@@ -211,29 +221,27 @@ class UpdateUserUseCase {
 }
 
 class GetUserUseCase {
-  public validate: userValidateInterface.GetUserUseCaseValidateInterface;
-  public repository: userRepositoryInterface.GetUserUseCaseRepositoryInterface;
+  public validate: userValidateInterface.GetUserUseCaseValidate;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.GetUserUseCaseValidateInterface,
-    repository: userRepositoryInterface.GetUserUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(userRepository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.GetUserUseCaseValidate();
+    this.userRepository = userRepository;
   }
 
-  async getUser(
+  async execute(
     req: userUcioInterface.GetUserUseCaseRequest,
   ): Promise<userUcioInterface.GetUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.getUser(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const user = await this.repository.getUser(req);
+        const user = await this.userRepository.getUser(req.id);
 
         if (user) {
           return new userUcioInterface.GetUserUseCaseResponse(user, null);
         } else {
+          console.log(`${TAG_PRE_CONDITIONAL_ERROR} Usuário não encontrado`);
           return new userUcioInterface.GetUserUseCaseResponse(
             user,
             newPreConditionalError("Usuário não encontrado"),
@@ -257,25 +265,24 @@ class GetUserUseCase {
 }
 
 class DeleteUserUseCase {
-  public validate: userValidateInterface.DeleteUserUseCaseValidateInterface;
-  public repository: userRepositoryInterface.DeleteUserUseCaseRepositoryInterface;
+  public validate: userValidateInterface.DeleteUserUseCaseValidate;
+  public userRepository: UserRepositoryInterface;
 
-  constructor(
-    validate: userValidateInterface.DeleteUserUseCaseValidateInterface,
-    repository: userRepositoryInterface.DeleteUserUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(userRepository: UserRepositoryInterface) {
+    this.validate = new userValidateInterface.DeleteUserUseCaseValidate(
+      userRepository,
+    );
+    this.userRepository = userRepository;
   }
 
-  async deleteUser(
+  async execute(
     req: userUcioInterface.DeleteUserUseCaseRequest,
   ): Promise<userUcioInterface.DeleteUserUseCaseResponse> {
     try {
-      const messageError = await this.validate.deleteUser(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        await this.repository.deleteUser(req);
+        await this.userRepository.deleteUser(req);
 
         return new userUcioInterface.DeleteUserUseCaseResponse(null);
       } else {

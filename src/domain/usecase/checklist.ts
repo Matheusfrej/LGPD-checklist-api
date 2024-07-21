@@ -1,5 +1,4 @@
 import * as checklistValidateInterface from "../usecase/validate/checklist";
-import * as checklistRepositoryInterface from "../usecase/repository/checklist";
 import * as checklistUcioInterface from "../usecase/ucio/checklist";
 import {
   INTERNAL_SERVER_ERROR_MESSAGE,
@@ -8,27 +7,36 @@ import {
   TAG_INTERNAL_SERVER_ERROR,
   TAG_PRE_CONDITIONAL_ERROR,
 } from "../entity/error";
+import { ChecklistRepositoryInterface } from "./repository/checklist";
+import { SystemRepositoryInterface } from "./repository/system";
+import { UserRepositoryInterface } from "./repository/user";
 
 class CreateChecklistUseCase {
-  public validate: checklistValidateInterface.CreateChecklistUseCaseValidateInterface;
-  public repository: checklistRepositoryInterface.CreateChecklistUseCaseRepositoryInterface;
+  public validate: checklistValidateInterface.CreateChecklistUseCaseValidate;
+  public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(
-    validate: checklistValidateInterface.CreateChecklistUseCaseValidateInterface,
-    repository: checklistRepositoryInterface.CreateChecklistUseCaseRepositoryInterface,
+    checklistRepository: ChecklistRepositoryInterface,
+    systemRepository: SystemRepositoryInterface,
+    userRepository: UserRepositoryInterface,
   ) {
-    this.validate = validate;
-    this.repository = repository;
+    this.validate =
+      new checklistValidateInterface.CreateChecklistUseCaseValidate(
+        systemRepository,
+        userRepository,
+      );
+    this.checklistRepository = checklistRepository;
   }
 
-  async createChecklist(
+  async execute(
     req: checklistUcioInterface.CreateChecklistUseCaseRequest,
   ): Promise<checklistUcioInterface.CreateChecklistUseCaseResponse> {
     try {
-      const messageError = await this.validate.createChecklist(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const checklistResp = await this.repository.createChecklist(req);
+        const checklistResp =
+          await this.checklistRepository.createChecklist(req);
 
         return new checklistUcioInterface.CreateChecklistUseCaseResponse(
           checklistResp,
@@ -52,25 +60,24 @@ class CreateChecklistUseCase {
 }
 
 class GetChecklistUseCase {
-  public validate: checklistValidateInterface.GetChecklistUseCaseValidateInterface;
-  public repository: checklistRepositoryInterface.GetChecklistUseCaseRepositoryInterface;
+  public validate: checklistValidateInterface.GetChecklistUseCaseValidate;
+  public checklistRepository: ChecklistRepositoryInterface;
 
-  constructor(
-    validate: checklistValidateInterface.GetChecklistUseCaseValidateInterface,
-    repository: checklistRepositoryInterface.GetChecklistUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(checklistRepository: ChecklistRepositoryInterface) {
+    this.validate = new checklistValidateInterface.GetChecklistUseCaseValidate(
+      checklistRepository,
+    );
+    this.checklistRepository = checklistRepository;
   }
 
-  async getChecklist(
+  async execute(
     req: checklistUcioInterface.GetChecklistUseCaseRequest,
   ): Promise<checklistUcioInterface.GetChecklistUseCaseResponse> {
     try {
-      const messageError = await this.validate.getChecklist(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const checklist = await this.repository.getChecklist(req);
+        const checklist = await this.checklistRepository.getChecklist(req.id);
 
         if (checklist) {
           return new checklistUcioInterface.GetChecklistUseCaseResponse(
@@ -100,24 +107,24 @@ class GetChecklistUseCase {
 }
 
 class DeleteChecklistUseCase {
-  public validate: checklistValidateInterface.DeleteChecklistUseCaseValidateInterface;
-  public repository: checklistRepositoryInterface.DeleteChecklistUseCaseRepositoryInterface;
+  public validate: checklistValidateInterface.DeleteChecklistUseCaseValidate;
+  public checklistRepository: ChecklistRepositoryInterface;
 
-  constructor(
-    validate: checklistValidateInterface.DeleteChecklistUseCaseValidateInterface,
-    repository: checklistRepositoryInterface.DeleteChecklistUseCaseRepositoryInterface,
-  ) {
-    this.validate = validate;
-    this.repository = repository;
+  constructor(checklistRepository: ChecklistRepositoryInterface) {
+    this.validate =
+      new checklistValidateInterface.DeleteChecklistUseCaseValidate(
+        checklistRepository,
+      );
+    this.checklistRepository = checklistRepository;
   }
 
-  async deleteChecklist(
+  async execute(
     req: checklistUcioInterface.DeleteChecklistUseCaseRequest,
   ): Promise<checklistUcioInterface.DeleteChecklistUseCaseResponse> {
     try {
-      const messageError = await this.validate.deleteChecklist(req);
+      const messageError = await this.validate.validate(req);
       if (!messageError) {
-        await this.repository.deleteChecklist(req);
+        await this.checklistRepository.deleteChecklist(req);
 
         return new checklistUcioInterface.DeleteChecklistUseCaseResponse(null);
       } else {
@@ -135,25 +142,29 @@ class DeleteChecklistUseCase {
 }
 
 class UpdateChecklistUseCase {
-  public validate: checklistValidateInterface.UpdateChecklistUseCaseValidateInterface;
-  public repository: checklistRepositoryInterface.UpdateChecklistUseCaseRepositoryInterface;
+  public validate: checklistValidateInterface.UpdateChecklistUseCaseValidate;
+  public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(
-    validate: checklistValidateInterface.UpdateChecklistUseCaseValidateInterface,
-    repository: checklistRepositoryInterface.UpdateChecklistUseCaseRepositoryInterface,
+    checklistRepository: ChecklistRepositoryInterface,
+    systemRepository: SystemRepositoryInterface,
   ) {
-    this.validate = validate;
-    this.repository = repository;
+    this.validate =
+      new checklistValidateInterface.UpdateChecklistUseCaseValidate(
+        checklistRepository,
+        systemRepository,
+      );
+    this.checklistRepository = checklistRepository;
   }
 
-  async updateChecklist(
+  async execute(
     req: checklistUcioInterface.UpdateChecklistUseCaseRequest,
   ): Promise<checklistUcioInterface.UpdateChecklistUseCaseResponse> {
     try {
-      const messageError = await this.validate.updateChecklist(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        await this.repository.updateChecklist(req);
+        await this.checklistRepository.updateChecklist(req);
 
         return new checklistUcioInterface.UpdateChecklistUseCaseResponse(null);
       } else {
@@ -171,25 +182,29 @@ class UpdateChecklistUseCase {
 }
 
 class ListChecklistsByUserIdUseCase {
-  public validate: checklistValidateInterface.ListChecklistsByUserIdUseCaseValidateInterface;
-  public repository: checklistRepositoryInterface.ListChecklistsByUserIdUseCaseRepositoryInterface;
+  public validate: checklistValidateInterface.ListChecklistsByUserIdUseCaseValidate;
+  public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(
-    validate: checklistValidateInterface.ListChecklistsByUserIdUseCaseValidateInterface,
-    repository: checklistRepositoryInterface.ListChecklistsByUserIdUseCaseRepositoryInterface,
+    checklistRepository: ChecklistRepositoryInterface,
+    userRepository: UserRepositoryInterface,
   ) {
-    this.validate = validate;
-    this.repository = repository;
+    this.validate =
+      new checklistValidateInterface.ListChecklistsByUserIdUseCaseValidate(
+        userRepository,
+      );
+    this.checklistRepository = checklistRepository;
   }
 
-  async listChecklistsByUserId(
+  async execute(
     req: checklistUcioInterface.ListChecklistsByUserIdUseCaseRequest,
   ): Promise<checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse> {
     try {
-      const messageError = await this.validate.listChecklistsByUserId(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const checklists = await this.repository.listChecklistsByUserId(req);
+        const checklists =
+          await this.checklistRepository.listChecklistsByUserId(req);
 
         return new checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse(
           checklists,
@@ -212,25 +227,29 @@ class ListChecklistsByUserIdUseCase {
 }
 
 class ListChecklistsBySystemIdUseCase {
-  public validate: checklistValidateInterface.ListChecklistsBySystemIdUseCaseValidateInterface;
-  public repository: checklistRepositoryInterface.ListChecklistsBySystemIdUseCaseRepositoryInterface;
+  public validate: checklistValidateInterface.ListChecklistsBySystemIdUseCaseValidate;
+  public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(
-    validate: checklistValidateInterface.ListChecklistsBySystemIdUseCaseValidateInterface,
-    repository: checklistRepositoryInterface.ListChecklistsBySystemIdUseCaseRepositoryInterface,
+    checklistRepository: ChecklistRepositoryInterface,
+    systemRepository: SystemRepositoryInterface,
   ) {
-    this.validate = validate;
-    this.repository = repository;
+    this.validate =
+      new checklistValidateInterface.ListChecklistsBySystemIdUseCaseValidate(
+        systemRepository,
+      );
+    this.checklistRepository = checklistRepository;
   }
 
-  async listChecklistsBySystemId(
+  async execute(
     req: checklistUcioInterface.ListChecklistsBySystemIdUseCaseRequest,
   ): Promise<checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse> {
     try {
-      const messageError = await this.validate.listChecklistsBySystemId(req);
+      const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const checklists = await this.repository.listChecklistsBySystemId(req);
+        const checklists =
+          await this.checklistRepository.listChecklistsBySystemId(req);
 
         return new checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse(
           checklists,
