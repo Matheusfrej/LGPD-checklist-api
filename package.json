@@ -16,6 +16,7 @@
     "test:watch": "vitest --dir src/domain",
     "pretest:e2e": "run-s test:create-prisma-environment test:install-prisma-environment",
     "test:e2e": "vitest run --dir src/delivery",
+    "test:e2e:watch": "vitest --dir src/delivery",
     "test:coverage": "vitest --coverage",
     "test:ui": "vitest --ui",
     "dev": "ts-node-dev src/main.ts",
