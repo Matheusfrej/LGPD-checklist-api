@@ -7,12 +7,20 @@ import { PORT } from "../config/config";
 import { Router } from "../router/index";
 
 class CmdRest {
-  private app: express.Application;
+  public app: express.Application;
+  public isReady: boolean = false;
+  private server: http.Server;
+  private serverReadyPromise: Promise<void>;
+  private resolveServerReady: () => void;
 
   constructor() {
     this.app = express();
     this.middleware();
     this.router();
+
+    this.serverReadyPromise = new Promise<void>((resolve) => {
+      this.resolveServerReady = resolve;
+    });
   }
 
   private router() {
@@ -25,11 +33,34 @@ class CmdRest {
     this.app.use(bodyParser.urlencoded({ extended: false }));
   }
 
-  public server(): void {
-    const server = http.createServer(this.app);
+  public startServer(): void {
+    this.server = http.createServer(this.app);
 
-    server.listen(PORT, () => {
+    this.server.listen(PORT, () => {
       console.log(`Server is Running... at http://localhost:${PORT}`);
+      this.isReady = true;
+      this.resolveServerReady();
+    });
+  }
+
+  public waitUntilReady(): Promise<void> {
+    return this.serverReadyPromise;
+  }
+
+  public closeServer(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this.server) {
+        this.server.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            console.log("Server is closed.");
+            resolve();
+          }
+        });
+      } else {
+        resolve();
+      }
     });
   }
 }
