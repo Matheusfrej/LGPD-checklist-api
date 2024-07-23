@@ -39,14 +39,6 @@ class Main {
 
     return true;
   }
-
-  public waitUntilRestIsReady(): Promise<void> {
-    return this.restApp.waitUntilReady();
-  }
-
-  public closeRestServer(): Promise<void> {
-    return this.restApp.closeServer();
-  }
 }
 
 const main = new Main();
@@ -58,5 +50,3 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export const restApp = main.restApp.app;
-export const waitUntilRestIsReady = main.waitUntilRestIsReady.bind(main);
-export const closeRestServer = main.closeRestServer.bind(main);
