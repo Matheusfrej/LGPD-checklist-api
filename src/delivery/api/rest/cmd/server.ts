@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 
 import { PORT } from "../config/config";
 import { Router } from "../router/index";
+import { env } from "@/domain/env";
 
 class CmdRest {
   public app: express.Application;
@@ -29,9 +30,11 @@ class CmdRest {
   public startServer(): void {
     this.server = http.createServer(this.app);
 
-    this.server.listen(PORT, () => {
-      console.log(`Server is Running... at http://localhost:${PORT}`);
-    });
+    if (env.NODE_ENV !== "test") {
+      this.server.listen(PORT, () => {
+        console.log(`Server is Running... at http://localhost:${PORT}`);
+      });
+    }
   }
 }
 

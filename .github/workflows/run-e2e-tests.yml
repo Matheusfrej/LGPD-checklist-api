@@ -31,3 +31,4 @@ jobs:
         env:
           JWT_SECRET: testing
           DATABASE_URL: "postgresql://docker:docker@localhost:5432/lgpd_checklist?schema=public"
+          NODE_ENV: test
