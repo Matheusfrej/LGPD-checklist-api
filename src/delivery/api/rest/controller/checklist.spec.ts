@@ -5,7 +5,6 @@ import { createUserAndSystem } from "../../../../../test/utils/createUserAndSyst
 import { ChecklistEntity } from "../../../../domain/entity/checklist";
 import { MockGenerator } from "../../../../../test/utils/mockGenerator";
 
-// TODO: trocar isIoT para isIot nas requests
 const checklistDummy: ChecklistEntity = {
   id: undefined,
   userId: undefined,
@@ -26,7 +25,7 @@ describe("Create Checklist (e2e)", () => {
         ...checklistDummy,
         userId: user.id,
         systemId: system.id,
-        isIoT: false,
+        isIot: false,
       });
 
     expect(response.statusCode).toBe(200);
@@ -44,7 +43,7 @@ describe("Get Checklist (e2e)", () => {
         ...checklistDummy,
         userId: user.id,
         systemId: system.id,
-        isIoT: false,
+        isIot: false,
       });
 
     const response = await request(restApp)
@@ -68,7 +67,7 @@ describe("Delete Checklist (e2e)", () => {
         ...checklistDummy,
         userId: user.id,
         systemId: system.id,
-        isIoT: false,
+        isIot: false,
       });
 
     const response = await request(restApp)
@@ -90,7 +89,7 @@ describe("Update Checklist (e2e)", () => {
         ...checklistDummy,
         userId: user.id,
         systemId: system.id,
-        isIoT: false,
+        isIot: false,
       });
 
     const response = await request(restApp)
@@ -99,7 +98,7 @@ describe("Update Checklist (e2e)", () => {
       .send({
         ...checklistDummy,
         systemId: system.id,
-        isIoT: true,
+        isIot: true,
       });
 
     expect(response.statusCode).toBe(200);
@@ -117,7 +116,7 @@ describe("List User Checklists (e2e)", () => {
         ...checklistDummy,
         userId: user.id,
         systemId: system.id,
-        isIoT: false,
+        isIot: false,
       });
 
     const response = await request(restApp)
@@ -141,7 +140,7 @@ describe("List System Checklists (e2e)", () => {
         ...checklistDummy,
         userId: user.id,
         systemId: system.id,
-        isIoT: false,
+        isIot: false,
       });
 
     const response = await request(restApp)

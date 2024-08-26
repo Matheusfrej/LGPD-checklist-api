@@ -11,7 +11,7 @@ import { UserPrismaRepository } from "@/infrastructure/provider/repository/user"
 
 class CreateChecklistController {
   async execute(req: Request, res: Response) {
-    const { tokenUserId, userId, systemId, checklistData, isGeneral, isIoT } =
+    const { tokenUserId, userId, systemId, checklistData, isGeneral, isIot } =
       req.body;
 
     const ucReq = new checklistUcio.CreateChecklistUseCaseRequest(
@@ -20,7 +20,7 @@ class CreateChecklistController {
       systemId,
       checklistData,
       isGeneral,
-      isIoT,
+      isIot,
     );
 
     const checklistRepository = new ChecklistPrismaRepository();
@@ -95,7 +95,7 @@ class DeleteChecklistController {
 class UpdateChecklistController {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
-    const { tokenUserId, systemId, checklistData, isGeneral, isIoT } = req.body;
+    const { tokenUserId, systemId, checklistData, isGeneral, isIot } = req.body;
 
     const ucReq = new checklistUcio.UpdateChecklistUseCaseRequest(
       +id,
@@ -103,7 +103,7 @@ class UpdateChecklistController {
       systemId,
       checklistData,
       isGeneral,
-      isIoT,
+      isIot,
     );
 
     const checklistRepository = new ChecklistPrismaRepository();
