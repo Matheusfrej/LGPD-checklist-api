@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
       "target": "es6",
-      "moduleResolution": "node",
-      "module": "commonjs",
+      "moduleResolution": "Bundler",
+      "module": "ES2020",
       "lib": [
       "es6",
       "DOM"
