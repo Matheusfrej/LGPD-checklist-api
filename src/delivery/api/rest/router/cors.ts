@@ -7,8 +7,7 @@ class CorsRouter {
   constructor() {
     this.router = Router();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.router.options("*", cors() as any);
+    this.router.options("*", cors());
 
     this.router.use("*", (_: Request, res: Response, next: NextFunction) => {
       res.header("Access-Control-Allow-Methods", "*");

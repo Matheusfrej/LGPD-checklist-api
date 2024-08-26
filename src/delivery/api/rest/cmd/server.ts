@@ -5,9 +5,11 @@ import bodyParser from "body-parser";
 
 import { PORT } from "../config/config";
 import { Router } from "../router/index";
+import { env } from "@/domain/env";
 
 class CmdRest {
-  private app: express.Application;
+  public app: express.Application;
+  private server: http.Server;
 
   constructor() {
     this.app = express();
@@ -25,12 +27,14 @@ class CmdRest {
     this.app.use(bodyParser.urlencoded({ extended: false }));
   }
 
-  public server(): void {
-    const server = http.createServer(this.app);
+  public startServer(): void {
+    this.server = http.createServer(this.app);
 
-    server.listen(PORT, () => {
-      console.log(`Server is Running... at http://localhost:${PORT}`);
-    });
+    if (env.NODE_ENV !== "test") {
+      this.server.listen(PORT, () => {
+        console.log(`Server is Running... at http://localhost:${PORT}`);
+      });
+    }
   }
 }
 
