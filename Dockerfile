@@ -4,7 +4,7 @@ WORKDIR /LGPD-checklist-api
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --silent
 
 COPY . .
 
