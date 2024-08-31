@@ -1,5 +1,10 @@
 {
-  "compilerOptions": {
+  "ts-node": {
+    "compilerOptions": {
+        "module": "commonjs"
+      },
+    },
+    "compilerOptions": {
       "target": "es6",
       "moduleResolution": "Bundler",
       "module": "ES2020",

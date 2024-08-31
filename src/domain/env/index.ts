@@ -8,9 +8,21 @@ const envSchema = z.object({
   PORT: z.coerce.number().optional(),
 });
 
-const _env = envSchema.safeParse(process.env);
+const envSchemaProductionOnly = z.object({
+  POSTGRES_USER: z.string(),
+  POSTGRES_PASSWORD: z.string(),
+  POSTGRES_DB: z.string(),
+});
 
-if (_env.success === false) {
+const _env = envSchema.safeParse(process.env);
+const _envProd = envSchemaProductionOnly.safeParse(process.env);
+
+const isProductionEnvMissing =
+  _env.success &&
+  _env.data.NODE_ENV === "production" &&
+  _envProd.success === false;
+
+if (_env.success === false || isProductionEnvMissing) {
   console.error("Invalid enviroment variables", _env.error.format());
 
   throw new Error("Invalid enviroment variables.");
