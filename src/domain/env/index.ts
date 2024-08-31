@@ -6,6 +6,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string(),
   DATABASE_URL: z.string(),
   PORT: z.coerce.number().optional(),
+  POSTGRES_USER: z.string(),
+  POSTGRES_PASSWORD: z.string(),
+  POSTGRES_DB: z.string(),
 });
 
 const _env = envSchema.safeParse(process.env);
