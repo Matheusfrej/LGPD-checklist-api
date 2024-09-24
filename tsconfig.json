@@ -5,9 +5,9 @@
       },
     },
     "compilerOptions": {
-      "target": "es6",
-      "moduleResolution": "Bundler",
-      "module": "ES2020",
+      "target": "esnext",
+      "moduleResolution": "Node",
+      "module": "CommonJS",
       "lib": [
       "es6",
       "DOM"
