@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "_moduleAliases": {
     "@/domain": "./src/domain",
     "@/delivery": "./src/delivery",
@@ -20,7 +21,7 @@
     "test:coverage": "vitest --coverage",
     "test:ui": "vitest --ui",
     "test:all": "run-s test test:e2e",
-    "dev": "nodemon ./src/main.ts",
+    "dev": "nodemon --exec node --loader ts-node/esm ./src/main.ts",
     "start": "node dist/src/main.js",
     "start:migrate": "npx prisma migrate deploy && npm run start",
     "build": "npm run prisma:generate && tsc && tsc-alias",
