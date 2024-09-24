@@ -6,8 +6,8 @@
     },
     "compilerOptions": {
       "target": "esnext",
-      "moduleResolution": "Node",
-      "module": "CommonJS",
+      "moduleResolution": "Bundler",
+      "module": "ES2020",
       "lib": [
       "es6",
       "DOM"
