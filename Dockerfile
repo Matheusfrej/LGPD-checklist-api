@@ -1,6 +1,6 @@
 FROM node:20
 
-WORKDIR /LGPD-checklist-api
+WORKDIR /lgpdchecklistapi
 
 COPY package*.json ./
 COPY prisma ./prisma/ 
