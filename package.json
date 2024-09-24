@@ -23,9 +23,10 @@
     "dev": "ts-node-dev src/main.ts",
     "start": "node dist/src/main.js",
     "start:migrate": "npx prisma migrate deploy && npm run start",
-    "build": "tsc && tsc-alias",
+    "build": "npm run prisma:generate && tsc && tsc-alias",
     "prisma:format": "npx prisma format",
     "prisma:migrate": "npx prisma migrate dev",
+    "prisma:generate": "npx prisma generate",
     "prisma:studio": "npx prisma studio"
   },
   "keywords": [],
