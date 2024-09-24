@@ -3,6 +3,7 @@ FROM node:20
 WORKDIR /LGPD-checklist-api
 
 COPY package*.json ./
+COPY prisma ./prisma/ 
 
 RUN npm install --silent
 
