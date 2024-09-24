@@ -22,7 +22,7 @@
     "test:ui": "vitest --ui",
     "test:all": "run-s test test:e2e",
     "dev": "nodemon --exec node --loader ts-node/esm ./src/main.ts",
-    "start": "node dist/src/main.js",
+    "start": "node --es-module-specifier-resolution=node dist/src/main.js",
     "start:migrate": "npx prisma migrate deploy && npm run start",
     "build": "npm run prisma:generate && tsc && tsc-alias",
     "prisma:format": "npx prisma format",
