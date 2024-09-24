@@ -21,7 +21,7 @@
     "test:ui": "vitest --ui",
     "test:all": "run-s test test:e2e",
     "dev": "ts-node-dev ./src/main.ts",
-    "start": "node --experimental-specifier-resolution=node dist/src/main.js",
+    "start": "node --loader ts-node/esm dist/src/main.js",
     "start:migrate": "npx prisma migrate deploy && npm run start",
     "build": "npm run prisma:generate && tsc && tsc-alias",
     "prisma:format": "npx prisma format",
