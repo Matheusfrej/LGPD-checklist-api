@@ -7,12 +7,13 @@ import {
   UpdateUserUseCase,
   VerifyTokenUseCase,
 } from "./user";
-import { compareSync } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { UserInMemoryRepository } from "../../../test/repository/user";
 import { AuthFakeRepository } from "../../../test/repository/auth";
 import { UserEntity } from "../entity/user";
 import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
 import { MockGenerator } from "../../../test/utils/mockGenerator";
+const { compareSync } = bcrypt;
 
 let userRepository: UserInMemoryRepository;
 let authRepository: AuthFakeRepository;

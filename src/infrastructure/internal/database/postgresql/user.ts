@@ -1,4 +1,4 @@
-import { compareSync } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { UserEntity } from "../../../../domain/entity/user";
 import {
   CreateUserUseCaseRequest,
@@ -6,6 +6,7 @@ import {
   UpdateUserUseCaseRequest,
 } from "../../../../domain/usecase/ucio/user";
 import { prisma } from "../../connection/prisma";
+const { compareSync } = bcrypt;
 
 async function createUser(data: CreateUserUseCaseRequest): Promise<UserEntity> {
   const user = await prisma.users.create({

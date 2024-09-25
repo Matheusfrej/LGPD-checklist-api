@@ -1,6 +1,6 @@
 import * as userValidateInterface from "./validate/user";
 import * as userUcioInterface from "./ucio/user";
-import { genSaltSync, hashSync } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import {
   INTERNAL_SERVER_ERROR_MESSAGE,
   TAG_INTERNAL_SERVER_ERROR,
@@ -10,6 +10,7 @@ import {
 } from "../entity/error";
 import { UserRepositoryInterface } from "./repository/user";
 import { AuthRepositoryInterface } from "./repository/auth";
+const { genSaltSync, hashSync } = bcrypt;
 
 class CreateUserUseCase {
   public validate: userValidateInterface.CreateUserUseCaseValidate;
