@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "extensionless": {
+    "lookFor": [
+      "js",
+      "mjs",
+      "cjs"
+    ]
+  },
   "_moduleAliases": {
     "@/domain": "./src/domain",
     "@/delivery": "./src/delivery",
@@ -21,7 +28,7 @@
     "test:ui": "vitest --ui",
     "test:all": "run-s test test:e2e",
     "dev": "ts-node-dev src/main.ts",
-    "start": "node dist/src/main.js",
+    "start": "node --import=extensionless/register dist/src/main.js",
     "start:migrate": "npx prisma migrate deploy && npm run start",
     "build": "npm run prisma:generate && tsc && tsc-alias",
     "prisma:format": "npx prisma format",
@@ -61,6 +68,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "extensionless": "^1.9.9",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.0",

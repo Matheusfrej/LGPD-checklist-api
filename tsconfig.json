@@ -13,7 +13,7 @@
       "DOM"
       ],
       "sourceMap": true,
-      "outDir": "dist/src",
+      "outDir": "dist",
       "strict": true,
       "noImplicitAny": true,
       "strictNullChecks": false,

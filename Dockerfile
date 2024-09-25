@@ -11,6 +11,8 @@ COPY . .
 
 RUN npm run build
 
+RUN echo "{\"type\": \"module\"}" > dist/src/package.json
+
 RUN npm prune --production
 
 EXPOSE 8045

@@ -1,8 +1,9 @@
-import { genSaltSync, hashSync } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { SystemRepositoryInterface } from "../../src/domain/usecase/repository/system";
 import { UserRepositoryInterface } from "../../src/domain/usecase/repository/user";
 import { ChecklistRepositoryInterface } from "../../src/domain/usecase/repository/checklist";
 import { Json } from "../../src/domain/@types";
+const { genSaltSync, hashSync } = bcrypt;
 
 enum Repositories {
   "User" = "User",
