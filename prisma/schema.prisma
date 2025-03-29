@@ -40,16 +40,63 @@ model Systems {
 }
 
 model Checklists {
-  id            Int      @id @default(autoincrement())
-  userId        Int      @map("user_id")
-  systemId      Int      @map("system_id")
-  isGeneral     Boolean  @default(true) @map("is_general")
-  isIot         Boolean  @default(false) @map("is_iot")
-  checklistData Json     @map("checklist_data")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
-  user          Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  system        Systems  @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  id              Int              @id @default(autoincrement())
+  userId          Int              @map("user_id")
+  systemId        Int              @map("system_id")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @default(now()) @updatedAt @map("updated_at")
+  user            Users            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  system          Systems          @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  ItemsChecklists ChecklistItems[]
 
   @@map("checklists")
+}
+
+model Laws {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  items     Items[]  @relation("item_laws")
+
+  @@map("laws")
+}
+
+model Devices {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  items     Items[]  @relation("item_devices")
+
+  @@map("devices")
+}
+
+model Items {
+  id              Int              @id @default(autoincrement())
+  code            String           @unique @db.VarChar(255)
+  itemDesc        String           @map("item_desc") @db.VarChar(255)
+  recommendations String           @db.VarChar(255)
+  isMandatory     Boolean          @map("is_mandatory")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @default(now()) @updatedAt @map("updated_at")
+  laws            Laws[]           @relation("item_laws")
+  devices         Devices[]        @relation("item_devices")
+  ItemsChecklists ChecklistItems[]
+
+  @@map("items")
+}
+
+model ChecklistItems {
+  checklistId Int        @map("checklist_id")
+  checklist   Checklists @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  itemId      Int        @map("item_id")
+  item        Items      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  answer         String  @db.VarChar(255)
+  severityDegree String? @map("severity_degree") @db.VarChar(255)
+  userComment    String? @map("user_comment") @db.VarChar(255)
+
+  @@id([checklistId, itemId])
+  @@map("checklist_items")
 }
