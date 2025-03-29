@@ -1,12 +1,14 @@
 import { ChecklistEntity } from "../../src/domain/entity/checklist";
 import { ChecklistRepositoryInterface } from "../../src/domain/usecase/repository/checklist";
+import { ChecklistItemEntity } from "../../src/domain/entity/checklistItem";
+import { ItemEntity } from "../../src/domain/entity/item";
 import {
   CreateChecklistUseCaseRequest,
   DeleteChecklistUseCaseRequest,
   UpdateChecklistUseCaseRequest,
   ListChecklistsByUserIdUseCaseRequest,
   ListChecklistsBySystemIdUseCaseRequest,
-} from "../domain/usecase/ucio/checklist";
+} from "../../src/domain/usecase/ucio/checklist";
 
 class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
   public items: ChecklistEntity[] = [];
@@ -15,15 +17,20 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
   async createChecklist(
     checklist: CreateChecklistUseCaseRequest,
   ): Promise<ChecklistEntity> {
-    return null;
-
     const newChecklist = new ChecklistEntity(
       this.counter + 1,
       checklist.userId,
       checklist.systemId,
-      checklist.checklistData,
-      checklist.isGeneral,
-      checklist.isIot,
+      checklist.items.map(
+        (item) =>
+          new ChecklistItemEntity(
+            null,
+            new ItemEntity(item.id, null, null, null, null, null, null),
+            item.answer,
+            item.severityDegree,
+            item.userComment,
+          ),
+      ),
       new Date(),
       new Date(),
     );

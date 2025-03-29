@@ -1,29 +1,31 @@
 import { Json } from "../../@types";
 import { ChecklistEntity } from "../../entity/checklist";
+import { AnswerType, SeverityDegreeType } from "../../entity/checklistItem";
 import { ErrorEntity } from "../../entity/error";
+
+type ItemsInput = {
+  id: number;
+  answer: AnswerType;
+  severityDegree: SeverityDegreeType;
+  userComment?: string;
+}[];
 
 class CreateChecklistUseCaseRequest {
   public tokenUserId: number;
   public userId: number;
   public systemId: number;
-  public checklistData: Json;
-  public isGeneral?: boolean;
-  public isIot?: boolean;
+  public items: ItemsInput;
 
   constructor(
     tokenUserId: number,
     userId: number,
     systemId: number,
-    checklistData: Json,
-    isGeneral?: boolean,
-    isIot?: boolean,
+    items: ItemsInput,
   ) {
     this.tokenUserId = tokenUserId;
     this.userId = userId;
     this.systemId = systemId;
-    this.checklistData = checklistData;
-    this.isGeneral = isGeneral;
-    this.isIot = isIot;
+    this.items = items;
   }
 }
 

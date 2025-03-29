@@ -8,31 +8,29 @@ import {
 import { ChecklistPrismaRepository } from "@/infrastructure/provider/repository/checklist";
 import { SystemPrismaRepository } from "@/infrastructure/provider/repository/system";
 import { UserPrismaRepository } from "@/infrastructure/provider/repository/user";
+import { ItemPrismaRepository } from "../../../../infrastructure/provider/repository/item";
 
 class CreateChecklistController {
   async execute(req: Request, res: Response) {
-    const { tokenUserId, userId, systemId, checklistData, isGeneral, isIot } =
-      req.body;
+    const { tokenUserId, userId, systemId, items } = req.body;
 
     const ucReq = new checklistUcio.CreateChecklistUseCaseRequest(
       tokenUserId,
       userId,
       systemId,
-      checklistData,
-      isGeneral,
-      isIot,
+      items,
     );
 
     const checklistRepository = new ChecklistPrismaRepository();
     const systemRepository = new SystemPrismaRepository();
     const userRepository = new UserPrismaRepository();
-    const usecase = new checklistUseCase.CreateChecklistUseCase(
+    const itemRepository = new ItemPrismaRepository();
+    const ucRes = await new checklistUseCase.CreateChecklistUseCase(
       checklistRepository,
       systemRepository,
       userRepository,
-    );
-
-    const ucRes = await usecase.execute(ucReq);
+      itemRepository,
+    ).execute(ucReq);
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, { checklist: ucRes.checklist });

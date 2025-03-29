@@ -1,6 +1,6 @@
-import { Json } from "../../../@types";
 import * as z from "zod";
 import { DEFAULT_VALIDATION_MESSAGE } from "../../../entity/error";
+import { Json } from "../../../@types";
 
 const requiredErrorMessage = (fieldName: string) =>
   `${fieldName} não pode ser vazio.`;

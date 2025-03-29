@@ -7,31 +7,62 @@ import { prisma } from "../../connection/prisma";
 import { ItemEntity } from "../../../../domain/entity/item";
 import { LawEntity } from "../../../../domain/entity/law";
 import { DeviceEntity } from "../../../../domain/entity/device";
-import { ChecklistItemEntity } from "../../../../domain/entity/checklistItem";
+import {
+  AnswerType,
+  ChecklistItemEntity,
+  SeverityDegreeType,
+} from "../../../../domain/entity/checklistItem";
 
 async function createChecklist(
   req: CreateChecklistUseCaseRequest,
 ): Promise<ChecklistEntity> {
-  return null;
+  const checklist = await prisma.checklists.create({
+    data: {
+      userId: req.userId,
+      systemId: req.systemId,
+      ItemsChecklists: {
+        createMany: {
+          data: req.items.map((item) => {
+            return {
+              itemId: item.id,
+              answer: item.answer,
+              severityDegree: item.severityDegree,
+              userComment: item.userComment,
+            };
+          }),
+        },
+      },
+    },
+    include: {
+      ItemsChecklists: {
+        include: {
+          item: true,
+        },
+      },
+    },
+  });
 
-  // const checklist = await prisma.checklists.create({
-  //   data: {
-  //     userId: req.userId,
-  //     systemId: req.systemId,
-  //     isGeneral: req.isGeneral,
-  //     isIot: req.isIot,
-  //     checklistData: req.checklistData,
-  //   },
-  // });
-
-  // return new ChecklistEntity(
-  //   checklist.id,
-  //   checklist.userId,
-  //   checklist.systemId,
-  //   checklist.checklistData,
-  //   checklist.isGeneral,
-  //   checklist.isIot,
-  // );
+  return new ChecklistEntity(
+    checklist.id,
+    checklist.userId,
+    checklist.systemId,
+    checklist.ItemsChecklists.map(
+      (itemChecklist) =>
+        new ChecklistItemEntity(
+          null,
+          new ItemEntity(
+            itemChecklist.item.id,
+            itemChecklist.item.code,
+            itemChecklist.item.itemDesc,
+            itemChecklist.item.recommendations,
+            itemChecklist.item.isMandatory,
+          ),
+          itemChecklist.answer as AnswerType,
+          itemChecklist.severityDegree as SeverityDegreeType,
+          itemChecklist.userComment,
+        ),
+    ),
+  );
 }
 
 async function getChecklist(id: number): Promise<ChecklistEntity> {
@@ -75,8 +106,8 @@ async function getChecklist(id: number): Promise<ChecklistEntity> {
                   (dev) => new DeviceEntity(dev.id, dev.name),
                 ),
               ),
-              itemChecklist.answer,
-              itemChecklist.severityDegree,
+              itemChecklist.answer as AnswerType,
+              itemChecklist.severityDegree as SeverityDegreeType,
               itemChecklist.userComment,
             ),
         ),
