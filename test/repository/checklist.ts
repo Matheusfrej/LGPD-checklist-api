@@ -15,6 +15,8 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
   async createChecklist(
     checklist: CreateChecklistUseCaseRequest,
   ): Promise<ChecklistEntity> {
+    return null;
+
     const newChecklist = new ChecklistEntity(
       this.counter + 1,
       checklist.userId,
@@ -51,9 +53,9 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
   async updateChecklist(req: UpdateChecklistUseCaseRequest): Promise<void> {
     const index = this.items.findIndex((item) => item.id === req.id);
 
-    if (index === -1) {
-      return null;
-    }
+    // if (index === -1) {
+    return null;
+    // }
 
     this.items[index].systemId = req.systemId;
     this.items[index].checklistData = req.checklistData;

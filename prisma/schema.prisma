@@ -93,7 +93,7 @@ model ChecklistItems {
   itemId      Int        @map("item_id")
   item        Items      @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
-  answer         String  @db.VarChar(255)
+  answer         String? @db.VarChar(255)
   severityDegree String? @map("severity_degree") @db.VarChar(255)
   userComment    String? @map("user_comment") @db.VarChar(255)
 
