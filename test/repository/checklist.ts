@@ -64,11 +64,11 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
     return null;
     // }
 
-    this.items[index].systemId = req.systemId;
-    this.items[index].checklistData = req.checklistData;
-    this.items[index].isGeneral = req.isGeneral;
-    this.items[index].isIot = req.isIot;
-    this.items[index].updatedAt = new Date();
+    // this.items[index].systemId = req.systemId;
+    // this.items[index].checklistData = req.checklistData;
+    // this.items[index].isGeneral = req.isGeneral;
+    // this.items[index].isIot = req.isIot;
+    // this.items[index].updatedAt = new Date();
   }
 
   async listChecklistsByUserId(

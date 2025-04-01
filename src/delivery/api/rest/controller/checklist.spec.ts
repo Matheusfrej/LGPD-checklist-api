@@ -8,10 +8,10 @@ import { MockGenerator } from "../../../../../test/utils/mockGenerator";
 const checklistDummy: ChecklistEntity = {
   id: undefined,
   userId: undefined,
-  checklistData: new MockGenerator().checklistData,
+  // checklistData: new MockGenerator().checklistData,
   systemId: undefined,
-  isGeneral: true,
-  isIot: false,
+  // isGeneral: true,
+  // isIot: false,
 };
 
 describe("Create Checklist (e2e)", () => {
