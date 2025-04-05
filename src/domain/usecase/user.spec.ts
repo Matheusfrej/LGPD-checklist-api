@@ -8,22 +8,23 @@ import {
   VerifyTokenUseCase,
 } from "./user";
 import bcrypt from "bcryptjs";
-import { UserInMemoryRepository } from "../../../test/repository/user";
-import { AuthFakeRepository } from "../../../test/repository/auth";
 import { UserEntity } from "../entity/user";
 import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
 import { MockGenerator } from "../../../test/utils/mockGenerator";
+import { testFactory } from "../../../test/factory";
+import { UserRepositoryInterface } from "./repository/user";
+import { AuthRepositoryInterface } from "./repository/auth";
 const { compareSync } = bcrypt;
 
-let userRepository: UserInMemoryRepository;
-let authRepository: AuthFakeRepository;
+let userRepository: UserRepositoryInterface;
+let authRepository: AuthRepositoryInterface;
 let mockGenerator: MockGenerator;
 
 describe("Create User Use Case", () => {
   let useCase: CreateUserUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
+    userRepository = testFactory.makeUserRepository();
     useCase = new CreateUserUseCase(userRepository);
   });
 
@@ -96,8 +97,8 @@ describe("Login Use Case", () => {
   let useCase: LoginUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
-    authRepository = new AuthFakeRepository();
+    userRepository = testFactory.makeUserRepository();
+    authRepository = testFactory.makeAuthRepository();
     useCase = new LoginUseCase(userRepository, authRepository);
     mockGenerator = new MockGenerator(userRepository);
   });
@@ -154,8 +155,8 @@ describe("Verify Token Use Case", () => {
   let useCase: VerifyTokenUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
-    authRepository = new AuthFakeRepository();
+    userRepository = testFactory.makeUserRepository();
+    authRepository = testFactory.makeAuthRepository();
     useCase = new VerifyTokenUseCase(userRepository, authRepository);
     mockGenerator = new MockGenerator(userRepository);
   });
@@ -194,7 +195,7 @@ describe("Update User Use Case", () => {
   let useCase: UpdateUserUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
+    userRepository = testFactory.makeUserRepository();
     useCase = new UpdateUserUseCase(userRepository);
     mockGenerator = new MockGenerator(userRepository);
   });
@@ -315,7 +316,7 @@ describe("Get User Use Case", () => {
   let useCase: GetUserUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
+    userRepository = testFactory.makeUserRepository();
     useCase = new GetUserUseCase(userRepository);
     mockGenerator = new MockGenerator(userRepository);
   });
@@ -348,7 +349,7 @@ describe("Delete User Use Case", () => {
   let useCase: DeleteUserUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
+    userRepository = testFactory.makeUserRepository();
     useCase = new DeleteUserUseCase(userRepository);
     mockGenerator = new MockGenerator(userRepository);
   });

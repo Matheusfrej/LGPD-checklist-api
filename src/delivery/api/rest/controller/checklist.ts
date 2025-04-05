@@ -5,12 +5,9 @@ import {
   InternalServerErrorResponse,
   SuccessResponse,
 } from "../response/response";
-import { ChecklistPrismaRepository } from "@/infrastructure/provider/repository/checklist";
-import { SystemPrismaRepository } from "@/infrastructure/provider/repository/system";
-import { UserPrismaRepository } from "@/infrastructure/provider/repository/user";
-import { ItemPrismaRepository } from "../../../../infrastructure/provider/repository/item";
+import { Controller } from "./controller";
 
-class CreateChecklistController {
+class CreateChecklistController extends Controller {
   async execute(req: Request, res: Response) {
     const { tokenUserId, userId, systemId, items } = req.body;
 
@@ -21,10 +18,10 @@ class CreateChecklistController {
       items,
     );
 
-    const checklistRepository = new ChecklistPrismaRepository();
-    const systemRepository = new SystemPrismaRepository();
-    const userRepository = new UserPrismaRepository();
-    const itemRepository = new ItemPrismaRepository();
+    const checklistRepository = this.factory.makeChecklistRepository();
+    const systemRepository = this.factory.makeSystemRepository();
+    const userRepository = this.factory.makeUserRepository();
+    const itemRepository = this.factory.makeItemRepository();
     const ucRes = await new checklistUseCase.CreateChecklistUseCase(
       checklistRepository,
       systemRepository,
@@ -40,7 +37,7 @@ class CreateChecklistController {
   }
 }
 
-class GetChecklistController {
+class GetChecklistController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId } = req.body;
@@ -50,7 +47,7 @@ class GetChecklistController {
       +id,
     );
 
-    const checklistRepository = new ChecklistPrismaRepository();
+    const checklistRepository = this.factory.makeChecklistRepository();
     const usecase = new checklistUseCase.GetChecklistUseCase(
       checklistRepository,
     );
@@ -65,7 +62,7 @@ class GetChecklistController {
   }
 }
 
-class DeleteChecklistController {
+class DeleteChecklistController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId } = req.body;
@@ -75,7 +72,7 @@ class DeleteChecklistController {
       +id,
     );
 
-    const checklistRepository = new ChecklistPrismaRepository();
+    const checklistRepository = this.factory.makeChecklistRepository();
     const usecase = new checklistUseCase.DeleteChecklistUseCase(
       checklistRepository,
     );
@@ -90,7 +87,7 @@ class DeleteChecklistController {
   }
 }
 
-class UpdateChecklistController {
+class UpdateChecklistController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId, systemId, checklistData, isGeneral, isIot } = req.body;
@@ -104,8 +101,8 @@ class UpdateChecklistController {
       isIot,
     );
 
-    const checklistRepository = new ChecklistPrismaRepository();
-    const systemRepository = new SystemPrismaRepository();
+    const checklistRepository = this.factory.makeChecklistRepository();
+    const systemRepository = this.factory.makeSystemRepository();
     const usecase = new checklistUseCase.UpdateChecklistUseCase(
       checklistRepository,
       systemRepository,
@@ -121,7 +118,7 @@ class UpdateChecklistController {
   }
 }
 
-class ListChecklistsByUserIdController {
+class ListChecklistsByUserIdController extends Controller {
   async execute(req: Request, res: Response) {
     const { userId } = req.params;
     const { tokenUserId } = req.body;
@@ -131,8 +128,8 @@ class ListChecklistsByUserIdController {
       +userId,
     );
 
-    const checklistRepository = new ChecklistPrismaRepository();
-    const userRepository = new UserPrismaRepository();
+    const checklistRepository = this.factory.makeChecklistRepository();
+    const userRepository = this.factory.makeUserRepository();
     const usecase = new checklistUseCase.ListChecklistsByUserIdUseCase(
       checklistRepository,
       userRepository,
@@ -148,7 +145,7 @@ class ListChecklistsByUserIdController {
   }
 }
 
-class ListChecklistsBySystemIdController {
+class ListChecklistsBySystemIdController extends Controller {
   async execute(req: Request, res: Response) {
     const { systemId } = req.params;
     const { tokenUserId } = req.body;
@@ -158,8 +155,8 @@ class ListChecklistsBySystemIdController {
       +systemId,
     );
 
-    const checklistRepository = new ChecklistPrismaRepository();
-    const systemRepository = new SystemPrismaRepository();
+    const checklistRepository = this.factory.makeChecklistRepository();
+    const systemRepository = this.factory.makeSystemRepository();
     const usecase = new checklistUseCase.ListChecklistsBySystemIdUseCase(
       checklistRepository,
       systemRepository,

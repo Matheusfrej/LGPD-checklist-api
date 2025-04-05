@@ -7,6 +7,8 @@ import {
 } from "../ucio/system";
 
 interface SystemRepositoryInterface {
+  items?: SystemEntity[];
+
   createSystem(req: CreateSystemUseCaseRequest): Promise<SystemEntity>;
   listSystemsByUserId(
     req: ListSystemsByUserIdUseCaseRequest,

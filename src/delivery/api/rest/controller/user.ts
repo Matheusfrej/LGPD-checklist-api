@@ -5,10 +5,11 @@ import {
   SuccessResponse,
 } from "../response/response";
 import { NextFunction, Request, Response } from "express";
-import { UserPrismaRepository } from "../../../../infrastructure/provider/repository/user";
 import { AuthJWTRepository } from "../../../../infrastructure/provider/repository/auth";
+import { Controller } from "./controller";
+import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
 
-class CreateUserController {
+class CreateUserController extends Controller {
   async execute(req: Request, res: Response) {
     const { name, office, email, password } = req.body;
 
@@ -19,7 +20,7 @@ class CreateUserController {
       password,
     );
 
-    const repository = new UserPrismaRepository();
+    const repository = this.factory.makeUserRepository();
     const usecase = new userUseCase.CreateUserUseCase(repository);
 
     const ucRes = await usecase.execute(ucReq);
@@ -32,14 +33,14 @@ class CreateUserController {
   }
 }
 
-class LoginController {
+class LoginController extends Controller {
   async execute(req: Request, res: Response) {
     const { email, password } = req.body;
 
     const ucReq = new userUcio.LoginUseCaseRequest(email, password);
 
-    const userRepository = new UserPrismaRepository();
-    const authRepository = new AuthJWTRepository();
+    const userRepository = this.factory.makeUserRepository();
+    const authRepository = this.factory.makeAuthRepository();
     const usecase = new userUseCase.LoginUseCase(
       userRepository,
       authRepository,
@@ -58,10 +59,11 @@ class LoginController {
   }
 }
 
-class VerifyTokenController {
+class VerifyTokenController extends Controller {
   private isMiddleware: boolean;
 
-  constructor(isMiddleware: boolean) {
+  constructor(isMiddleware: boolean, factory: RepositoryFactory) {
+    super(factory);
     this.isMiddleware = isMiddleware;
   }
 
@@ -70,7 +72,7 @@ class VerifyTokenController {
 
     const ucReq = new userUcio.VerifyTokenUseCaseRequest(token);
 
-    const userRepository = new UserPrismaRepository();
+    const userRepository = this.factory.makeUserRepository();
     const authRepository = new AuthJWTRepository();
     const usecase = new userUseCase.VerifyTokenUseCase(
       userRepository,
@@ -108,7 +110,7 @@ class VerifyTokenController {
   }
 }
 
-class UpdateUserController {
+class UpdateUserController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId, name, office } = req.body;
@@ -120,7 +122,7 @@ class UpdateUserController {
       office,
     );
 
-    const repository = new UserPrismaRepository();
+    const repository = this.factory.makeUserRepository();
     const usecase = new userUseCase.UpdateUserUseCase(repository);
 
     const ucRes = await usecase.execute(ucReq);
@@ -133,13 +135,13 @@ class UpdateUserController {
   }
 }
 
-class GetUserController {
+class GetUserController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
 
     const ucReq = new userUcio.GetUserUseCaseRequest(+id);
 
-    const repository = new UserPrismaRepository();
+    const repository = this.factory.makeUserRepository();
     const usecase = new userUseCase.GetUserUseCase(repository);
 
     const ucRes = await usecase.execute(ucReq);
@@ -152,14 +154,14 @@ class GetUserController {
   }
 }
 
-class DeleteUserController {
+class DeleteUserController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
     const ucReq = new userUcio.DeleteUserUseCaseRequest(tokenUserId, +id);
 
-    const repository = new UserPrismaRepository();
+    const repository = this.factory.makeUserRepository();
     const usecase = new userUseCase.DeleteUserUseCase(repository);
 
     const ucRes = await usecase.execute(ucReq);

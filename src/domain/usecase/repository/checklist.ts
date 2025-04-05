@@ -8,6 +8,8 @@ import {
 } from "../ucio/checklist";
 
 interface ChecklistRepositoryInterface {
+  items?: ChecklistEntity[];
+
   createChecklist(req: CreateChecklistUseCaseRequest): Promise<ChecklistEntity>;
   getChecklist(id: number): Promise<ChecklistEntity>;
   deleteChecklist(req: DeleteChecklistUseCaseRequest): Promise<void>;

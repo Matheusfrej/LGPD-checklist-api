@@ -1,6 +1,3 @@
-import { UserInMemoryRepository } from "../../../test/repository/user";
-import { SystemInMemoryRepository } from "../../../test/repository/system";
-import { ItemInMemoryRepository } from "../../../test/repository/item";
 import {
   CreateChecklistUseCase,
   DeleteChecklistUseCase,
@@ -11,7 +8,6 @@ import {
 } from "./checklist";
 import { MockGenerator } from "../../../test/utils/mockGenerator";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ChecklistInMemoryRepository } from "../../../test/repository/checklist";
 import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
 import { ChecklistEntity } from "../entity/checklist";
 import { Json } from "../@types";
@@ -21,21 +17,26 @@ import {
   ChecklistItemEntity,
   SeverityDegreeType,
 } from "../entity/checklistItem";
+import { testFactory } from "../../../test/factory";
+import { UserRepositoryInterface } from "./repository/user";
+import { SystemRepositoryInterface } from "./repository/system";
+import { ChecklistRepositoryInterface } from "./repository/checklist";
+import { ItemRepositoryInterface } from "./repository/item";
 
-let userRepository: UserInMemoryRepository;
-let systemRepository: SystemInMemoryRepository;
-let checklistRepository: ChecklistInMemoryRepository;
-let itemRepository: ItemInMemoryRepository;
+let userRepository: UserRepositoryInterface;
+let systemRepository: SystemRepositoryInterface;
+let checklistRepository: ChecklistRepositoryInterface;
+let itemRepository: ItemRepositoryInterface;
 let mockGenerator: MockGenerator;
 
 describe("Create Checklist Use Case", () => {
   let useCase: CreateChecklistUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
-    systemRepository = new SystemInMemoryRepository();
-    checklistRepository = new ChecklistInMemoryRepository();
-    itemRepository = new ItemInMemoryRepository();
+    userRepository = testFactory.makeUserRepository();
+    systemRepository = testFactory.makeSystemRepository();
+    checklistRepository = testFactory.makeChecklistRepository();
+    itemRepository = testFactory.makeItemRepository();
     useCase = new CreateChecklistUseCase(
       checklistRepository,
       systemRepository,
@@ -486,7 +487,7 @@ describe("Get Checklist Use Case", () => {
   let useCase: GetChecklistUseCase;
 
   beforeEach(() => {
-    checklistRepository = new ChecklistInMemoryRepository();
+    checklistRepository = testFactory.makeChecklistRepository();
     useCase = new GetChecklistUseCase(checklistRepository);
     mockGenerator = new MockGenerator(
       undefined,
@@ -533,65 +534,65 @@ describe("Get Checklist Use Case", () => {
   });
 });
 
-// describe("Delete Checklist Use Case", () => {
-//   let useCase: DeleteChecklistUseCase;
+describe("Delete Checklist Use Case", () => {
+  let useCase: DeleteChecklistUseCase;
 
-//   beforeEach(() => {
-//     checklistRepository = new ChecklistInMemoryRepository();
-//     useCase = new DeleteChecklistUseCase(checklistRepository);
-//     mockGenerator = new MockGenerator(
-//       undefined,
-//       undefined,
-//       checklistRepository,
-//     );
-//   });
+  beforeEach(() => {
+    checklistRepository = testFactory.makeChecklistRepository();
+    useCase = new DeleteChecklistUseCase(checklistRepository);
+    mockGenerator = new MockGenerator(
+      undefined,
+      undefined,
+      checklistRepository,
+    );
+  });
 
-//   it("should delete checklist", async () => {
-//     const checklist = await mockGenerator.createChecklistMock();
+  it("should delete checklist", async () => {
+    const checklist = await mockGenerator.createChecklistMock();
 
-//     const oldSize = checklistRepository.items.length;
+    const oldSize = checklistRepository.items.length;
 
-//     const result = await useCase.execute({
-//       id: checklist.id,
-//       tokenUserId: checklist.userId,
-//     });
+    const result = await useCase.execute({
+      id: checklist.id,
+      tokenUserId: checklist.userId,
+    });
 
-//     expect(result.error).toBe(null);
-//     expect(checklistRepository.items.length).toBe(0);
-//     expect(checklistRepository.items.length).toBe(oldSize - 1);
-//   });
+    expect(result.error).toBe(null);
+    expect(checklistRepository.items.length).toBe(0);
+    expect(checklistRepository.items.length).toBe(oldSize - 1);
+  });
 
-//   it("should not delete inexistent checklist", async () => {
-//     const id = 1;
+  it("should not delete inexistent checklist", async () => {
+    const id = 1;
 
-//     const result = await useCase.execute({
-//       id,
-//       tokenUserId: 1,
-//     });
+    const result = await useCase.execute({
+      id,
+      tokenUserId: 1,
+    });
 
-//     expectPreConditionalError({ error: result.error });
-//     expect(checklistRepository.items.length).toBe(0);
-//   });
+    expectPreConditionalError({ error: result.error });
+    expect(checklistRepository.items.length).toBe(0);
+  });
 
-//   it("should not delete checklist if checklist doesnt belong to authenticated user", async () => {
-//     const checklist = await mockGenerator.createChecklistMock();
+  it("should not delete checklist if checklist doesnt belong to authenticated user", async () => {
+    const checklist = await mockGenerator.createChecklistMock();
 
-//     const result = await useCase.execute({
-//       id: checklist.id,
-//       tokenUserId: 2,
-//     });
+    const result = await useCase.execute({
+      id: checklist.id,
+      tokenUserId: 2,
+    });
 
-//     expectPreConditionalError({ error: result.error, noPermission: true });
-//     expect(checklistRepository.items.length).toBe(1);
-//   });
-// });
+    expectPreConditionalError({ error: result.error, noPermission: true });
+    expect(checklistRepository.items.length).toBe(1);
+  });
+});
 
 // describe("Update Checklist Use Case", () => {
 //   let useCase: UpdateChecklistUseCase;
 
 //   beforeEach(() => {
-//     checklistRepository = new ChecklistInMemoryRepository();
-//     systemRepository = new SystemInMemoryRepository();
+//     checklistRepository = testFactory.makeChecklistRepository();
+//     systemRepository = testFactory.makeSystemRepository();
 //     useCase = new UpdateChecklistUseCase(checklistRepository, systemRepository);
 //     mockGenerator = new MockGenerator(
 //       undefined,
@@ -845,9 +846,9 @@ describe("Get Checklist Use Case", () => {
 //   let useCase: ListChecklistsByUserIdUseCase;
 
 //   beforeEach(() => {
-//     checklistRepository = new ChecklistInMemoryRepository();
-//     systemRepository = new SystemInMemoryRepository();
-//     userRepository = new UserInMemoryRepository();
+//     checklistRepository = testFactory.makeChecklistRepository();
+//     systemRepository = testFactory.makeSystemRepository();
+//     userRepository = testFactory.makeUserRepository();
 //     useCase = new ListChecklistsByUserIdUseCase(
 //       checklistRepository,
 //       userRepository,
@@ -942,9 +943,9 @@ describe("Get Checklist Use Case", () => {
 //   let useCase: ListChecklistsBySystemIdUseCase;
 
 //   beforeEach(() => {
-//     checklistRepository = new ChecklistInMemoryRepository();
-//     systemRepository = new SystemInMemoryRepository();
-//     userRepository = new UserInMemoryRepository();
+//     checklistRepository = testFactory.makeChecklistRepository();
+//     systemRepository = testFactory.makeSystemRepository();
+//     userRepository = testFactory.makeUserRepository();
 //     useCase = new ListChecklistsBySystemIdUseCase(
 //       checklistRepository,
 //       systemRepository,

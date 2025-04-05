@@ -8,42 +8,50 @@ import {
   ListChecklistsByUserIdController,
   UpdateChecklistController,
 } from "../controller/checklist";
+import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
 
 class ChecklistRouter {
   private router: Router;
 
-  constructor() {
+  constructor(factory: RepositoryFactory) {
     this.router = Router();
+
+    const create = new CreateChecklistController(factory);
+    const get = new GetChecklistController(factory);
+    const listByUser = new ListChecklistsByUserIdController(factory);
+    const listBySystem = new ListChecklistsBySystemIdController(factory);
+    const _delete = new DeleteChecklistController(factory);
+    const update = new UpdateChecklistController(factory);
 
     this.router.post(
       "/checklists",
-      verifyTokenMiddleware,
-      new CreateChecklistController().execute,
+      verifyTokenMiddleware(factory),
+      create.execute.bind(create),
     );
     this.router.get(
       "/checklists/:id",
-      verifyTokenMiddleware,
-      new GetChecklistController().execute,
+      verifyTokenMiddleware(factory),
+      get.execute.bind(get),
     );
     this.router.get(
       "/checklistsByUserId/:userId",
-      verifyTokenMiddleware,
-      new ListChecklistsByUserIdController().execute,
+      verifyTokenMiddleware(factory),
+      listByUser.execute.bind(listByUser),
     );
     this.router.get(
       "/checklistsBySystemId/:systemId",
-      verifyTokenMiddleware,
-      new ListChecklistsBySystemIdController().execute,
+      verifyTokenMiddleware(factory),
+      listBySystem.execute.bind(listBySystem),
     );
     this.router.delete(
       "/checklists/:id",
-      verifyTokenMiddleware,
-      new DeleteChecklistController().execute,
+      verifyTokenMiddleware(factory),
+      _delete.execute.bind(_delete),
     );
     this.router.put(
       "/checklists/:id",
-      verifyTokenMiddleware,
-      new UpdateChecklistController().execute,
+      verifyTokenMiddleware(factory),
+      update.execute.bind(update),
     );
   }
 
