@@ -2,6 +2,7 @@ import { Json } from "../../@types";
 import { ChecklistEntity } from "../../entity/checklist";
 import { AnswerType, SeverityDegreeType } from "../../entity/checklistItem";
 import { ErrorEntity } from "../../entity/error";
+import { BaseResponse } from "./common";
 
 type ItemsInput = {
   id: number;
@@ -10,54 +11,25 @@ type ItemsInput = {
   userComment?: string;
 }[];
 
-class CreateChecklistUseCaseRequest {
-  public tokenUserId: number;
-  public userId: number;
-  public systemId: number;
-  public items: ItemsInput;
+export type CreateChecklistUseCaseRequest = {
+  tokenUserId: number;
+  userId: number;
+  systemId: number;
+  items: ItemsInput;
+};
 
-  constructor(
-    tokenUserId: number,
-    userId: number,
-    systemId: number,
-    items: ItemsInput,
-  ) {
-    this.tokenUserId = tokenUserId;
-    this.userId = userId;
-    this.systemId = systemId;
-    this.items = items;
-  }
-}
+export type CreateChecklistUseCaseResponse = BaseResponse & {
+  checklist: ChecklistEntity;
+};
 
-class CreateChecklistUseCaseResponse {
-  public checklist: ChecklistEntity;
-  public error: ErrorEntity;
+export type GetChecklistUseCaseRequest = {
+  tokenUserId: number;
+  id: number;
+};
 
-  constructor(checklist: ChecklistEntity, error: ErrorEntity) {
-    this.checklist = checklist;
-    this.error = error;
-  }
-}
-
-class GetChecklistUseCaseRequest {
-  public tokenUserId: number;
-  public id: number;
-
-  constructor(tokenUserId: number, id: number) {
-    this.tokenUserId = tokenUserId;
-    this.id = id;
-  }
-}
-
-class GetChecklistUseCaseResponse {
-  public checklist: ChecklistEntity;
-  public error: ErrorEntity;
-
-  constructor(checklist: ChecklistEntity, error: ErrorEntity) {
-    this.checklist = checklist;
-    this.error = error;
-  }
-}
+export type GetChecklistUseCaseResponse = BaseResponse & {
+  checklist: ChecklistEntity;
+};
 
 class DeleteChecklistUseCaseRequest {
   public tokenUserId: number;
@@ -151,10 +123,6 @@ class ListChecklistsBySystemIdUseCaseResponse {
 }
 
 export {
-  CreateChecklistUseCaseRequest,
-  CreateChecklistUseCaseResponse,
-  GetChecklistUseCaseRequest,
-  GetChecklistUseCaseResponse,
   DeleteChecklistUseCaseRequest,
   DeleteChecklistUseCaseResponse,
   UpdateChecklistUseCaseRequest,

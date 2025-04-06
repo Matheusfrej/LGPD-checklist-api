@@ -1,5 +1,5 @@
-import * as systemUseCase from "@/domain/usecase/system";
-import * as systemUcio from "@/domain/usecase/ucio/system";
+import * as useCase from "@/domain/usecase/system";
+import * as ucio from "@/domain/usecase/ucio/system";
 import { Request, Response } from "express";
 import {
   InternalServerErrorResponse,
@@ -11,7 +11,7 @@ class CreateSystemController extends Controller {
   async execute(req: Request, res: Response) {
     const { name, description, userId, tokenUserId } = req.body;
 
-    const ucReq = new systemUcio.CreateSystemUseCaseRequest(
+    const ucReq = new ucio.CreateSystemUseCaseRequest(
       name,
       description,
       userId,
@@ -20,7 +20,7 @@ class CreateSystemController extends Controller {
 
     const systemRepository = this.factory.makeSystemRepository();
     const userRepository = this.factory.makeUserRepository();
-    const usecase = new systemUseCase.CreateSystemUseCase(
+    const usecase = new useCase.CreateSystemUseCase(
       systemRepository,
       userRepository,
     );
@@ -40,14 +40,14 @@ class ListSystemsByUserIdController extends Controller {
     const { userId } = req.params;
     const { tokenUserId } = req.body;
 
-    const ucReq = new systemUcio.ListSystemsByUserIdUseCaseRequest(
+    const ucReq = new ucio.ListSystemsByUserIdUseCaseRequest(
       tokenUserId,
       +userId,
     );
 
     const systemRepository = this.factory.makeSystemRepository();
     const userRepository = this.factory.makeUserRepository();
-    const usecase = new systemUseCase.ListSystemsByUserIdUseCase(
+    const usecase = new useCase.ListSystemsByUserIdUseCase(
       systemRepository,
       userRepository,
     );
@@ -66,10 +66,10 @@ class GetSystemController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
 
-    const ucReq = new systemUcio.GetSystemUseCaseRequest(+id);
+    const ucReq = new ucio.GetSystemUseCaseRequest(+id);
 
     const systemRepository = this.factory.makeSystemRepository();
-    const usecase = new systemUseCase.GetSystemUseCase(systemRepository);
+    const usecase = new useCase.GetSystemUseCase(systemRepository);
 
     const ucRes = await usecase.execute(ucReq);
 
@@ -86,10 +86,10 @@ class DeleteSystemController extends Controller {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
-    const ucReq = new systemUcio.DeleteSystemUseCaseRequest(+id, tokenUserId);
+    const ucReq = new ucio.DeleteSystemUseCaseRequest(+id, tokenUserId);
 
     const systemRepository = this.factory.makeSystemRepository();
-    const usecase = new systemUseCase.DeleteSystemUseCase(systemRepository);
+    const usecase = new useCase.DeleteSystemUseCase(systemRepository);
 
     const ucRes = await usecase.execute(ucReq);
 
@@ -106,7 +106,7 @@ class UpdateSystemController extends Controller {
     const { id } = req.params;
     const { tokenUserId, name, description } = req.body;
 
-    const ucReq = new systemUcio.UpdateSystemUseCaseRequest(
+    const ucReq = new ucio.UpdateSystemUseCaseRequest(
       +id,
       name,
       description,
@@ -114,7 +114,7 @@ class UpdateSystemController extends Controller {
     );
 
     const systemRepository = this.factory.makeSystemRepository();
-    const usecase = new systemUseCase.UpdateSystemUseCase(systemRepository);
+    const usecase = new useCase.UpdateSystemUseCase(systemRepository);
 
     const ucRes = await usecase.execute(ucReq);
 

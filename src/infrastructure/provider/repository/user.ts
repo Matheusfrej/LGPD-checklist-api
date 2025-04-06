@@ -1,5 +1,5 @@
 import * as userService from "@/internal/database/postgresql/user";
-import * as userUcio from "@/domain/usecase/ucio/user";
+import * as ucio from "@/domain/usecase/ucio/user";
 import { UserEntity } from "../../../domain/entity/user";
 import { UserRepositoryInterface } from "../../../domain/usecase/repository/user";
 
@@ -8,13 +8,11 @@ class UserPrismaRepository implements UserRepositoryInterface {
     return await userService.checkUserByEmailExists(email, id);
   }
 
-  async createUser(
-    user: userUcio.CreateUserUseCaseRequest,
-  ): Promise<UserEntity> {
+  async createUser(user: ucio.CreateUserUseCaseRequest): Promise<UserEntity> {
     return await userService.createUser(user);
   }
 
-  async login(req: userUcio.LoginUseCaseRequest): Promise<UserEntity> {
+  async login(req: ucio.LoginUseCaseRequest): Promise<UserEntity> {
     return await userService.login(req);
   }
 
@@ -22,11 +20,11 @@ class UserPrismaRepository implements UserRepositoryInterface {
     return userService.getUser(id);
   }
 
-  async updateUser(req: userUcio.UpdateUserUseCaseRequest) {
+  async updateUser(req: ucio.UpdateUserUseCaseRequest) {
     return userService.updateUser(req);
   }
 
-  deleteUser(req: userUcio.DeleteUserUseCaseRequest) {
+  deleteUser(req: ucio.DeleteUserUseCaseRequest) {
     return userService.deleteUser(req.id);
   }
 }

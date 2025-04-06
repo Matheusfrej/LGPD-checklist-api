@@ -1,5 +1,5 @@
-import * as userUseCase from "@/domain/usecase/user";
-import * as userUcio from "@/domain/usecase/ucio/user";
+import * as useCase from "@/domain/usecase/user";
+import * as ucio from "@/domain/usecase/ucio/user";
 import {
   InternalServerErrorResponse,
   SuccessResponse,
@@ -13,7 +13,7 @@ class CreateUserController extends Controller {
   async execute(req: Request, res: Response) {
     const { name, office, email, password } = req.body;
 
-    const ucReq = new userUcio.CreateUserUseCaseRequest(
+    const ucReq = new ucio.CreateUserUseCaseRequest(
       name,
       office,
       email,
@@ -21,7 +21,7 @@ class CreateUserController extends Controller {
     );
 
     const repository = this.factory.makeUserRepository();
-    const usecase = new userUseCase.CreateUserUseCase(repository);
+    const usecase = new useCase.CreateUserUseCase(repository);
 
     const ucRes = await usecase.execute(ucReq);
 
@@ -37,14 +37,11 @@ class LoginController extends Controller {
   async execute(req: Request, res: Response) {
     const { email, password } = req.body;
 
-    const ucReq = new userUcio.LoginUseCaseRequest(email, password);
+    const ucReq = new ucio.LoginUseCaseRequest(email, password);
 
     const userRepository = this.factory.makeUserRepository();
     const authRepository = this.factory.makeAuthRepository();
-    const usecase = new userUseCase.LoginUseCase(
-      userRepository,
-      authRepository,
-    );
+    const usecase = new useCase.LoginUseCase(userRepository, authRepository);
 
     const ucRes = await usecase.execute(ucReq);
 
@@ -70,11 +67,11 @@ class VerifyTokenController extends Controller {
   async execute(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.authorization;
 
-    const ucReq = new userUcio.VerifyTokenUseCaseRequest(token);
+    const ucReq = new ucio.VerifyTokenUseCaseRequest(token);
 
     const userRepository = this.factory.makeUserRepository();
     const authRepository = new AuthJWTRepository();
-    const usecase = new userUseCase.VerifyTokenUseCase(
+    const usecase = new useCase.VerifyTokenUseCase(
       userRepository,
       authRepository,
     );
@@ -88,7 +85,7 @@ class VerifyTokenController extends Controller {
     req: Request,
     res: Response,
     next: NextFunction,
-    ucRes: userUcio.VerifyTokenUseCaseResponse,
+    ucRes: ucio.VerifyTokenUseCaseResponse,
   ) {
     if (this.isMiddleware) {
       if (!ucRes.error) {
@@ -115,7 +112,7 @@ class UpdateUserController extends Controller {
     const { id } = req.params;
     const { tokenUserId, name, office } = req.body;
 
-    const ucReq = new userUcio.UpdateUserUseCaseRequest(
+    const ucReq = new ucio.UpdateUserUseCaseRequest(
       tokenUserId,
       +id,
       name,
@@ -123,7 +120,7 @@ class UpdateUserController extends Controller {
     );
 
     const repository = this.factory.makeUserRepository();
-    const usecase = new userUseCase.UpdateUserUseCase(repository);
+    const usecase = new useCase.UpdateUserUseCase(repository);
 
     const ucRes = await usecase.execute(ucReq);
 
@@ -139,10 +136,10 @@ class GetUserController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
 
-    const ucReq = new userUcio.GetUserUseCaseRequest(+id);
+    const ucReq = new ucio.GetUserUseCaseRequest(+id);
 
     const repository = this.factory.makeUserRepository();
-    const usecase = new userUseCase.GetUserUseCase(repository);
+    const usecase = new useCase.GetUserUseCase(repository);
 
     const ucRes = await usecase.execute(ucReq);
 
@@ -159,10 +156,10 @@ class DeleteUserController extends Controller {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
-    const ucReq = new userUcio.DeleteUserUseCaseRequest(tokenUserId, +id);
+    const ucReq = new ucio.DeleteUserUseCaseRequest(tokenUserId, +id);
 
     const repository = this.factory.makeUserRepository();
-    const usecase = new userUseCase.DeleteUserUseCase(repository);
+    const usecase = new useCase.DeleteUserUseCase(repository);
 
     const ucRes = await usecase.execute(ucReq);
 

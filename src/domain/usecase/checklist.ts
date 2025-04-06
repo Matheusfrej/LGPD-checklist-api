@@ -1,5 +1,5 @@
-import * as checklistValidateInterface from "../usecase/validate/checklist";
-import * as checklistUcioInterface from "../usecase/ucio/checklist";
+import * as validate from "../usecase/validate/checklist";
+import * as ucio from "../usecase/ucio/checklist";
 import {
   INTERNAL_SERVER_ERROR_MESSAGE,
   newInternalServerError,
@@ -13,7 +13,7 @@ import { UserRepositoryInterface } from "./repository/user";
 import { ItemRepositoryInterface } from "./repository/item";
 
 class CreateChecklistUseCase {
-  public validate: checklistValidateInterface.CreateChecklistUseCaseValidate;
+  public validate: validate.CreateChecklistUseCaseValidate;
   public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(
@@ -22,60 +22,58 @@ class CreateChecklistUseCase {
     userRepository: UserRepositoryInterface,
     itemRepository: ItemRepositoryInterface,
   ) {
-    this.validate =
-      new checklistValidateInterface.CreateChecklistUseCaseValidate(
-        systemRepository,
-        userRepository,
-        itemRepository,
-      );
+    this.validate = new validate.CreateChecklistUseCaseValidate(
+      systemRepository,
+      userRepository,
+      itemRepository,
+    );
     this.checklistRepository = checklistRepository;
   }
 
   async execute(
-    req: checklistUcioInterface.CreateChecklistUseCaseRequest,
-  ): Promise<checklistUcioInterface.CreateChecklistUseCaseResponse> {
+    req: ucio.CreateChecklistUseCaseRequest,
+  ): Promise<ucio.CreateChecklistUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        const checklistResp =
-          await this.checklistRepository.createChecklist(req);
+        const checklist = await this.checklistRepository.createChecklist(req);
 
-        return new checklistUcioInterface.CreateChecklistUseCaseResponse(
-          checklistResp,
-          null,
-        );
+        return {
+          checklist,
+          error: null,
+        };
       } else {
         console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new checklistUcioInterface.CreateChecklistUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          checklist: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new checklistUcioInterface.CreateChecklistUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        checklist: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
 
 class GetChecklistUseCase {
-  public validate: checklistValidateInterface.GetChecklistUseCaseValidate;
+  public validate: validate.GetChecklistUseCaseValidate;
   public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(checklistRepository: ChecklistRepositoryInterface) {
-    this.validate = new checklistValidateInterface.GetChecklistUseCaseValidate(
+    this.validate = new validate.GetChecklistUseCaseValidate(
       checklistRepository,
     );
     this.checklistRepository = checklistRepository;
   }
 
   async execute(
-    req: checklistUcioInterface.GetChecklistUseCaseRequest,
-  ): Promise<checklistUcioInterface.GetChecklistUseCaseResponse> {
+    req: ucio.GetChecklistUseCaseRequest,
+  ): Promise<ucio.GetChecklistUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
 
@@ -83,61 +81,60 @@ class GetChecklistUseCase {
         const checklist = await this.checklistRepository.getChecklist(req.id);
 
         if (checklist) {
-          return new checklistUcioInterface.GetChecklistUseCaseResponse(
+          return {
             checklist,
-            null,
-          );
+            error: null,
+          };
         } else {
-          return new checklistUcioInterface.GetChecklistUseCaseResponse(
-            null,
-            newPreConditionalError("Checklist não encontrada"),
-          );
+          return {
+            checklist: null,
+            error: newPreConditionalError("Checklist não encontrada"),
+          };
         }
       } else {
-        return new checklistUcioInterface.GetChecklistUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          checklist: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new checklistUcioInterface.GetChecklistUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        checklist: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
 
 class DeleteChecklistUseCase {
-  public validate: checklistValidateInterface.DeleteChecklistUseCaseValidate;
+  public validate: validate.DeleteChecklistUseCaseValidate;
   public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(checklistRepository: ChecklistRepositoryInterface) {
-    this.validate =
-      new checklistValidateInterface.DeleteChecklistUseCaseValidate(
-        checklistRepository,
-      );
+    this.validate = new validate.DeleteChecklistUseCaseValidate(
+      checklistRepository,
+    );
     this.checklistRepository = checklistRepository;
   }
 
   async execute(
-    req: checklistUcioInterface.DeleteChecklistUseCaseRequest,
-  ): Promise<checklistUcioInterface.DeleteChecklistUseCaseResponse> {
+    req: ucio.DeleteChecklistUseCaseRequest,
+  ): Promise<ucio.DeleteChecklistUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
       if (!messageError) {
         await this.checklistRepository.deleteChecklist(req);
 
-        return new checklistUcioInterface.DeleteChecklistUseCaseResponse(null);
+        return new ucio.DeleteChecklistUseCaseResponse(null);
       } else {
-        return new checklistUcioInterface.DeleteChecklistUseCaseResponse(
+        return new ucio.DeleteChecklistUseCaseResponse(
           newPreConditionalError(messageError),
         );
       }
     } catch (error) {
       console.log(error);
-      return new checklistUcioInterface.DeleteChecklistUseCaseResponse(
+      return new ucio.DeleteChecklistUseCaseResponse(
         newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
       );
     }
@@ -145,39 +142,38 @@ class DeleteChecklistUseCase {
 }
 
 class UpdateChecklistUseCase {
-  public validate: checklistValidateInterface.UpdateChecklistUseCaseValidate;
+  public validate: validate.UpdateChecklistUseCaseValidate;
   public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(
     checklistRepository: ChecklistRepositoryInterface,
     systemRepository: SystemRepositoryInterface,
   ) {
-    this.validate =
-      new checklistValidateInterface.UpdateChecklistUseCaseValidate(
-        checklistRepository,
-        systemRepository,
-      );
+    this.validate = new validate.UpdateChecklistUseCaseValidate(
+      checklistRepository,
+      systemRepository,
+    );
     this.checklistRepository = checklistRepository;
   }
 
   async execute(
-    req: checklistUcioInterface.UpdateChecklistUseCaseRequest,
-  ): Promise<checklistUcioInterface.UpdateChecklistUseCaseResponse> {
+    req: ucio.UpdateChecklistUseCaseRequest,
+  ): Promise<ucio.UpdateChecklistUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         await this.checklistRepository.updateChecklist(req);
 
-        return new checklistUcioInterface.UpdateChecklistUseCaseResponse(null);
+        return new ucio.UpdateChecklistUseCaseResponse(null);
       } else {
-        return new checklistUcioInterface.UpdateChecklistUseCaseResponse(
+        return new ucio.UpdateChecklistUseCaseResponse(
           newPreConditionalError(messageError),
         );
       }
     } catch (error) {
       console.log(error);
-      return new checklistUcioInterface.UpdateChecklistUseCaseResponse(
+      return new ucio.UpdateChecklistUseCaseResponse(
         newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
       );
     }
@@ -185,23 +181,22 @@ class UpdateChecklistUseCase {
 }
 
 class ListChecklistsByUserIdUseCase {
-  public validate: checklistValidateInterface.ListChecklistsByUserIdUseCaseValidate;
+  public validate: validate.ListChecklistsByUserIdUseCaseValidate;
   public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(
     checklistRepository: ChecklistRepositoryInterface,
     userRepository: UserRepositoryInterface,
   ) {
-    this.validate =
-      new checklistValidateInterface.ListChecklistsByUserIdUseCaseValidate(
-        userRepository,
-      );
+    this.validate = new validate.ListChecklistsByUserIdUseCaseValidate(
+      userRepository,
+    );
     this.checklistRepository = checklistRepository;
   }
 
   async execute(
-    req: checklistUcioInterface.ListChecklistsByUserIdUseCaseRequest,
-  ): Promise<checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse> {
+    req: ucio.ListChecklistsByUserIdUseCaseRequest,
+  ): Promise<ucio.ListChecklistsByUserIdUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
 
@@ -209,19 +204,16 @@ class ListChecklistsByUserIdUseCase {
         const checklists =
           await this.checklistRepository.listChecklistsByUserId(req);
 
-        return new checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse(
-          checklists,
-          null,
-        );
+        return new ucio.ListChecklistsByUserIdUseCaseResponse(checklists, null);
       } else {
-        return new checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse(
+        return new ucio.ListChecklistsByUserIdUseCaseResponse(
           null,
           newPreConditionalError(messageError),
         );
       }
     } catch (error) {
       console.log(error);
-      return new checklistUcioInterface.ListChecklistsByUserIdUseCaseResponse(
+      return new ucio.ListChecklistsByUserIdUseCaseResponse(
         null,
         newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
       );
@@ -230,23 +222,22 @@ class ListChecklistsByUserIdUseCase {
 }
 
 class ListChecklistsBySystemIdUseCase {
-  public validate: checklistValidateInterface.ListChecklistsBySystemIdUseCaseValidate;
+  public validate: validate.ListChecklistsBySystemIdUseCaseValidate;
   public checklistRepository: ChecklistRepositoryInterface;
 
   constructor(
     checklistRepository: ChecklistRepositoryInterface,
     systemRepository: SystemRepositoryInterface,
   ) {
-    this.validate =
-      new checklistValidateInterface.ListChecklistsBySystemIdUseCaseValidate(
-        systemRepository,
-      );
+    this.validate = new validate.ListChecklistsBySystemIdUseCaseValidate(
+      systemRepository,
+    );
     this.checklistRepository = checklistRepository;
   }
 
   async execute(
-    req: checklistUcioInterface.ListChecklistsBySystemIdUseCaseRequest,
-  ): Promise<checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse> {
+    req: ucio.ListChecklistsBySystemIdUseCaseRequest,
+  ): Promise<ucio.ListChecklistsBySystemIdUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
 
@@ -254,19 +245,19 @@ class ListChecklistsBySystemIdUseCase {
         const checklists =
           await this.checklistRepository.listChecklistsBySystemId(req);
 
-        return new checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse(
+        return new ucio.ListChecklistsBySystemIdUseCaseResponse(
           checklists,
           null,
         );
       } else {
-        return new checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse(
+        return new ucio.ListChecklistsBySystemIdUseCaseResponse(
           null,
           newPreConditionalError(messageError),
         );
       }
     } catch (error) {
       console.log(error);
-      return new checklistUcioInterface.ListChecklistsBySystemIdUseCaseResponse(
+      return new ucio.ListChecklistsBySystemIdUseCaseResponse(
         null,
         newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
       );
