@@ -5,6 +5,8 @@ const verifyTokenMiddlewareBind = (factory: RepositoryFactory) =>
   new VerifyTokenController(true, factory);
 
 const verifyTokenMiddleware = (factory: RepositoryFactory) =>
-  verifyTokenMiddlewareBind(factory).execute.bind(verifyTokenMiddlewareBind);
+  verifyTokenMiddlewareBind(factory).execute.bind(
+    verifyTokenMiddlewareBind(factory),
+  );
 
 export { verifyTokenMiddleware };
