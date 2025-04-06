@@ -1,4 +1,3 @@
-import { Router } from "express";
 import {
   CreateUserController,
   DeleteUserController,
@@ -9,12 +8,11 @@ import {
 } from "../controller/user";
 import { verifyTokenMiddleware } from "../middleware/verifyToken";
 import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
+import { CustomRouter } from "./customRouter";
 
-class UserRouter {
-  private router: Router;
-
+class UserRouter extends CustomRouter {
   constructor(factory: RepositoryFactory) {
-    this.router = Router();
+    super();
 
     const verifyToken = new VerifyTokenController(false, factory);
     const login = new LoginController(factory);
@@ -39,10 +37,6 @@ class UserRouter {
       verifyTokenMiddleware(factory),
       update.execute.bind(update),
     );
-  }
-
-  getRouter(): Router {
-    return this.router;
   }
 }
 

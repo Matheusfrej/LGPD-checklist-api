@@ -2,7 +2,7 @@ import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory"
 import { Request, Response, NextFunction } from "express";
 
 export abstract class Controller {
-  public factory: RepositoryFactory;
+  protected factory: RepositoryFactory;
 
   constructor(factory: RepositoryFactory) {
     this.factory = factory;

@@ -1,4 +1,3 @@
-import { Router } from "express";
 import { verifyTokenMiddleware } from "../middleware/verifyToken";
 import {
   CreateSystemController,
@@ -8,12 +7,11 @@ import {
   UpdateSystemController,
 } from "../controller/system";
 import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
+import { CustomRouter } from "./customRouter";
 
-class SystemRouter {
-  private router: Router;
-
+class SystemRouter extends CustomRouter {
   constructor(factory: RepositoryFactory) {
-    this.router = Router();
+    super();
 
     const create = new CreateSystemController(factory);
     const get = new GetSystemController(factory);
@@ -42,10 +40,6 @@ class SystemRouter {
       verifyTokenMiddleware(factory),
       update.execute.bind(update),
     );
-  }
-
-  getRouter(): Router {
-    return this.router;
   }
 }
 

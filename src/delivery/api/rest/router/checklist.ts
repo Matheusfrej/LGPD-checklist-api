@@ -1,4 +1,3 @@
-import { Router } from "express";
 import { verifyTokenMiddleware } from "../middleware/verifyToken";
 import {
   CreateChecklistController,
@@ -9,12 +8,11 @@ import {
   UpdateChecklistController,
 } from "../controller/checklist";
 import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
+import { CustomRouter } from "./customRouter";
 
-class ChecklistRouter {
-  private router: Router;
-
+class ChecklistRouter extends CustomRouter {
   constructor(factory: RepositoryFactory) {
-    this.router = Router();
+    super();
 
     const create = new CreateChecklistController(factory);
     const get = new GetChecklistController(factory);
@@ -53,10 +51,6 @@ class ChecklistRouter {
       verifyTokenMiddleware(factory),
       update.execute.bind(update),
     );
-  }
-
-  getRouter(): Router {
-    return this.router;
   }
 }
 
