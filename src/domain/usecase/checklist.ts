@@ -11,6 +11,7 @@ import { ChecklistRepositoryInterface } from "./repository/checklist";
 import { SystemRepositoryInterface } from "./repository/system";
 import { UserRepositoryInterface } from "./repository/user";
 import { ItemRepositoryInterface } from "./repository/item";
+import { error } from "console";
 
 class CreateChecklistUseCase {
   public validate: validate.CreateChecklistUseCaseValidate;
@@ -126,17 +127,24 @@ class DeleteChecklistUseCase {
       if (!messageError) {
         await this.checklistRepository.deleteChecklist(req);
 
-        return new ucio.DeleteChecklistUseCaseResponse(null);
+        return {
+          error: null,
+        };
+
       } else {
-        return new ucio.DeleteChecklistUseCaseResponse(
-          newPreConditionalError(messageError),
-        );
+
+        return {
+          error: newPreConditionalError(messageError),
+        };
+
+
       }
     } catch (error) {
       console.log(error);
-      return new ucio.DeleteChecklistUseCaseResponse(
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+
+      return {
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -165,17 +173,21 @@ class UpdateChecklistUseCase {
       if (!messageError) {
         await this.checklistRepository.updateChecklist(req);
 
-        return new ucio.UpdateChecklistUseCaseResponse(null);
+        return {
+          error: null,
+        };
       } else {
-        return new ucio.UpdateChecklistUseCaseResponse(
-          newPreConditionalError(messageError),
-        );
+
+        return {
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new ucio.UpdateChecklistUseCaseResponse(
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+
+      return {
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -204,19 +216,25 @@ class ListChecklistsByUserIdUseCase {
         const checklists =
           await this.checklistRepository.listChecklistsByUserId(req);
 
-        return new ucio.ListChecklistsByUserIdUseCaseResponse(checklists, null);
+        return {
+          checklists,
+          error: null,
+        };
+
       } else {
-        return new ucio.ListChecklistsByUserIdUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+
+        return {
+          checklists: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new ucio.ListChecklistsByUserIdUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+
+      return {
+        checklists: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -245,22 +263,25 @@ class ListChecklistsBySystemIdUseCase {
         const checklists =
           await this.checklistRepository.listChecklistsBySystemId(req);
 
-        return new ucio.ListChecklistsBySystemIdUseCaseResponse(
+        return {
           checklists,
-          null,
-        );
+          error: null,
+        };
+
       } else {
-        return new ucio.ListChecklistsBySystemIdUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+
+        return {
+          checklists: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new ucio.ListChecklistsBySystemIdUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+
+      return {
+        checklists: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
