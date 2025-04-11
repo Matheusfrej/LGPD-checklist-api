@@ -11,7 +11,6 @@ import { ChecklistRepositoryInterface } from "./repository/checklist";
 import { SystemRepositoryInterface } from "./repository/system";
 import { UserRepositoryInterface } from "./repository/user";
 import { ItemRepositoryInterface } from "./repository/item";
-import { error } from "console";
 
 class CreateChecklistUseCase {
   public validate: validate.CreateChecklistUseCaseValidate;
@@ -130,14 +129,10 @@ class DeleteChecklistUseCase {
         return {
           error: null,
         };
-
       } else {
-
         return {
           error: newPreConditionalError(messageError),
         };
-
-
       }
     } catch (error) {
       console.log(error);
@@ -177,7 +172,6 @@ class UpdateChecklistUseCase {
           error: null,
         };
       } else {
-
         return {
           error: newPreConditionalError(messageError),
         };
@@ -220,9 +214,7 @@ class ListChecklistsByUserIdUseCase {
           checklists,
           error: null,
         };
-
       } else {
-
         return {
           checklists: null,
           error: newPreConditionalError(messageError),
@@ -267,9 +259,7 @@ class ListChecklistsBySystemIdUseCase {
           checklists,
           error: null,
         };
-
       } else {
-
         return {
           checklists: null,
           error: newPreConditionalError(messageError),

@@ -71,4 +71,4 @@ export type ListChecklistsBySystemIdUseCaseRequest = {
 export type ListChecklistsBySystemIdUseCaseResponse = BaseResponse & {
   checklists: ChecklistEntity[];
   error: ErrorEntity;
-};  
+};

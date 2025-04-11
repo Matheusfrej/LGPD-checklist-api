@@ -1,5 +1,4 @@
 import * as useCase from "@/domain/usecase/checklist";
-import * as ucio from "@/domain/usecase/ucio/checklist";
 import { Request, Response } from "express";
 import {
   InternalServerErrorResponse,
@@ -118,12 +117,12 @@ class ListChecklistsByUserIdController extends Controller {
   async execute(req: Request, res: Response) {
     const { userId } = req.params;
     const { tokenUserId } = req.body;
-   
+
     const ucReq = {
       tokenUserId,
       userId: +userId,
     };
-    
+
     const checklistRepository = this.factory.makeChecklistRepository();
     const userRepository = this.factory.makeUserRepository();
     const usecase = new useCase.ListChecklistsByUserIdUseCase(
