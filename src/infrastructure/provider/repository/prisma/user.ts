@@ -1,12 +1,13 @@
 import * as ucio from "@/domain/usecase/ucio/user";
 import { UserEntity } from "../../../../domain/entity/user";
 import { UserRepositoryInterface } from "../../../../domain/usecase/repository/user";
-import { PrismaClient } from "@prisma/client";
 import { compareSync } from "bcryptjs";
+import { PrismaRepository } from "./repository";
 
-class UserPrismaRepository implements UserRepositoryInterface {
-  constructor(private prisma: PrismaClient) {}
-
+class UserPrismaRepository
+  extends PrismaRepository
+  implements UserRepositoryInterface
+{
   async checkUserByEmailExists(email: string, id?: number): Promise<boolean> {
     const user = await this.prisma.users.findFirst({
       where: {

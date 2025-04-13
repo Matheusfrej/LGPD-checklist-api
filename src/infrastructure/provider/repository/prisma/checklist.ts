@@ -11,19 +11,15 @@ import {
   ChecklistItemEntity,
   SeverityDegreeType,
 } from "../../../../domain/entity/checklistItem";
-import { runInTransaction } from "../../../internal/database/prisma/common";
-import { PrismaClient } from "@prisma/client";
 import { ItemEntity } from "../../../../domain/entity/item";
 import { LawEntity } from "../../../../domain/entity/law";
 import { DeviceEntity } from "../../../../domain/entity/device";
+import { PrismaRepository } from "./repository";
 
-class ChecklistPrismaRepository implements ChecklistRepositoryInterface {
-  constructor(private prisma: PrismaClient) {}
-
-  async runInTransaction<T>(fn: () => Promise<T>): Promise<T> {
-    return await runInTransaction(fn);
-  }
-
+class ChecklistPrismaRepository
+  extends PrismaRepository
+  implements ChecklistRepositoryInterface
+{
   async createChecklist(
     req: CreateChecklistUseCaseRequest,
   ): Promise<ChecklistEntity> {

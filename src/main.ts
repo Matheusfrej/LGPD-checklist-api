@@ -3,7 +3,7 @@ import "module-alias/register";
 import { CmdRest } from "./delivery/api/rest/cmd/server";
 import { PrismaRepositoryFactory } from "./domain/factory/prismaRepositoryFactory";
 import { RepositoryFactory } from "./domain/factory/repositoryFactory";
-import { prisma } from "./infrastructure/internal/connection/prisma";
+import { PrismaClient } from "@prisma/client";
 
 class Main {
   public restApp: CmdRest;
@@ -17,6 +17,7 @@ class Main {
   }
 }
 
+const prisma = new PrismaClient();
 const main = new Main(new PrismaRepositoryFactory(prisma));
 
 main.init();

@@ -1,11 +1,12 @@
 import { ItemRepositoryInterface } from "../../../../domain/usecase/repository/item";
 import { ItemEntity } from "../../../../domain/entity/item";
 import { CreateItemUseCaseRequest } from "../../../../domain/usecase/ucio/item";
-import { PrismaClient } from "@prisma/client";
+import { PrismaRepository } from "./repository";
 
-class ItemPrismaRepository implements ItemRepositoryInterface {
-  constructor(private prisma: PrismaClient) {}
-
+class ItemPrismaRepository
+  extends PrismaRepository
+  implements ItemRepositoryInterface
+{
   createItem(req: CreateItemUseCaseRequest): Promise<ItemEntity> {
     throw new Error("Method not implemented.");
   }

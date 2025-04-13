@@ -6,11 +6,12 @@ import {
   UpdateSystemUseCaseRequest,
 } from "../../../../domain/usecase/ucio/system";
 import { SystemRepositoryInterface } from "../../../../domain/usecase/repository/system";
-import { PrismaClient } from "@prisma/client";
+import { PrismaRepository } from "./repository";
 
-class SystemPrismaRepository implements SystemRepositoryInterface {
-  constructor(private prisma: PrismaClient) {}
-
+class SystemPrismaRepository
+  extends PrismaRepository
+  implements SystemRepositoryInterface
+{
   async createSystem(req: CreateSystemUseCaseRequest): Promise<SystemEntity> {
     const system = await this.prisma.systems.create({
       data: {
