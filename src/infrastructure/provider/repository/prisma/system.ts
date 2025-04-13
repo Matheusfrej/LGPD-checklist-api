@@ -1,4 +1,3 @@
-import * as systemService from "@/internal/database/postgresql/system";
 import { SystemEntity } from "@/domain/entity/system";
 import {
   CreateSystemUseCaseRequest,
@@ -7,28 +6,86 @@ import {
   UpdateSystemUseCaseRequest,
 } from "../../../../domain/usecase/ucio/system";
 import { SystemRepositoryInterface } from "../../../../domain/usecase/repository/system";
+import { PrismaClient } from "@prisma/client";
 
 class SystemPrismaRepository implements SystemRepositoryInterface {
+  constructor(private prisma: PrismaClient) {}
+
   async createSystem(req: CreateSystemUseCaseRequest): Promise<SystemEntity> {
-    return await systemService.createSystem(req);
+    const system = await this.prisma.systems.create({
+      data: {
+        name: req.name,
+        description: req.description,
+        userId: req.userId,
+      },
+    });
+
+    return new SystemEntity(
+      system.id,
+      system.name,
+      system.description,
+      system.userId,
+    );
   }
 
   async listSystemsByUserId(
     req: ListSystemsByUserIdUseCaseRequest,
   ): Promise<SystemEntity[]> {
-    return await systemService.listSystemsByUserId(req.userId);
+    const systems = await this.prisma.systems.findMany({
+      where: {
+        userId: req.userId,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return systems.map(
+      (system) =>
+        new SystemEntity(
+          system.id,
+          system.name,
+          system.description,
+          system.userId,
+        ),
+    );
   }
 
   async getSystem(id: number): Promise<SystemEntity> {
-    return await systemService.getSystem(id);
+    const system = await this.prisma.systems.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return system
+      ? new SystemEntity(
+          system.id,
+          system.name,
+          system.description,
+          system.userId,
+        )
+      : null;
   }
 
   async deleteSystem(req: DeleteSystemUseCaseRequest): Promise<void> {
-    await systemService.deleteSystem(req.id);
+    await this.prisma.systems.delete({
+      where: {
+        id: req.id,
+      },
+    });
   }
 
   async updateSystem(req: UpdateSystemUseCaseRequest): Promise<void> {
-    return await systemService.updateSystem(req);
+    await this.prisma.systems.update({
+      where: {
+        id: req.id,
+      },
+      data: {
+        name: req.name,
+        description: req.description,
+      },
+    });
   }
 }
 

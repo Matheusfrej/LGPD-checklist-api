@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client";
 import { AuthJWTRepository } from "../../infrastructure/provider/repository/auth";
 import { ChecklistPrismaRepository } from "../../infrastructure/provider/repository/prisma/checklist";
 import { ItemPrismaRepository } from "../../infrastructure/provider/repository/prisma/item";
@@ -11,20 +12,22 @@ import { UserRepositoryInterface } from "../usecase/repository/user";
 import { RepositoryFactory } from "./repositoryFactory";
 
 export class PrismaRepositoryFactory implements RepositoryFactory {
+  constructor(private prisma: PrismaClient) {}
+
   makeUserRepository(): UserRepositoryInterface {
-    return new UserPrismaRepository();
+    return new UserPrismaRepository(this.prisma);
   }
 
   makeSystemRepository(): SystemRepositoryInterface {
-    return new SystemPrismaRepository();
+    return new SystemPrismaRepository(this.prisma);
   }
 
   makeChecklistRepository(): ChecklistRepositoryInterface {
-    return new ChecklistPrismaRepository();
+    return new ChecklistPrismaRepository(this.prisma);
   }
 
   makeItemRepository(): ItemRepositoryInterface {
-    return new ItemPrismaRepository();
+    return new ItemPrismaRepository(this.prisma);
   }
 
   makeAuthRepository(): AuthRepositoryInterface {

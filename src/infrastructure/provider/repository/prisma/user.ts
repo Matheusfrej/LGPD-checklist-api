@@ -1,31 +1,89 @@
-import * as userService from "@/internal/database/postgresql/user";
 import * as ucio from "@/domain/usecase/ucio/user";
 import { UserEntity } from "../../../../domain/entity/user";
 import { UserRepositoryInterface } from "../../../../domain/usecase/repository/user";
+import { PrismaClient } from "@prisma/client";
+import { compareSync } from "bcryptjs";
 
 class UserPrismaRepository implements UserRepositoryInterface {
+  constructor(private prisma: PrismaClient) {}
+
   async checkUserByEmailExists(email: string, id?: number): Promise<boolean> {
-    return await userService.checkUserByEmailExists(email, id);
+    const user = await this.prisma.users.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    return user && user.id !== id;
   }
 
-  async createUser(user: ucio.CreateUserUseCaseRequest): Promise<UserEntity> {
-    return await userService.createUser(user);
+  async createUser(req: ucio.CreateUserUseCaseRequest): Promise<UserEntity> {
+    const user = await this.prisma.users.create({
+      data: {
+        name: req.name,
+        office: req.office,
+        email: req.email,
+        password: req.password,
+      },
+    });
+
+    return user
+      ? new UserEntity(user.id, user.name, user.office, user.email, null)
+      : null;
   }
 
   async login(req: ucio.LoginUseCaseRequest): Promise<UserEntity> {
-    return await userService.login(req);
+    const user = await this.prisma.users.findFirst({
+      where: {
+        email: req.email,
+      },
+    });
+
+    if (user && compareSync(req.password, user.password)) {
+      delete user.password;
+
+      return user
+        ? new UserEntity(user.id, user.name, user.office, user.email, null)
+        : null;
+    }
+
+    return null;
   }
 
-  getUser(id: number): Promise<UserEntity> {
-    return userService.getUser(id);
+  async getUser(id: number): Promise<UserEntity> {
+    const user = await this.prisma.users.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    return user
+      ? new UserEntity(user.id, user.name, user.office, user.email, null)
+      : null;
   }
 
   async updateUser(req: ucio.UpdateUserUseCaseRequest) {
-    return userService.updateUser(req);
+    const user = await this.prisma.users.update({
+      where: {
+        id: req.id,
+      },
+      data: {
+        name: req.name,
+        office: req.office,
+      },
+    });
+
+    return user
+      ? new UserEntity(user.id, user.name, user.office, user.email, null)
+      : null;
   }
 
-  deleteUser(req: ucio.DeleteUserUseCaseRequest) {
-    return userService.deleteUser(req.id);
+  async deleteUser(req: ucio.DeleteUserUseCaseRequest) {
+    await this.prisma.users.delete({
+      where: {
+        id: req.id,
+      },
+    });
   }
 }
 
