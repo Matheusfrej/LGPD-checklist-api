@@ -1,7 +1,7 @@
 import * as itemService from "@/internal/database/postgresql/item";
-import { ItemRepositoryInterface } from "../../../domain/usecase/repository/item";
-import { ItemEntity } from "../../../domain/entity/item";
-import { CreateItemUseCaseRequest } from "../../../domain/usecase/ucio/item";
+import { ItemRepositoryInterface } from "../../../../domain/usecase/repository/item";
+import { ItemEntity } from "../../../../domain/entity/item";
+import { CreateItemUseCaseRequest } from "../../../../domain/usecase/ucio/item";
 
 class ItemPrismaRepository implements ItemRepositoryInterface {
   createItem(req: CreateItemUseCaseRequest): Promise<ItemEntity> {

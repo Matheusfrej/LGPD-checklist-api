@@ -1,7 +1,7 @@
 import * as userService from "@/internal/database/postgresql/user";
 import * as ucio from "@/domain/usecase/ucio/user";
-import { UserEntity } from "../../../domain/entity/user";
-import { UserRepositoryInterface } from "../../../domain/usecase/repository/user";
+import { UserEntity } from "../../../../domain/entity/user";
+import { UserRepositoryInterface } from "../../../../domain/usecase/repository/user";
 
 class UserPrismaRepository implements UserRepositoryInterface {
   async checkUserByEmailExists(email: string, id?: number): Promise<boolean> {

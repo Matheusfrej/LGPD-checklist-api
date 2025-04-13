@@ -1,4 +1,3 @@
-import { Json } from "../../@types";
 import { ChecklistEntity } from "../../entity/checklist";
 import { AnswerType, SeverityDegreeType } from "../../entity/checklistItem";
 import { BaseResponse, UserAuthenticated } from "./common";
@@ -37,9 +36,7 @@ export type DeleteChecklistUseCaseResponse = BaseResponse;
 export type UpdateChecklistUseCaseRequest = UserAuthenticated & {
   id: number;
   systemId: number;
-  checklistData: Json;
-  isGeneral?: boolean;
-  isIot?: boolean;
+  items: ItemsInput;
 };
 
 export type UpdateChecklistUseCaseResponse = BaseResponse;

@@ -5,6 +5,7 @@ import {
   SuccessResponse,
 } from "../response/response";
 import { Controller } from "./controller";
+import { UpdateChecklistUseCaseResponse } from "../../../../domain/usecase/ucio/checklist";
 
 class CreateChecklistController extends Controller {
   async execute(req: Request, res: Response) {
@@ -85,16 +86,7 @@ class DeleteChecklistController extends Controller {
 class UpdateChecklistController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
-    const { tokenUserId, systemId, checklistData, isGeneral, isIot } = req.body;
-
-    const ucReq = {
-      id: +id,
-      tokenUserId,
-      systemId,
-      checklistData,
-      isGeneral,
-      isIot,
-    };
+    const { tokenUserId, systemId, items } = req.body;
 
     const checklistRepository = this.factory.makeChecklistRepository();
     const systemRepository = this.factory.makeSystemRepository();
@@ -103,7 +95,15 @@ class UpdateChecklistController extends Controller {
       systemRepository,
     );
 
-    const ucRes = await usecase.execute(ucReq);
+    let ucRes: UpdateChecklistUseCaseResponse;
+    await checklistRepository.runInTransaction(async () => {
+      ucRes = await usecase.execute({
+        id: +id,
+        tokenUserId,
+        systemId,
+        items,
+      });
+    });
 
     if (!ucRes.error) {
       new SuccessResponse().success(res, undefined);

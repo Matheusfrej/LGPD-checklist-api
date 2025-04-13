@@ -12,19 +12,36 @@ import {
 import { ChecklistRepositoryInterface } from "../repository/checklist";
 import { SystemRepositoryInterface } from "../repository/system";
 import { UserRepositoryInterface } from "../repository/user";
-import {
-  isNonEmptyJson,
-  validateWithZod,
-  zodBooleanSchema,
-  zodNumberSchema,
-  zodStringSchema,
-} from "./utils";
-import { Json } from "../../@types";
+import { validateWithZod, zodNumberSchema, zodStringSchema } from "./utils";
 import {
   answerTypeArray,
   severityDegreeTypeArray,
 } from "../../entity/checklistItem";
 import { ItemRepositoryInterface } from "../repository/item";
+
+const itemsZodValidation = z
+  .object({
+    id: zodNumberSchema("Id do item"),
+    answer: z.enum(answerTypeArray).optional(),
+    severityDegree: z.enum(severityDegreeTypeArray).optional(),
+    userComment: zodStringSchema("userComment").optional(),
+  })
+  .refine(
+    (item) => {
+      return !(
+        item.answer === "Não" && !(item.severityDegree && item.userComment)
+      );
+    },
+    {
+      message:
+        "Para resposta não, é obrigatório ter grau de severidade e comentário do usuário",
+      path: ["answer"],
+    },
+  )
+  .array()
+  .nonempty({
+    message: "Items não pode ser um array vazio.",
+  });
 
 class CreateChecklistUseCaseValidate implements ValidateInterface {
   private systemRepository: SystemRepositoryInterface;
@@ -34,31 +51,7 @@ class CreateChecklistUseCaseValidate implements ValidateInterface {
     userId: zodNumberSchema("UserId"),
     systemId: zodNumberSchema("SystemId"),
     tokenUserId: zodNumberSchema("Id do token"),
-    items: z
-      .object({
-        id: zodNumberSchema("Id do item"),
-        answer: z.enum(answerTypeArray).optional(),
-        severityDegree: z.enum(severityDegreeTypeArray).optional(),
-        userComment: zodStringSchema("userComment").optional(),
-      })
-      .refine(
-        (item) => {
-          console.log(item.userComment);
-
-          return !(
-            item.answer === "Não" && !(item.severityDegree && item.userComment)
-          );
-        },
-        {
-          message:
-            "Para resposta não, é obrigatório ter grau de severidade e comentário do usuário",
-          path: ["answer"],
-        },
-      )
-      .array()
-      .nonempty({
-        message: "Items não pode ser um array vazio.",
-      }),
+    items: itemsZodValidation,
   });
 
   constructor(
@@ -168,13 +161,7 @@ class UpdateChecklistUseCaseValidate implements ValidateInterface {
     id: zodNumberSchema("Id"),
     systemId: zodNumberSchema("SystemId"),
     tokenUserId: zodNumberSchema("Id do token"),
-    isGeneral: zodBooleanSchema("isGeneral").refine((val) => val === true, {
-      message: "isGeneral não pode ser falso.",
-    }),
-    isIot: zodBooleanSchema("isIot"),
-    checklistData: z.custom<Json>(isNonEmptyJson, {
-      message: "checklistData não podem ser vazio e deve ser no formato JSON",
-    }),
+    items: itemsZodValidation,
   });
 
   constructor(

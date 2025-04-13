@@ -128,19 +128,26 @@ async function deleteChecklist(id: number): Promise<void> {
 async function updateChecklist(
   req: UpdateChecklistUseCaseRequest,
 ): Promise<void> {
-  return null;
-
-  // await prisma.checklists.update({
-  //   where: {
-  //     id: req.id,
-  //   },
-  //   data: {
-  //     systemId: req.systemId,
-  //     checklistData: req.checklistData,
-  //     isGeneral: req.isGeneral,
-  //     isIot: req.isIot,
-  //   },
-  // });
+  await prisma.checklists.update({
+    where: {
+      id: req.id,
+    },
+    data: {
+      systemId: req.systemId,
+      ItemsChecklists: {
+        createMany: {
+          data: req.items.map((item) => {
+            return {
+              itemId: item.id,
+              answer: item.answer,
+              severityDegree: item.severityDegree,
+              userComment: item.userComment,
+            };
+          }),
+        },
+      },
+    },
+  });
 }
 
 async function listChecklistsByUserId(
@@ -193,6 +200,84 @@ async function listChecklistsBySystemId(
   );
 }
 
+async function getItemsFromChecklist(
+  id: number,
+): Promise<ChecklistItemEntity[]> {
+  const items = await prisma.checklistItems.findMany({
+    where: {
+      checklistId: id,
+    },
+    include: {
+      item: true,
+    },
+  });
+
+  return items.map((item) => {
+    return new ChecklistItemEntity(
+      null,
+      new ItemEntity(
+        item.item.id,
+        item.item.code,
+        item.item.itemDesc,
+        item.item.recommendations,
+        item.item.isMandatory,
+        null,
+        null,
+      ),
+      item.answer as AnswerType,
+      item.severityDegree as SeverityDegreeType,
+      item.userComment,
+    );
+  });
+}
+
+async function insertItemsInChecklist(
+  id: number,
+  items: ChecklistItemEntity[],
+) {
+  await prisma.checklists.update({
+    where: { id },
+    data: {
+      ItemsChecklists: {
+        createMany: {
+          data: items.map((item) => {
+            return {
+              itemId: item.item.id,
+              answer: item.answer,
+              severityDegree: item.severityDegree,
+              userComment: item.userComment,
+            };
+          }),
+        },
+      },
+    },
+  });
+}
+
+async function removeItemsFromChecklist(id: number, itemsIds: number[]) {
+  await prisma.checklistItems.deleteMany({
+    where: {
+      AND: {
+        checklistId: id,
+        itemId: {
+          in: itemsIds,
+        },
+      },
+    },
+  });
+}
+
+async function updateItemFromChecklist(id: number, item: ChecklistItemEntity) {
+  await prisma.checklistItems.update({
+    where: { checklistId_itemId: { checklistId: id, itemId: item.item.id } },
+    data: {
+      answer: item.answer,
+      severityDegree: item.severityDegree,
+      userComment: item.userComment,
+    },
+  });
+}
+
 export {
   createChecklist,
   getChecklist,
@@ -200,4 +285,8 @@ export {
   updateChecklist,
   listChecklistsByUserId,
   listChecklistsBySystemId,
+  getItemsFromChecklist,
+  insertItemsInChecklist,
+  removeItemsFromChecklist,
+  updateItemFromChecklist,
 };

@@ -5,8 +5,8 @@ import {
   DeleteSystemUseCaseRequest,
   ListSystemsByUserIdUseCaseRequest,
   UpdateSystemUseCaseRequest,
-} from "../../../domain/usecase/ucio/system";
-import { SystemRepositoryInterface } from "../../../domain/usecase/repository/system";
+} from "../../../../domain/usecase/ucio/system";
+import { SystemRepositoryInterface } from "../../../../domain/usecase/repository/system";
 
 class SystemPrismaRepository implements SystemRepositoryInterface {
   async createSystem(req: CreateSystemUseCaseRequest): Promise<SystemEntity> {
