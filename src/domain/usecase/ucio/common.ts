@@ -1,7 +1,9 @@
 import { ErrorEntity } from "../../entity/error";
 
-type BaseResponse = {
+export type BaseResponse = {
   error: ErrorEntity;
 };
 
-export { BaseResponse };
+export type UserAuthenticated = {
+  tokenUserId: number;
+};

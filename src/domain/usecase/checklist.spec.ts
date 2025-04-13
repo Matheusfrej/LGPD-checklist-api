@@ -842,102 +842,102 @@ describe("Delete Checklist Use Case", () => {
 //   });
 // });
 
-// describe("List User Checklists Use Case", () => {
-//   let useCase: ListChecklistsByUserIdUseCase;
+describe("List User Checklists Use Case", () => {
+  let useCase: ListChecklistsByUserIdUseCase;
 
-//   beforeEach(() => {
-//     checklistRepository = testFactory.makeChecklistRepository();
-//     systemRepository = testFactory.makeSystemRepository();
-//     userRepository = testFactory.makeUserRepository();
-//     useCase = new ListChecklistsByUserIdUseCase(
-//       checklistRepository,
-//       userRepository,
-//     );
-//     mockGenerator = new MockGenerator(
-//       userRepository,
-//       systemRepository,
-//       checklistRepository,
-//     );
-//   });
+  beforeEach(() => {
+    checklistRepository = testFactory.makeChecklistRepository();
+    systemRepository = testFactory.makeSystemRepository();
+    userRepository = testFactory.makeUserRepository();
+    useCase = new ListChecklistsByUserIdUseCase(
+      checklistRepository,
+      userRepository,
+    );
+    mockGenerator = new MockGenerator(
+      userRepository,
+      systemRepository,
+      checklistRepository,
+    );
+  });
 
-//   it("should list user checklists", async () => {
-//     // system 1 and 2 belong to user 1
-//     const { user: user1, system: system1 } =
-//       await mockGenerator.createUserAndSystemMock();
-//     const system2 = await mockGenerator.createSystemMock({ userId: user1.id });
+  it("should list user checklists", async () => {
+    // system 1 and 2 belong to user 1
+    const { user: user1, system: system1 } =
+      await mockGenerator.createUserAndSystemMock();
+    const system2 = await mockGenerator.createSystemMock({ userId: user1.id });
 
-//     // system 3 belongs to user 2
-//     const user2 = await mockGenerator.createUserMock();
-//     const system3 = await mockGenerator.createSystemMock({
-//       userId: user2.id,
-//       tokenUserId: user2.id,
-//     });
+    // system 3 belongs to user 2
+    const user2 = await mockGenerator.createUserMock();
+    const system3 = await mockGenerator.createSystemMock({
+      userId: user2.id,
+      tokenUserId: user2.id,
+    });
 
-//     // checklists from user 1
-//     const checklist1 = await mockGenerator.createChecklistMock({
-//       userId: user1.id,
-//       systemId: system1.id,
-//     });
-//     const checklist2 = await mockGenerator.createChecklistMock({
-//       userId: user1.id,
-//       systemId: system2.id,
-//     });
+    // checklists from user 1
+    const checklist1 = await mockGenerator.createChecklistMock({
+      userId: user1.id,
+      systemId: system1.id,
+    });
+    const checklist2 = await mockGenerator.createChecklistMock({
+      userId: user1.id,
+      systemId: system2.id,
+    });
 
-//     // checklist from user 2
-//     await mockGenerator.createChecklistMock({
-//       userId: user2.id,
-//       systemId: system3.id,
-//     });
+    // checklist from user 2
+    await mockGenerator.createChecklistMock({
+      userId: user2.id,
+      systemId: system3.id,
+    });
 
-//     const result = await useCase.execute({
-//       userId: user1.id,
-//       tokenUserId: user1.id,
-//     });
+    const result = await useCase.execute({
+      userId: user1.id,
+      tokenUserId: user1.id,
+    });
 
-//     expect(result.error).toBe(null);
-//     expect(result.checklists[0]).toEqual(checklist1);
-//     expect(result.checklists[1]).toEqual(checklist2);
-//     expect(result.checklists.length).toBe(checklistRepository.items.length - 1);
+    expect(result.error).toBe(null);
+    expect(result.checklists[0]).toEqual(checklist1);
+    expect(result.checklists[1]).toEqual(checklist2);
+    expect(result.checklists.length).toBe(checklistRepository.items.length - 1);
 
-//     result.checklists.forEach((system) => {
-//       expect(system.userId).toBe(user1.id);
-//     });
-//   });
+    result.checklists.forEach((system) => {
+      expect(system.userId).toBe(user1.id);
+    });
+  });
 
-//   it("should list empty list when user doesnt have checklists", async () => {
-//     const user = await mockGenerator.createUserMock();
+  it("should list empty list when user doesnt have checklists", async () => {
+    const user = await mockGenerator.createUserMock();
 
-//     const result = await useCase.execute({
-//       userId: user.id,
-//       tokenUserId: user.id,
-//     });
+    const result = await useCase.execute({
+      userId: user.id,
+      tokenUserId: user.id,
+    });
 
-//     expect(result.error).toBe(null);
-//     expect(result.checklists.length).toBe(0);
-//   });
+    expect(result.error).toBe(null);
+    expect(result.checklists.length).toBe(0);
+  });
 
-//   it("should not list checklists when user authenticated is different from user", async () => {
-//     const user = await mockGenerator.createUserMock();
+  it("should not list checklists when user authenticated is different from user", async () => {
+    const user = await mockGenerator.createUserMock();
 
-//     const result = await useCase.execute({
-//       userId: user.id,
-//       tokenUserId: user.id + 1,
-//     });
+    const result = await useCase.execute({
+      userId: user.id,
+      tokenUserId: user.id + 1,
+    });
 
-//     expectPreConditionalError({ error: result.error, noPermission: true });
-//   });
+    expectPreConditionalError({ error: result.error, noPermission: true });
+  });
 
-//   it("should not list checklists from inexistent user", async () => {
-//     const userId = 1;
+  it("should not list checklists from inexistent user", async () => {
+    const userId = 1;
 
-//     const result = await useCase.execute({
-//       userId,
-//       tokenUserId: userId,
-//     });
+    const result = await useCase.execute({
+      userId,
+      tokenUserId: userId,
+    });
 
-//     expectPreConditionalError({ error: result.error, noPermission: false });
-//   });
-// });
+    expectPreConditionalError({ error: result.error, noPermission: false });
+  });
+});
 
 // describe("List System Checklists Use Case", () => {
 //   let useCase: ListChecklistsBySystemIdUseCase;
