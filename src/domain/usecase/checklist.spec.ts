@@ -899,8 +899,8 @@ describe("List User Checklists Use Case", () => {
     expect(result.checklists[1]).toEqual(checklist2);
     expect(result.checklists.length).toBe(checklistRepository.items.length - 1);
 
-    result.checklists.forEach((system) => {
-      expect(system.userId).toBe(user1.id);
+    result.checklists.forEach((checklist) => {
+      expect(checklist.userId).toBe(user1.id);
     });
   });
 
@@ -939,93 +939,96 @@ describe("List User Checklists Use Case", () => {
   });
 });
 
-// describe("List System Checklists Use Case", () => {
-//   let useCase: ListChecklistsBySystemIdUseCase;
+describe("List System Checklists Use Case", () => {
+  let useCase: ListChecklistsBySystemIdUseCase;
 
-//   beforeEach(() => {
-//     checklistRepository = testFactory.makeChecklistRepository();
-//     systemRepository = testFactory.makeSystemRepository();
-//     userRepository = testFactory.makeUserRepository();
-//     useCase = new ListChecklistsBySystemIdUseCase(
-//       checklistRepository,
-//       systemRepository,
-//     );
-//     mockGenerator = new MockGenerator(
-//       userRepository,
-//       systemRepository,
-//       checklistRepository,
-//     );
-//   });
+  beforeEach(() => {
+    checklistRepository = testFactory.makeChecklistRepository();
+    systemRepository = testFactory.makeSystemRepository();
+    userRepository = testFactory.makeUserRepository();
+    useCase = new ListChecklistsBySystemIdUseCase(
+      checklistRepository,
+      systemRepository,
+    );
+    mockGenerator = new MockGenerator(
+      userRepository,
+      systemRepository,
+      checklistRepository,
+    );
+  });
 
-//   it("should list system checklists", async () => {
-//     const { user, system: system1 } =
-//       await mockGenerator.createUserAndSystemMock();
-//     const system2 = await mockGenerator.createSystemMock({ userId: user.id });
+  it("should list system checklists", async () => {
+    const { user, system: system1 } =
+      await mockGenerator.createUserAndSystemMock();
+    const system2 = await mockGenerator.createSystemMock({ userId: user.id });
 
-//     // checklists from system 1
-//     const checklist1 = await mockGenerator.createChecklistMock({
-//       userId: user.id,
-//       systemId: system1.id,
-//     });
-//     const checklist2 = await mockGenerator.createChecklistMock({
-//       userId: user.id,
-//       systemId: system1.id,
-//     });
+    // checklists from system 1
+    const checklist1 = await mockGenerator.createChecklistMock({
+      userId: user.id,
+      systemId: system1.id,
+    });
+    const checklist2 = await mockGenerator.createChecklistMock({
+      userId: user.id,
+      systemId: system1.id,
+    });
 
-//     // checklist from system 2
-//     await mockGenerator.createChecklistMock({
-//       userId: user.id,
-//       systemId: system2.id,
-//     });
+    // checklist from system 2
+    await mockGenerator.createChecklistMock({
+      userId: user.id,
+      systemId: system2.id,
+    });
 
-//     // list system 1 checklists
-//     const result = await useCase.execute({
-//       systemId: system1.id,
-//       tokenUserId: user.id,
-//     });
+    // list system 1 checklists
+    const result = await useCase.execute({
+      systemId: system1.id,
+      tokenUserId: user.id,
+    });
 
-//     expect(result.error).toBe(null);
-//     expect(result.checklists[0]).toEqual(checklist1);
-//     expect(result.checklists[1]).toEqual(checklist2);
-//     expect(result.checklists.length).toBe(checklistRepository.items.length - 1);
+    expect(result.error).toBe(null);
+    expect(result.checklists[0]).toEqual(checklist1);
+    expect(result.checklists[1]).toEqual(checklist2);
+    expect(result.checklists.length).toBe(checklistRepository.items.length - 1);
 
-//     result.checklists.forEach((system) => {
-//       expect(system.systemId).toBe(system1.id);
-//     });
-//   });
+    result.checklists.forEach((checklist) => {
+      expect(checklist.systemId).toBe(system1.id);
+    });
+    result.checklists.forEach((checklist) => {
+      expect(checklist.userId).toBe(user.id);
+    });
+  });
 
-//   it("should list empty list when system doesnt have checklists", async () => {
-//     const system = await mockGenerator.createSystemMock();
+  it("should return empty list when system doesnt have checklists", async () => {
+    const system = await mockGenerator.createSystemMock();
 
-//     const result = await useCase.execute({
-//       systemId: system.id,
-//       tokenUserId: system.userId,
-//     });
+    const result = await useCase.execute({
+      systemId: system.id,
+      tokenUserId: system.userId,
+    });
 
-//     expect(result.error).toBe(null);
-//     expect(result.checklists.length).toBe(0);
-//   });
+    expect(result.error).toBe(null);
+    expect(result.checklists.length).toBe(0);
+  });
 
-//   it("should not list checklists when system belongs to user different from authenticated user", async () => {
-//     const { user, system } = await mockGenerator.createUserAndSystemMock();
+  it("should not list checklists when system belongs to user different from authenticated user", async () => {
+    const { user, system } = await mockGenerator.createUserAndSystemMock();
 
-//     const result = await useCase.execute({
-//       systemId: system.id,
-//       tokenUserId: user.id + 1,
-//     });
+    const result = await useCase.execute({
+      systemId: system.id,
+      tokenUserId: user.id + 1,
+    });
 
-//     expectPreConditionalError({ error: result.error, noPermission: true });
-//   });
+    expectPreConditionalError({ error: result.error, noPermission: true });
+  });
 
-//   it("should not list checklists from inexistent system", async () => {
-//     const systemId = 1;
-//     const user = await mockGenerator.createUserMock();
+  it("should not list checklists from inexistent system", async () => {
+    const systemId = 1;
+    const user = await mockGenerator.createUserMock();
 
-//     const result = await useCase.execute({
-//       systemId,
-//       tokenUserId: user.id,
-//     });
+    const result = await useCase.execute({
+      systemId,
+      tokenUserId: user.id,
+    });
 
-//     expectPreConditionalError({ error: result.error, noPermission: false });
-//   });
-// });
+    expectPreConditionalError({ error: result.error, noPermission: false });
+  });
+});

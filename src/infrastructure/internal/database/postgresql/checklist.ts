@@ -171,30 +171,26 @@ async function listChecklistsByUserId(
 async function listChecklistsBySystemId(
   systemId: number,
 ): Promise<ChecklistEntity[]> {
-  return null;
+  const checklists = await prisma.checklists.findMany({
+    where: {
+      systemId,
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
 
-  // const checklists = await prisma.checklists.findMany({
-  //   where: {
-  //     systemId,
-  //   },
-  //   orderBy: {
-  //     updatedAt: "desc",
-  //   },
-  // });
-
-  // return checklists.map(
-  //   (checklist: Checklists) =>
-  //     new ChecklistEntity(
-  //       checklist.id,
-  //       checklist.userId,
-  //       checklist.systemId,
-  //       null,
-  //       checklist.isGeneral,
-  //       checklist.isIot,
-  //       checklist.createdAt,
-  //       checklist.updatedAt,
-  //     ),
-  // );
+  return checklists.map(
+    (checklist) =>
+      new ChecklistEntity(
+        checklist.id,
+        checklist.userId,
+        checklist.systemId,
+        null,
+        checklist.createdAt,
+        checklist.updatedAt,
+      ),
+  );
 }
 
 export {
