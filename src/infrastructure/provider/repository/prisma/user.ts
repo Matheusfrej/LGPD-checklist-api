@@ -3,11 +3,16 @@ import { UserEntity } from "../../../../domain/entity/user";
 import { UserRepositoryInterface } from "../../../../domain/usecase/repository/user";
 import { compareSync } from "bcryptjs";
 import { PrismaRepository } from "./repository";
+import { Prisma } from "@prisma/client";
 
 class UserPrismaRepository
   extends PrismaRepository
   implements UserRepositoryInterface
 {
+  protected withTransaction(tx: Prisma.TransactionClient): this {
+    return new UserPrismaRepository(tx) as this;
+  }
+
   async checkUserByEmailExists(email: string, id?: number): Promise<boolean> {
     const user = await this.prisma.users.findFirst({
       where: {

@@ -15,11 +15,16 @@ import { ItemEntity } from "../../../../domain/entity/item";
 import { LawEntity } from "../../../../domain/entity/law";
 import { DeviceEntity } from "../../../../domain/entity/device";
 import { PrismaRepository } from "./repository";
+import { Prisma } from "@prisma/client";
 
 class ChecklistPrismaRepository
   extends PrismaRepository
   implements ChecklistRepositoryInterface
 {
+  protected withTransaction(tx: Prisma.TransactionClient): this {
+    return new ChecklistPrismaRepository(tx) as this;
+  }
+
   async createChecklist(
     req: CreateChecklistUseCaseRequest,
   ): Promise<ChecklistEntity> {

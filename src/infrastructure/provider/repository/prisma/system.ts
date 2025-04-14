@@ -7,11 +7,16 @@ import {
 } from "../../../../domain/usecase/ucio/system";
 import { SystemRepositoryInterface } from "../../../../domain/usecase/repository/system";
 import { PrismaRepository } from "./repository";
+import { Prisma } from "@prisma/client";
 
 class SystemPrismaRepository
   extends PrismaRepository
   implements SystemRepositoryInterface
 {
+  protected withTransaction(tx: Prisma.TransactionClient): this {
+    return new SystemPrismaRepository(tx) as this;
+  }
+
   async createSystem(req: CreateSystemUseCaseRequest): Promise<SystemEntity> {
     const system = await this.prisma.systems.create({
       data: {

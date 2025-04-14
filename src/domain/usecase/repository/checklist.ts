@@ -27,7 +27,7 @@ interface ChecklistRepositoryInterface {
   removeItemsFromChecklist(id: number, itemsIds: number[]): Promise<void>;
   updateItemFromChecklist(id: number, item: ChecklistItemEntity): Promise<void>;
 
-  runInTransaction<T>(fn: () => Promise<T>): Promise<T>;
+  runInTransaction<T>(fn: (repo: this) => Promise<T>): Promise<T>;
 }
 
 export { ChecklistRepositoryInterface };

@@ -188,53 +188,53 @@ class UpdateChecklistUseCase {
   }
 
   async update(req: ucio.UpdateChecklistUseCaseRequest) {
-    const currentItems = await this.checklistRepository.getItemsFromChecklist(
-      req.id,
-    );
+    // Transação
+    this.checklistRepository.runInTransaction(async (repo) => {
+      const currentItems = await repo.getItemsFromChecklist(req.id);
 
-    const currentIds = currentItems.map((item) => item.item.id);
-    const newItemsIds = req.items.map((item) => item.id);
+      const currentIds = currentItems.map((item) => item.item.id);
+      const newItemsIds = req.items.map((item) => item.id);
 
-    const itemsToDelete = currentIds.filter((id) => !newItemsIds.includes(id));
-    const itemsToCreate = req.items.filter(
-      (item) => !currentIds.includes(item.id),
-    );
-    const itemsToUpdate = req.items.filter((item) =>
-      currentIds.includes(item.id),
-    );
-
-    if (itemsToDelete.length)
-      await this.checklistRepository.removeItemsFromChecklist(
-        req.id,
-        itemsToDelete,
+      const itemsToDelete = currentIds.filter(
+        (id) => !newItemsIds.includes(id),
+      );
+      const itemsToCreate = req.items.filter(
+        (item) => !currentIds.includes(item.id),
+      );
+      const itemsToUpdate = req.items.filter((item) =>
+        currentIds.includes(item.id),
       );
 
-    if (itemsToCreate.length)
-      await this.checklistRepository.insertItemsFromChecklist(
-        req.id,
-        itemsToCreate.map(
-          (item) =>
-            new ChecklistItemEntity(
-              null,
-              new ItemEntity(item.id, null, null, null, null, null, null),
-              item.answer,
-              item.severityDegree,
-              item.userComment,
-            ),
-        ),
-      );
+      if (itemsToDelete.length)
+        await repo.removeItemsFromChecklist(req.id, itemsToDelete);
 
-    for (const item of itemsToUpdate)
-      await this.checklistRepository.updateItemFromChecklist(
-        req.id,
-        new ChecklistItemEntity(
-          null,
-          new ItemEntity(item.id, null, null, null, null, null, null),
-          item.answer,
-          item.severityDegree,
-          item.userComment,
-        ),
-      );
+      if (itemsToCreate.length)
+        await repo.insertItemsFromChecklist(
+          req.id,
+          itemsToCreate.map(
+            (item) =>
+              new ChecklistItemEntity(
+                null,
+                new ItemEntity(item.id, null, null, null, null, null, null),
+                item.answer,
+                item.severityDegree,
+                item.userComment,
+              ),
+          ),
+        );
+
+      for (const item of itemsToUpdate)
+        await repo.updateItemFromChecklist(
+          req.id,
+          new ChecklistItemEntity(
+            null,
+            new ItemEntity(item.id, null, null, null, null, null, null),
+            item.answer,
+            item.severityDegree,
+            item.userComment,
+          ),
+        );
+    });
   }
 }
 
