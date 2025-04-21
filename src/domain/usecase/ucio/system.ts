@@ -1,19 +1,17 @@
 import { SystemEntity } from "../../entity/system";
-import { BaseResponse } from "./common";
+import { BaseResponse, UserAuthenticated } from "./common";
 
-export type CreateSystemUseCaseRequest = {
+export type CreateSystemUseCaseRequest = UserAuthenticated & {
   name: string;
   description: string;
   userId: number;
-  tokenUserId: number;
 };
 
 export type CreateSystemUseCaseResponse = BaseResponse & {
   system: SystemEntity;
 };
 
-export type ListSystemsByUserIdUseCaseRequest = {
-  tokenUserId: number;
+export type ListSystemsByUserIdUseCaseRequest = UserAuthenticated & {
   userId: number;
 };
 
@@ -29,18 +27,16 @@ export type GetSystemUseCaseResponse = BaseResponse & {
   system: SystemEntity;
 };
 
-export type DeleteSystemUseCaseRequest = {
+export type DeleteSystemUseCaseRequest = UserAuthenticated & {
   id: number;
-  tokenUserId: number;
 };
 
 export type DeleteSystemUseCaseResponse = BaseResponse;
 
-export type UpdateSystemUseCaseRequest = {
+export type UpdateSystemUseCaseRequest = UserAuthenticated & {
   id: number;
   name: string;
   description: string;
-  tokenUserId: number;
 };
 
 export type UpdateSystemUseCaseResponse = BaseResponse;
