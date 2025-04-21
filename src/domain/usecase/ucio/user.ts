@@ -1,141 +1,51 @@
-import { ErrorEntity } from "../../entity/error";
 import { UserEntity } from "../../entity/user";
+import { BaseResponse, UserAuthenticated } from "./common";
 
-class CreateUserUseCaseRequest {
-  public name: string;
-  public office: string;
-  public email: string;
-  public password: string;
-
-  constructor(name: string, office: string, email: string, password: string) {
-    this.name = name;
-    this.office = office;
-    this.email = email;
-    this.password = password;
-  }
-}
-
-class CreateUserUseCaseResponse {
-  public user: UserEntity;
-  public error: ErrorEntity;
-
-  constructor(user: UserEntity, error: ErrorEntity) {
-    this.user = user;
-    this.error = error;
-  }
-}
-
-class LoginUseCaseRequest {
-  public email: string;
-  public password: string;
-
-  constructor(email: string, password: string) {
-    this.email = email;
-    this.password = password;
-  }
-}
-
-class LoginUseCaseResponse {
-  public user: UserEntity;
-  public token: string;
-  public error: ErrorEntity;
-
-  constructor(user: UserEntity, token: string, error: ErrorEntity) {
-    this.user = user;
-    this.token = token;
-    this.error = error;
-  }
-}
-
-class VerifyTokenUseCaseRequest {
-  public token: string;
-
-  constructor(token: string) {
-    this.token = token;
-  }
-}
-
-class VerifyTokenUseCaseResponse {
-  public user: UserEntity;
-  public token: string;
-  public error: ErrorEntity;
-
-  constructor(user: UserEntity, token: string, error: ErrorEntity) {
-    this.user = user;
-    this.token = token;
-    this.error = error;
-  }
-}
-
-class UpdateUserUseCaseRequest {
-  public tokenUserId: number;
-  public id: number;
-  public name: string;
-  public office: string;
-
-  constructor(tokenUserId: number, id: number, name: string, office: string) {
-    this.tokenUserId = tokenUserId;
-    this.id = id;
-    this.name = name;
-    this.office = office;
-  }
-}
-
-class UpdateUserUseCaseResponse {
-  public error: ErrorEntity;
-
-  constructor(error: ErrorEntity) {
-    this.error = error;
-  }
-}
-
-class GetUserUseCaseRequest {
-  public id: number;
-
-  constructor(id: number) {
-    this.id = id;
-  }
-}
-
-class GetUserUseCaseResponse {
-  public user: UserEntity;
-  public error: ErrorEntity;
-
-  constructor(user: UserEntity, error: ErrorEntity) {
-    this.user = user;
-    this.error = error;
-  }
-}
-
-class DeleteUserUseCaseRequest {
-  public tokenUserId: number;
-  public id: number;
-
-  constructor(tokenUserId: number, id: number) {
-    this.tokenUserId = tokenUserId;
-    this.id = id;
-  }
-}
-
-class DeleteUserUseCaseResponse {
-  public error: ErrorEntity;
-
-  constructor(error: ErrorEntity) {
-    this.error = error;
-  }
-}
-
-export {
-  CreateUserUseCaseRequest,
-  CreateUserUseCaseResponse,
-  LoginUseCaseRequest,
-  LoginUseCaseResponse,
-  VerifyTokenUseCaseRequest,
-  VerifyTokenUseCaseResponse,
-  UpdateUserUseCaseRequest,
-  UpdateUserUseCaseResponse,
-  GetUserUseCaseRequest,
-  GetUserUseCaseResponse,
-  DeleteUserUseCaseRequest,
-  DeleteUserUseCaseResponse,
+export type CreateUserUseCaseRequest = {
+  name: string;
+  office: string;
+  email: string;
+  password: string;
 };
+
+export type CreateUserUseCaseResponse = BaseResponse & {
+  user: UserEntity;
+};
+
+export type LoginUseCaseRequest = {
+  email: string;
+  password: string;
+};
+export type LoginUseCaseResponse = BaseResponse & {
+  user: UserEntity;
+  token: string;
+};
+
+export type VerifyTokenUseCaseRequest = {
+  token: string;
+};
+export type VerifyTokenUseCaseResponse = BaseResponse & {
+  user: UserEntity;
+  token: string;
+};
+
+export type UpdateUserUseCaseRequest = UserAuthenticated & {
+  id: number;
+  name: string;
+  office: string;
+};
+
+export type UpdateUserUseCaseResponse = BaseResponse;
+
+export type GetUserUseCaseRequest = {
+  id: number;
+};
+
+export type GetUserUseCaseResponse = BaseResponse & {
+  user: UserEntity;
+};
+
+export type DeleteUserUseCaseRequest = UserAuthenticated & {
+  id: number;
+};
+export type DeleteUserUseCaseResponse = BaseResponse;

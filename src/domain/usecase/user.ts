@@ -34,20 +34,25 @@ class CreateUserUseCase {
 
         const userResp = await this.userRepository.createUser(req);
 
-        return new ucio.CreateUserUseCaseResponse(userResp, null);
+        return {
+          user: userResp,
+          error: null,
+        };
       } else {
         console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new ucio.CreateUserUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+
+        return {
+          user: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new ucio.CreateUserUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+
+      return {
+        user: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -77,33 +82,37 @@ class LoginUseCase {
 
         if (userResp) {
           const token = this.authRepository.createToken(userResp.id);
-
-          return new ucio.LoginUseCaseResponse(userResp, token, null);
+          return {
+            user: userResp,
+            token,
+            error: null,
+          };
         }
 
         console.log(
           `${TAG_PRE_CONDITIONAL_ERROR} E-mail e/ou Senha incorretos.`,
         );
-        return new ucio.LoginUseCaseResponse(
-          null,
-          null,
-          newPreConditionalError("E-mail e/ou Senha incorretos."),
-        );
+        return {
+          user: null,
+          token: null,
+          error: newPreConditionalError("E-mail e/ou Senha incorretos."),
+        };
       }
 
       console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-      return new ucio.LoginUseCaseResponse(
-        null,
-        null,
-        newPreConditionalError(messageError),
-      );
+      return {
+        user: null,
+        token: null,
+        error: newPreConditionalError(messageError),
+      };
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new ucio.LoginUseCaseResponse(
-        null,
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+
+      return {
+        user: null,
+        token: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -133,11 +142,11 @@ class VerifyTokenUseCase {
 
         if (typeof userIsValid === "string") {
           console.log(`${TAG_PRE_CONDITIONAL_ERROR} Sua sessão expirou`);
-          return new ucio.VerifyTokenUseCaseResponse(
-            null,
-            null,
-            newPreConditionalError("Sua sessão expirou"),
-          );
+          return {
+            user: null,
+            token: null,
+            error: newPreConditionalError("Sua sessão expirou"),
+          };
         }
 
         const user = await this.userRepository.getUser(userIsValid.id);
@@ -145,32 +154,36 @@ class VerifyTokenUseCase {
         if (user) {
           const newToken = await this.authRepository.createToken(user.id);
 
-          return new ucio.VerifyTokenUseCaseResponse(user, newToken, null);
+          return {
+            user,
+            token: newToken,
+            error: null,
+          };
         } else {
           console.log(
             `${TAG_PRE_CONDITIONAL_ERROR} Houve um erro com sua sessão, por favor, faça login novamente`,
           );
-          return new ucio.VerifyTokenUseCaseResponse(
-            null,
-            null,
-            newPreConditionalError(
+          return {
+            user: null,
+            token: null,
+            error: newPreConditionalError(
               "Houve um erro com sua sessão, por favor, faça login novamente",
             ),
-          );
+          };
         }
       } else {
-        return new ucio.VerifyTokenUseCaseResponse(
-          null,
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          user: null,
+          token: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (err) {
-      return new ucio.VerifyTokenUseCaseResponse(
-        null,
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        user: null,
+        token: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -192,19 +205,20 @@ class UpdateUserUseCase {
 
       if (!messageError) {
         await this.userRepository.updateUser(req);
-
-        return new ucio.UpdateUserUseCaseResponse(null);
+        return {
+          error: null,
+        };
       } else {
         console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new ucio.UpdateUserUseCaseResponse(
-          newPreConditionalError(messageError),
-        );
+        return {
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new ucio.UpdateUserUseCaseResponse(
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -228,27 +242,30 @@ class GetUserUseCase {
         const user = await this.userRepository.getUser(req.id);
 
         if (user) {
-          return new ucio.GetUserUseCaseResponse(user, null);
+          return {
+            user,
+            error: null,
+          };
         } else {
           console.log(`${TAG_PRE_CONDITIONAL_ERROR} Usuário não encontrado`);
-          return new ucio.GetUserUseCaseResponse(
+          return {
             user,
-            newPreConditionalError("Usuário não encontrado"),
-          );
+            error: newPreConditionalError("Usuário não encontrado"),
+          };
         }
       } else {
         console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new ucio.GetUserUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          user: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new ucio.GetUserUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        user: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -271,18 +288,20 @@ class DeleteUserUseCase {
       if (!messageError) {
         await this.userRepository.deleteUser(req);
 
-        return new ucio.DeleteUserUseCaseResponse(null);
+        return {
+          error: null,
+        };
       } else {
         console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new ucio.DeleteUserUseCaseResponse(
-          newPreConditionalError(messageError),
-        );
+        return {
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new ucio.DeleteUserUseCaseResponse(
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }

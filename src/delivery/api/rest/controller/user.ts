@@ -13,12 +13,12 @@ class CreateUserController extends Controller {
   async execute(req: Request, res: Response) {
     const { name, office, email, password } = req.body;
 
-    const ucReq = new ucio.CreateUserUseCaseRequest(
+    const ucReq: ucio.CreateUserUseCaseRequest = {
       name,
       office,
       email,
       password,
-    );
+    };
 
     const repository = this.factory.makeUserRepository();
     const usecase = new useCase.CreateUserUseCase(repository);
@@ -37,7 +37,10 @@ class LoginController extends Controller {
   async execute(req: Request, res: Response) {
     const { email, password } = req.body;
 
-    const ucReq = new ucio.LoginUseCaseRequest(email, password);
+    const ucReq: ucio.LoginUseCaseRequest = {
+      email,
+      password,
+    };
 
     const userRepository = this.factory.makeUserRepository();
     const authRepository = this.factory.makeAuthRepository();
@@ -67,7 +70,9 @@ class VerifyTokenController extends Controller {
   async execute(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.authorization;
 
-    const ucReq = new ucio.VerifyTokenUseCaseRequest(token);
+    const ucReq: ucio.VerifyTokenUseCaseRequest = {
+      token,
+    };
 
     const userRepository = this.factory.makeUserRepository();
     const authRepository = new AuthJWTRepository();
@@ -112,12 +117,19 @@ class UpdateUserController extends Controller {
     const { id } = req.params;
     const { tokenUserId, name, office } = req.body;
 
+    const ucReq: ucio.UpdateUserUseCaseRequest = {
+      tokenUserId,
+      id: +id,
+      name,
+      office,
+    };
+    /* 
     const ucReq = new ucio.UpdateUserUseCaseRequest(
       tokenUserId,
       +id,
       name,
       office,
-    );
+    ); */
 
     const repository = this.factory.makeUserRepository();
     const usecase = new useCase.UpdateUserUseCase(repository);
@@ -136,7 +148,7 @@ class GetUserController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
 
-    const ucReq = new ucio.GetUserUseCaseRequest(+id);
+    const ucReq: ucio.GetUserUseCaseRequest = { id: +id };
 
     const repository = this.factory.makeUserRepository();
     const usecase = new useCase.GetUserUseCase(repository);
@@ -156,7 +168,10 @@ class DeleteUserController extends Controller {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
-    const ucReq = new ucio.DeleteUserUseCaseRequest(tokenUserId, +id);
+    const ucReq: ucio.DeleteUserUseCaseRequest = {
+      tokenUserId,
+      id: +id,
+    };
 
     const repository = this.factory.makeUserRepository();
     const usecase = new useCase.DeleteUserUseCase(repository);
