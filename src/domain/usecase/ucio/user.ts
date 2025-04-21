@@ -16,6 +16,7 @@ export type LoginUseCaseRequest = {
   email: string;
   password: string;
 };
+
 export type LoginUseCaseResponse = BaseResponse & {
   user: UserEntity;
   token: string;
@@ -24,6 +25,7 @@ export type LoginUseCaseResponse = BaseResponse & {
 export type VerifyTokenUseCaseRequest = {
   token: string;
 };
+
 export type VerifyTokenUseCaseResponse = BaseResponse & {
   user: UserEntity;
   token: string;
@@ -48,4 +50,5 @@ export type GetUserUseCaseResponse = BaseResponse & {
 export type DeleteUserUseCaseRequest = UserAuthenticated & {
   id: number;
 };
+
 export type DeleteUserUseCaseResponse = BaseResponse;
