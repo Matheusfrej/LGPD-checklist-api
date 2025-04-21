@@ -11,12 +11,12 @@ class CreateSystemController extends Controller {
   async execute(req: Request, res: Response) {
     const { name, description, userId, tokenUserId } = req.body;
 
-    const ucReq = new ucio.CreateSystemUseCaseRequest(
+    const ucReq: ucio.CreateSystemUseCaseRequest = {
       name,
       description,
       userId,
       tokenUserId,
-    );
+    };
 
     const systemRepository = this.factory.makeSystemRepository();
     const userRepository = this.factory.makeUserRepository();
@@ -40,10 +40,10 @@ class ListSystemsByUserIdController extends Controller {
     const { userId } = req.params;
     const { tokenUserId } = req.body;
 
-    const ucReq = new ucio.ListSystemsByUserIdUseCaseRequest(
+    const ucReq: ucio.ListSystemsByUserIdUseCaseRequest = {
       tokenUserId,
-      +userId,
-    );
+      userId: +userId,
+    };
 
     const systemRepository = this.factory.makeSystemRepository();
     const userRepository = this.factory.makeUserRepository();
@@ -66,7 +66,9 @@ class GetSystemController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
 
-    const ucReq = new ucio.GetSystemUseCaseRequest(+id);
+    const ucReq: ucio.GetSystemUseCaseRequest = {
+      id: +id,
+    };
 
     const systemRepository = this.factory.makeSystemRepository();
     const usecase = new useCase.GetSystemUseCase(systemRepository);
@@ -86,8 +88,10 @@ class DeleteSystemController extends Controller {
     const { id } = req.params;
     const { tokenUserId } = req.body;
 
-    const ucReq = new ucio.DeleteSystemUseCaseRequest(+id, tokenUserId);
-
+    const ucReq: ucio.DeleteSystemUseCaseRequest = {
+      id: +id,
+      tokenUserId,
+    };
     const systemRepository = this.factory.makeSystemRepository();
     const usecase = new useCase.DeleteSystemUseCase(systemRepository);
 
@@ -106,12 +110,12 @@ class UpdateSystemController extends Controller {
     const { id } = req.params;
     const { tokenUserId, name, description } = req.body;
 
-    const ucReq = new ucio.UpdateSystemUseCaseRequest(
-      +id,
+    const ucReq: ucio.UpdateSystemUseCaseRequest = {
+      id: +id,
       name,
       description,
       tokenUserId,
-    );
+    };
 
     const systemRepository = this.factory.makeSystemRepository();
     const usecase = new useCase.UpdateSystemUseCase(systemRepository);

@@ -30,21 +30,23 @@ class CreateSystemUseCase {
 
       if (!messageError) {
         const systemResp = await this.systemRepository.createSystem(req);
-
-        return new ucio.CreateSystemUseCaseResponse(systemResp, null);
+        return {
+          system: systemResp,
+          error: null,
+        };
       } else {
         console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new ucio.CreateSystemUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          system: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new ucio.CreateSystemUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        system: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -72,21 +74,23 @@ class ListSystemsByUserIdUseCase {
       if (!messageError) {
         const systemsResp =
           await this.systemRepository.listSystemsByUserId(req);
-
-        return new ucio.ListSystemsByUserIdUseCaseResponse(systemsResp, null);
+        return {
+          systems: systemsResp,
+          error: null,
+        };
       } else {
         console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new ucio.ListSystemsByUserIdUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          systems: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new ucio.ListSystemsByUserIdUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        systems: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -110,25 +114,28 @@ class GetSystemUseCase {
         const system = await this.systemRepository.getSystem(req.id);
 
         if (system) {
-          return new ucio.GetSystemUseCaseResponse(system, null);
+          return {
+            system,
+            error: null,
+          };
         } else {
-          return new ucio.GetSystemUseCaseResponse(
-            null,
-            newPreConditionalError("Sistema não encontrado"),
-          );
+          return {
+            system: null,
+            error: newPreConditionalError("Sistema não encontrado"),
+          };
         }
       } else {
-        return new ucio.GetSystemUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          system: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new ucio.GetSystemUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        system: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -149,18 +156,19 @@ class DeleteSystemUseCase {
       const messageError = await this.validate.validate(req);
       if (!messageError) {
         await this.systemRepository.deleteSystem(req);
-
-        return new ucio.DeleteSystemUseCaseResponse(null);
+        return {
+          error: null,
+        };
       } else {
-        return new ucio.DeleteSystemUseCaseResponse(
-          newPreConditionalError(messageError),
-        );
+        return {
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new ucio.DeleteSystemUseCaseResponse(
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
@@ -182,18 +190,20 @@ class UpdateSystemUseCase {
 
       if (!messageError) {
         await this.systemRepository.updateSystem(req);
-
-        return new ucio.UpdateSystemUseCaseResponse(null);
+        return {
+          error: null,
+        };
       } else {
-        return new ucio.UpdateSystemUseCaseResponse(
-          newPreConditionalError(messageError),
-        );
+        return {
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new ucio.UpdateSystemUseCaseResponse(
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+
+      return {
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
