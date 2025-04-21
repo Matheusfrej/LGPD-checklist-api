@@ -1,5 +1,5 @@
 import { SystemEntity } from "../../entity/system";
-import { ErrorEntity } from "../../entity/error";
+import { BaseResponse } from "./common";
 
 export type CreateSystemUseCaseRequest = {
   name: string;
@@ -8,9 +8,8 @@ export type CreateSystemUseCaseRequest = {
   tokenUserId: number;
 };
 
-export type CreateSystemUseCaseResponse = {
+export type CreateSystemUseCaseResponse = BaseResponse & {
   system: SystemEntity;
-  error: ErrorEntity;
 };
 
 export type ListSystemsByUserIdUseCaseRequest = {
@@ -18,18 +17,16 @@ export type ListSystemsByUserIdUseCaseRequest = {
   userId: number;
 };
 
-export type ListSystemsByUserIdUseCaseResponse = {
+export type ListSystemsByUserIdUseCaseResponse = BaseResponse & {
   systems: SystemEntity[];
-  error: ErrorEntity;
 };
 
 export type GetSystemUseCaseRequest = {
   id: number;
 };
 
-export type GetSystemUseCaseResponse = {
+export type GetSystemUseCaseResponse = BaseResponse & {
   system: SystemEntity;
-  error: ErrorEntity;
 };
 
 export type DeleteSystemUseCaseRequest = {
@@ -37,9 +34,7 @@ export type DeleteSystemUseCaseRequest = {
   tokenUserId: number;
 };
 
-export type DeleteSystemUseCaseResponse = {
-  error: ErrorEntity;
-};
+export type DeleteSystemUseCaseResponse = BaseResponse;
 
 export type UpdateSystemUseCaseRequest = {
   id: number;
@@ -48,6 +43,4 @@ export type UpdateSystemUseCaseRequest = {
   tokenUserId: number;
 };
 
-export type UpdateSystemUseCaseResponse = {
-  error: ErrorEntity;
-};
+export type UpdateSystemUseCaseResponse = BaseResponse;
