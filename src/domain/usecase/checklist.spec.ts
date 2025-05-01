@@ -10,13 +10,8 @@ import { MockGenerator } from "../../../test/utils/mockGenerator";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
 import { ChecklistEntity } from "../entity/checklist";
-import { Json } from "../@types";
 import { afterEach } from "node:test";
-import {
-  AnswerType,
-  ChecklistItemEntity,
-  SeverityDegreeType,
-} from "../entity/checklistItem";
+import { AnswerType, SeverityDegreeType } from "../entity/checklistItem";
 import { testFactory } from "../../../test/factory";
 import { UserRepositoryInterface } from "./repository/user";
 import { SystemRepositoryInterface } from "./repository/system";
@@ -186,8 +181,8 @@ describe("Create Checklist Use Case", () => {
         return {
           id,
           answer,
-          severityDegree: undefined,
-          userComment: undefined,
+          severityDegree: undefined as SeverityDegreeType,
+          userComment: undefined as string,
         };
       }),
     });
@@ -215,8 +210,8 @@ describe("Create Checklist Use Case", () => {
         return {
           id,
           answer,
-          severityDegree: undefined,
-          userComment: undefined,
+          severityDegree: undefined as SeverityDegreeType,
+          userComment: undefined as string,
         };
       }),
     });
@@ -587,260 +582,503 @@ describe("Delete Checklist Use Case", () => {
   });
 });
 
-// describe("Update Checklist Use Case", () => {
-//   let useCase: UpdateChecklistUseCase;
+describe("Update Checklist Use Case", () => {
+  let useCase: UpdateChecklistUseCase;
 
-//   beforeEach(() => {
-//     checklistRepository = testFactory.makeChecklistRepository();
-//     systemRepository = testFactory.makeSystemRepository();
-//     useCase = new UpdateChecklistUseCase(checklistRepository, systemRepository);
-//     mockGenerator = new MockGenerator(
-//       undefined,
-//       systemRepository,
-//       checklistRepository,
-//     );
+  beforeEach(() => {
+    checklistRepository = testFactory.makeChecklistRepository();
+    systemRepository = testFactory.makeSystemRepository();
+    itemRepository = testFactory.makeItemRepository();
+    useCase = new UpdateChecklistUseCase(checklistRepository, systemRepository);
+    mockGenerator = new MockGenerator(
+      undefined,
+      systemRepository,
+      checklistRepository,
+      itemRepository,
+    );
 
-//     vi.useFakeTimers();
-//   });
+    vi.useFakeTimers();
+  });
 
-//   afterEach(() => {
-//     vi.useRealTimers();
-//   });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-//   it("should update checklist", async () => {
-//     const system1 = await mockGenerator.createSystemMock();
+  it("should update checklist", async () => {
+    const system1 = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
 
-//     const oldChecklist = {
-//       ...(await mockGenerator.createChecklistMock({ systemId: system1.id })),
-//     };
+    const oldItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
 
-//     const system2 = await mockGenerator.createSystemMock();
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system1.id,
+        items: [oldItem],
+      }),
+    );
 
-//     const newChecklistData: Json = { message: "hey" };
-//     const newIsIot = !oldChecklist.isIot;
+    const system2 = await mockGenerator.createSystemMock();
 
-//     const oldSize = checklistRepository.items.length;
+    const oldSize = checklistRepository.items.length;
 
-//     const result = await useCase.execute({
-//       id: oldChecklist.id,
-//       checklistData: newChecklistData,
-//       systemId: system2.id,
-//       tokenUserId: oldChecklist.userId,
-//       isGeneral: oldChecklist.isGeneral,
-//       isIot: newIsIot,
-//     });
+    const newItem = {
+      id: item.id,
+      answer: "Não" as AnswerType,
+      severityDegree: "Grave" as SeverityDegreeType,
+      userComment: "Ajustar isso",
+    };
 
-//     const checklistUpdated = checklistRepository.items.find(
-//       (item) => item.id === oldChecklist.id,
-//     );
+    const result = await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system2.id,
+      tokenUserId: oldChecklist.userId,
+      items: [newItem],
+    });
 
-//     expect(result.error).toBe(null);
-//     expect(checklistUpdated).toBeInstanceOf(ChecklistEntity);
-//     expect(checklistUpdated.checklistData).toEqual(newChecklistData);
-//     expect(checklistUpdated.checklistData).not.toEqual(
-//       oldChecklist.checklistData,
-//     );
-//     expect(checklistUpdated.systemId).toBe(system2.id);
-//     expect(checklistUpdated.isGeneral).toBe(oldChecklist.isGeneral);
-//     expect(checklistUpdated.isIot).toBe(newIsIot);
-//     expect(checklistUpdated.userId).toBe(oldChecklist.userId);
-//     expect(oldChecklist).not.toEqual(checklistUpdated);
-//     expect(oldSize).toBe(checklistRepository.items.length);
-//     expect(checklistUpdated.id).toBe(oldChecklist.id);
-//   });
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
 
-//   it("should be able to update only checklistData", async () => {
-//     vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
+    expect(result.error).toBe(null);
+    expect(checklistUpdated).toBeInstanceOf(ChecklistEntity);
+    expect(checklistUpdated.checklistItems[0].answer).toEqual(newItem.answer);
+    expect(checklistUpdated.checklistItems[0].severityDegree).toEqual(
+      newItem.severityDegree,
+    );
+    expect(checklistUpdated.checklistItems[0].userComment).toEqual(
+      newItem.userComment,
+    );
+    expect(checklistUpdated.systemId).toBe(system2.id);
+    expect(checklistUpdated.userId).toBe(oldChecklist.userId);
+    expect(oldChecklist).not.toEqual(checklistUpdated);
+    expect(oldSize).toBe(checklistRepository.items.length);
+    expect(checklistUpdated.id).toBe(oldChecklist.id);
+  });
 
-//     const system = await mockGenerator.createSystemMock();
+  it("should be able to update only items", async () => {
+    vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
 
-//     const oldChecklist = {
-//       ...(await mockGenerator.createChecklistMock({ systemId: system.id })),
-//     };
-//     const newChecklistData: Json = { message: "hey" };
+    const oldItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
 
-//     const oldSize = checklistRepository.items.length;
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [oldItem],
+      }),
+    );
 
-//     const result = await useCase.execute({
-//       id: oldChecklist.id,
-//       checklistData: newChecklistData,
-//       systemId: system.id,
-//       tokenUserId: oldChecklist.userId,
-//       isGeneral: oldChecklist.isGeneral,
-//       isIot: oldChecklist.isIot,
-//     });
+    const oldSize = checklistRepository.items.length;
 
-//     const checklistUpdated = checklistRepository.items.find(
-//       (item) => item.id === oldChecklist.id,
-//     );
+    const newItem = {
+      id: item.id,
+      answer: "Não" as AnswerType,
+      severityDegree: "Grave" as SeverityDegreeType,
+      userComment: "Ajustar isso",
+    };
 
-//     expect(result.error).toBe(null);
-//     expect(checklistUpdated).toBeInstanceOf(ChecklistEntity);
-//     expect(checklistUpdated.checklistData).toEqual(newChecklistData);
-//     expect({
-//       ...checklistUpdated,
-//       checklistData: undefined,
-//     }).toEqual({
-//       ...oldChecklist,
-//       checklistData: undefined,
-//     });
-//     expect(oldChecklist).not.toEqual(checklistUpdated);
-//     expect(oldSize).toBe(checklistRepository.items.length);
-//     expect(checklistUpdated.id).toBe(oldChecklist.id);
-//   });
+    const result = await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [newItem],
+    });
 
-//   it("should be able to update only systemId", async () => {
-//     vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
 
-//     const system1 = await mockGenerator.createSystemMock();
+    expect(result.error).toBe(null);
+    expect(checklistUpdated).toBeInstanceOf(ChecklistEntity);
+    expect({
+      ...checklistUpdated,
+      checklistItems: undefined,
+    }).toEqual({
+      ...oldChecklist,
+      checklistItems: undefined,
+    });
+    expect(oldChecklist.checklistItems).not.toEqual(
+      checklistUpdated.checklistItems,
+    );
+    expect(oldSize).toBe(checklistRepository.items.length);
+    expect(checklistUpdated.id).toBe(oldChecklist.id);
+  });
 
-//     const oldChecklist = {
-//       ...(await mockGenerator.createChecklistMock({ systemId: system1.id })),
-//     };
+  it("should be able to update only systemId", async () => {
+    vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
 
-//     const system2 = await mockGenerator.createSystemMock();
+    const system1 = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
 
-//     const oldSize = checklistRepository.items.length;
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
 
-//     const result = await useCase.execute({
-//       id: oldChecklist.id,
-//       checklistData: oldChecklist.checklistData,
-//       systemId: system2.id,
-//       tokenUserId: oldChecklist.userId,
-//       isGeneral: oldChecklist.isGeneral,
-//       isIot: oldChecklist.isIot,
-//     });
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system1.id,
+        items: [checklistItem],
+      }),
+    );
 
-//     const checklistUpdated = checklistRepository.items.find(
-//       (item) => item.id === oldChecklist.id,
-//     );
+    const oldSize = checklistRepository.items.length;
 
-//     expect(result.error).toBe(null);
-//     expect(checklistUpdated).toBeInstanceOf(ChecklistEntity);
-//     expect(checklistUpdated.systemId).toBe(system2.id);
-//     expect({
-//       ...checklistUpdated,
-//       systemId: undefined,
-//     }).toEqual({
-//       ...oldChecklist,
-//       systemId: undefined,
-//     });
-//     expect(oldChecklist).not.toEqual(checklistUpdated);
-//     expect(oldSize).toBe(checklistRepository.items.length);
-//     expect(checklistUpdated.id).toBe(oldChecklist.id);
-//   });
+    const system2 = await mockGenerator.createSystemMock();
 
-//   it("should be able to update only isIot", async () => {
-//     vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
+    const result = await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system2.id,
+      tokenUserId: oldChecklist.userId,
+      items: [checklistItem],
+    });
 
-//     const system = await mockGenerator.createSystemMock();
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
 
-//     const oldChecklist = {
-//       ...(await mockGenerator.createChecklistMock({ systemId: system.id })),
-//     };
+    expect(result.error).toBe(null);
+    expect(checklistUpdated).toBeInstanceOf(ChecklistEntity);
+    expect(checklistUpdated.systemId).toBe(system2.id);
+    expect(checklistUpdated.systemId).not.toBe(system1.id);
+    expect({
+      ...checklistUpdated,
+      systemId: undefined,
+    }).toEqual({
+      ...oldChecklist,
+      systemId: undefined,
+    });
+    expect(oldChecklist).not.toEqual(checklistUpdated);
+    expect(oldSize).toBe(checklistRepository.items.length);
+    expect(checklistUpdated.id).toBe(oldChecklist.id);
+  });
 
-//     const newIsIot = !oldChecklist.isIot;
+  it("should remove item not present in updated checklist", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const item1 = await mockGenerator.createItemMock();
+    const item2 = await mockGenerator.createItemMock();
 
-//     const oldSize = checklistRepository.items.length;
+    const checklistItem1 = {
+      id: item1.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
 
-//     const result = await useCase.execute({
-//       id: oldChecklist.id,
-//       checklistData: oldChecklist.checklistData,
-//       systemId: system.id,
-//       tokenUserId: oldChecklist.userId,
-//       isGeneral: oldChecklist.isGeneral,
-//       isIot: newIsIot,
-//     });
+    const checklistItem2 = {
+      id: item2.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
 
-//     const checklistUpdated = checklistRepository.items.find(
-//       (item) => item.id === oldChecklist.id,
-//     );
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [checklistItem1, checklistItem2],
+      }),
+    );
 
-//     expect(result.error).toBe(null);
-//     expect(checklistUpdated).toBeInstanceOf(ChecklistEntity);
-//     expect(checklistUpdated.isIot).toBe(newIsIot);
-//     expect({
-//       ...checklistUpdated,
-//       isIot: undefined,
-//     }).toEqual({
-//       ...oldChecklist,
-//       isIot: undefined,
-//     });
-//     expect(oldChecklist).not.toEqual(checklistUpdated);
-//     expect(oldSize).toBe(checklistRepository.items.length);
-//     expect(checklistUpdated.id).toBe(oldChecklist.id);
-//   });
+    const oldSize = checklistRepository.items.length;
 
-//   it("should not update inexistent checklist", async () => {
-//     const system = await mockGenerator.createSystemMock();
+    // manda só o item 2
+    const result = await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [checklistItem2],
+    });
 
-//     const result = await useCase.execute({
-//       id: 1,
-//       checklistData: mockGenerator.checklistData,
-//       systemId: system.id,
-//       tokenUserId: 1,
-//       isGeneral: true,
-//       isIot: false,
-//     });
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
 
-//     expectPreConditionalError({ error: result.error });
-//   });
+    const updatedItemIds = checklistUpdated?.checklistItems.map(
+      (item) => item.item.id,
+    );
 
-//   it("should not update checklist to system that doesnt exist", async () => {
-//     const checklist = {
-//       ...(await mockGenerator.createChecklistMock()),
-//     };
+    expect(result.error).toBe(null);
+    expect(checklistUpdated).toBeInstanceOf(ChecklistEntity);
+    expect(oldChecklist).not.toEqual(checklistUpdated);
+    expect(oldChecklist.checklistItems.length).toEqual(
+      checklistUpdated.checklistItems.length + 1,
+    );
 
-//     const result = await useCase.execute({
-//       id: checklist.id,
-//       checklistData: mockGenerator.checklistData,
-//       systemId: 1,
-//       tokenUserId: checklist.userId,
-//       isGeneral: true,
-//       isIot: false,
-//     });
+    expect(updatedItemIds).toContain(item2.id); // item 2 está presente
+    expect(updatedItemIds).not.toContain(item1.id); // item 1 foi removido
 
-//     expectPreConditionalError({ error: result.error });
-//   });
+    expect(oldSize).toBe(checklistRepository.items.length);
+    expect(checklistUpdated.id).toBe(oldChecklist.id);
+  });
 
-//   it("should not update checklist from user that is different from authenticated user", async () => {
-//     const checklist = {
-//       ...(await mockGenerator.createChecklistMock()),
-//     };
-//     const system = await mockGenerator.createSystemMock();
+  it("should add new item to checklist if not previously present", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const item1 = await mockGenerator.createItemMock();
+    const item2 = await mockGenerator.createItemMock();
+    const item3 = await mockGenerator.createItemMock(); // novo item
 
-//     const result = await useCase.execute({
-//       id: checklist.id,
-//       checklistData: mockGenerator.checklistData,
-//       systemId: system.id,
-//       tokenUserId: checklist.userId + 1,
-//       isGeneral: true,
-//       isIot: false,
-//     });
+    const checklistItem1 = {
+      id: item1.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
 
-//     expectPreConditionalError({ error: result.error, noPermission: true });
-//   });
+    const checklistItem2 = {
+      id: item2.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
 
-//   it("should not update checklist from system that belongs to user different from authenticated user", async () => {
-//     const checklist = {
-//       ...(await mockGenerator.createChecklistMock()),
-//     };
-//     const system = await mockGenerator.createSystemMock({
-//       userId: checklist.userId + 1,
-//     });
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [checklistItem1, checklistItem2],
+      }),
+    );
 
-//     const result = await useCase.execute({
-//       id: checklist.id,
-//       checklistData: mockGenerator.checklistData,
-//       systemId: system.id,
-//       tokenUserId: checklist.userId,
-//       isGeneral: true,
-//       isIot: false,
-//     });
+    const checklistItem3 = {
+      id: item3.id,
+      answer: "Não" as AnswerType,
+      severityDegree: "Grave" as SeverityDegreeType,
+      userComment: "Comentário novo",
+    };
 
-//     expectPreConditionalError({ error: result.error, noPermission: true });
-//   });
-// });
+    await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [checklistItem1, checklistItem2, checklistItem3],
+    });
+
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
+
+    const updatedItemIds = checklistUpdated?.checklistItems.map(
+      (item) => item.item.id,
+    );
+
+    expect(updatedItemIds).toContain(item3.id); // novo item foi adicionado
+  });
+
+  it("should update fields of existing checklist item", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const item1 = await mockGenerator.createItemMock();
+
+    const originalItem = {
+      id: item1.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [originalItem],
+      }),
+    );
+
+    const updatedItem = {
+      id: item1.id,
+      answer: "Não" as AnswerType,
+      severityDegree: "Leve" as SeverityDegreeType,
+      userComment: "Problema identificado",
+    };
+
+    await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [updatedItem],
+    });
+
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
+
+    const updatedItemInstance = checklistUpdated?.checklistItems.find(
+      (i) => i.item.id === item1.id,
+    );
+
+    expect(updatedItemInstance?.answer).toBe(updatedItem.answer);
+    expect(updatedItemInstance?.severityDegree).toBe(
+      updatedItem.severityDegree,
+    );
+    expect(updatedItemInstance?.userComment).toBe(updatedItem.userComment);
+  });
+
+  it("should remove one item, add another and update one", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const item1 = await mockGenerator.createItemMock(); // será atualizado
+    const item2 = await mockGenerator.createItemMock(); // será removido
+    const item3 = await mockGenerator.createItemMock(); // será adicionado
+
+    const checklistItem1 = {
+      id: item1.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const checklistItem2 = {
+      id: item2.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [checklistItem1, checklistItem2],
+      }),
+    );
+
+    const updatedItem1 = {
+      id: item1.id,
+      answer: "Não" as AnswerType,
+      severityDegree: "Catastrófico" as SeverityDegreeType,
+      userComment: "Atualizado",
+    };
+
+    const newItem3 = {
+      id: item3.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: "Leve" as SeverityDegreeType,
+      userComment: "Novo",
+    };
+
+    await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [updatedItem1, newItem3],
+    });
+
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
+
+    const updatedItemIds = checklistUpdated?.checklistItems.map(
+      (item) => item.item.id,
+    );
+
+    expect(updatedItemIds).toContain(item1.id); // atualizado
+    expect(updatedItemIds).not.toContain(item2.id); // removido
+    expect(updatedItemIds).toContain(item3.id); // novo
+  });
+
+  it("should not update inexistent checklist", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const result = await useCase.execute({
+      id: 1,
+      systemId: system.id,
+      tokenUserId: 1,
+      items: [checklistItem],
+    });
+
+    expectPreConditionalError({ error: result.error });
+  });
+
+  it("should not update checklist to system that doesnt exist", async () => {
+    const item = await mockGenerator.createItemMock();
+
+    const checklist = {
+      ...(await mockGenerator.createChecklistMock()),
+    };
+
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const result = await useCase.execute({
+      id: checklist.id,
+      systemId: 1,
+      tokenUserId: checklist.userId,
+      items: [checklistItem],
+    });
+
+    expectPreConditionalError({ error: result.error });
+  });
+
+  it("should not update checklist from user that is different from authenticated user", async () => {
+    const checklist = {
+      ...(await mockGenerator.createChecklistMock()),
+    };
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const result = await useCase.execute({
+      id: checklist.id,
+      systemId: system.id,
+      tokenUserId: checklist.userId + 1,
+      items: [checklistItem],
+    });
+
+    expectPreConditionalError({ error: result.error, noPermission: true });
+  });
+
+  it("should not update checklist from system that belongs to user different from authenticated user", async () => {
+    const checklist = {
+      ...(await mockGenerator.createChecklistMock()),
+    };
+    const system = await mockGenerator.createSystemMock({
+      userId: checklist.userId + 1,
+    });
+    const item = await mockGenerator.createItemMock();
+
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const result = await useCase.execute({
+      id: checklist.id,
+      systemId: system.id,
+      tokenUserId: checklist.userId,
+      items: [checklistItem],
+    });
+
+    expectPreConditionalError({ error: result.error, noPermission: true });
+  });
+});
 
 describe("List User Checklists Use Case", () => {
   let useCase: ListChecklistsByUserIdUseCase;

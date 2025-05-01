@@ -5,6 +5,7 @@ import {
   DeleteChecklistUseCaseRequest,
   ListChecklistsBySystemIdUseCaseRequest,
   ListChecklistsByUserIdUseCaseRequest,
+  UpdateChecklistUseCaseRequest,
 } from "../ucio/checklist";
 
 interface ChecklistRepositoryInterface {
@@ -13,6 +14,7 @@ interface ChecklistRepositoryInterface {
   createChecklist(req: CreateChecklistUseCaseRequest): Promise<ChecklistEntity>;
   getChecklist(id: number): Promise<ChecklistEntity>;
   deleteChecklist(req: DeleteChecklistUseCaseRequest): Promise<void>;
+  updateChecklist(req: UpdateChecklistUseCaseRequest): Promise<void>;
   listChecklistsByUserId(
     req: ListChecklistsByUserIdUseCaseRequest,
   ): Promise<ChecklistEntity[]>;

@@ -189,7 +189,7 @@ class UpdateChecklistUseCase {
 
   async update(req: ucio.UpdateChecklistUseCaseRequest) {
     // Transação
-    this.checklistRepository.runInTransaction(async (repo) => {
+    await this.checklistRepository.runInTransaction(async (repo) => {
       const currentItems = await repo.getItemsFromChecklist(req.id);
 
       const currentIds = currentItems.map((item) => item.item.id);
@@ -234,6 +234,9 @@ class UpdateChecklistUseCase {
             item.userComment,
           ),
         );
+
+      // Atualiza o resto dos campos
+      await repo.updateChecklist(req);
     });
   }
 }

@@ -4,6 +4,7 @@ import {
   DeleteChecklistUseCaseRequest,
   ListChecklistsBySystemIdUseCaseRequest,
   ListChecklistsByUserIdUseCaseRequest,
+  UpdateChecklistUseCaseRequest,
 } from "../../../../domain/usecase/ucio/checklist";
 import { ChecklistRepositoryInterface } from "../../../../domain/usecase/repository/checklist";
 import {
@@ -21,6 +22,8 @@ class ChecklistPrismaRepository
   extends PrismaRepository
   implements ChecklistRepositoryInterface
 {
+  items?: ChecklistEntity[];
+
   protected withTransaction(tx: Prisma.TransactionClient): this {
     return new ChecklistPrismaRepository(tx) as this;
   }
@@ -133,6 +136,17 @@ class ChecklistPrismaRepository
     await this.prisma.checklists.delete({
       where: {
         id: req.id,
+      },
+    });
+  }
+
+  async updateChecklist(req: UpdateChecklistUseCaseRequest): Promise<void> {
+    await this.prisma.checklists.update({
+      where: {
+        id: req.id,
+      },
+      data: {
+        systemId: req.systemId,
       },
     });
   }
