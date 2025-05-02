@@ -450,7 +450,7 @@ describe("Create Checklist Use Case", () => {
     expect(oldSize).toBe(checklistRepository.items.length);
   });
 
-  it("should not create checklist for no device", async () => {
+  it("should be able to create checklist for no device", async () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
@@ -475,9 +475,11 @@ describe("Create Checklist Use Case", () => {
       devices: [],
     });
 
-    expectPreConditionalError({ error: result.error });
-    expect(result.checklist).toBe(null);
-    expect(oldSize).toBe(checklistRepository.items.length);
+    expect(result.error).toBe(null);
+    expect(result.checklist.userId).toBe(user.id);
+    expect(result.checklist.systemId).toBe(system.id);
+    expect(result.checklist.devices.length).toBe(0);
+    expect(oldSize).toBe(checklistRepository.items.length - 1);
   });
 
   it("should not create checklist for user different from authenticated user", async () => {

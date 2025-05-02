@@ -60,9 +60,7 @@ class CreateChecklistUseCaseValidate implements ValidateInterface {
     laws: zodNumberSchema("laws").array().nonempty({
       message: "Laws não pode ser um array vazio.",
     }),
-    devices: zodNumberSchema("devices").array().nonempty({
-      message: "Devices não pode ser um array vazio.",
-    }),
+    devices: zodNumberSchema("devices").array(),
   });
 
   constructor(
@@ -197,9 +195,7 @@ class UpdateChecklistUseCaseValidate implements ValidateInterface {
     laws: zodNumberSchema("laws").array().nonempty({
       message: "Laws não pode ser um array vazio.",
     }),
-    devices: zodNumberSchema("devices").array().nonempty({
-      message: "Devices não pode ser um array vazio.",
-    }),
+    devices: zodNumberSchema("devices").array(),
   });
 
   constructor(
