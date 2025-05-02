@@ -10,6 +10,10 @@ import { ItemRepositoryInterface } from "../usecase/repository/item";
 import { SystemRepositoryInterface } from "../usecase/repository/system";
 import { UserRepositoryInterface } from "../usecase/repository/user";
 import { RepositoryFactory } from "./repositoryFactory";
+import { LawPrismaRepository } from "../../infrastructure/provider/repository/prisma/law";
+import { DevicePrismaRepository } from "../../infrastructure/provider/repository/prisma/device";
+import { DeviceRepositoryInterface } from "../usecase/repository/device";
+import { LawRepositoryInterface } from "../usecase/repository/law";
 
 export class PrismaRepositoryFactory implements RepositoryFactory {
   constructor(private prisma: PrismaClient) {}
@@ -28,6 +32,14 @@ export class PrismaRepositoryFactory implements RepositoryFactory {
 
   makeItemRepository(): ItemRepositoryInterface {
     return new ItemPrismaRepository(this.prisma);
+  }
+
+  makeLawRepository(): LawRepositoryInterface {
+    return new LawPrismaRepository(this.prisma);
+  }
+
+  makeDeviceRepository(): DeviceRepositoryInterface {
+    return new DevicePrismaRepository(this.prisma);
   }
 
   makeAuthRepository(): AuthRepositoryInterface {

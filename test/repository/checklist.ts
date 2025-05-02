@@ -9,6 +9,8 @@ import {
   ListChecklistsByUserIdUseCaseRequest,
   ListChecklistsBySystemIdUseCaseRequest,
 } from "../../src/domain/usecase/ucio/checklist";
+import { LawEntity } from "../../src/domain/entity/law";
+import { DeviceEntity } from "../../src/domain/entity/device";
 
 class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
   public items: ChecklistEntity[] = [];
@@ -31,8 +33,8 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
             item.userComment,
           ),
       ),
-      null,
-      null,
+      checklist.laws.map((id) => new LawEntity(id, null)),
+      checklist.devices.map((id) => new DeviceEntity(id, null)),
       new Date(),
       new Date(),
     );

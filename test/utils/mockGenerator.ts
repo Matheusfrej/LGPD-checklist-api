@@ -4,6 +4,8 @@ import { UserRepositoryInterface } from "../../src/domain/usecase/repository/use
 import { ChecklistRepositoryInterface } from "../../src/domain/usecase/repository/checklist";
 import { AnswerType, SeverityDegreeType } from "../domain/entity/checklistItem";
 import { ItemRepositoryInterface } from "../domain/usecase/repository/item";
+import { LawRepositoryInterface } from "../domain/usecase/repository/law";
+import { DeviceRepositoryInterface } from "../domain/usecase/repository/device";
 const { genSaltSync, hashSync } = bcrypt;
 
 enum Repositories {
@@ -11,6 +13,8 @@ enum Repositories {
   "System" = "System",
   "Checklist" = "Checklist",
   "Item" = "Item",
+  "Law" = "Law",
+  "Device" = "Device",
 }
 
 class NoRepositoryError extends Error {
@@ -24,17 +28,23 @@ class MockGenerator {
   private systemRepository: SystemRepositoryInterface;
   private checklistRepository: ChecklistRepositoryInterface;
   private itemRepository: ItemRepositoryInterface;
+  private lawRepository: LawRepositoryInterface;
+  private deviceRepository: DeviceRepositoryInterface;
 
   constructor(
     userRepository?: UserRepositoryInterface,
     systemRepository?: SystemRepositoryInterface,
     checklistRepository?: ChecklistRepositoryInterface,
     itemRepository?: ItemRepositoryInterface,
+    lawRepository?: LawRepositoryInterface,
+    deviceRepository?: DeviceRepositoryInterface,
   ) {
     this.userRepository = userRepository;
     this.systemRepository = systemRepository;
     this.checklistRepository = checklistRepository;
     this.itemRepository = itemRepository;
+    this.lawRepository = lawRepository;
+    this.deviceRepository = deviceRepository;
   }
 
   async createUserMock({
@@ -83,6 +93,8 @@ class MockGenerator {
         userComment: undefined as string,
       },
     ],
+    laws = [1],
+    devices = [1],
   } = {}) {
     if (this.checklistRepository) {
       return await this.checklistRepository.createChecklist({
@@ -90,6 +102,8 @@ class MockGenerator {
         tokenUserId,
         systemId,
         items,
+        laws,
+        devices,
       });
     }
     throw new NoRepositoryError(Repositories.Checklist);
@@ -116,6 +130,26 @@ class MockGenerator {
       });
     }
     throw new NoRepositoryError(Repositories.Item);
+  }
+
+  async createLawMock({ id = 1, name = "LGPD" } = {}) {
+    if (this.lawRepository) {
+      return await this.lawRepository.create({
+        id,
+        name,
+      });
+    }
+    throw new NoRepositoryError(Repositories.Law);
+  }
+
+  async createDeviceMock({ id = 1, name = "Sensor IoT" } = {}) {
+    if (this.deviceRepository) {
+      return await this.deviceRepository.create({
+        id,
+        name,
+      });
+    }
+    throw new NoRepositoryError(Repositories.Device);
   }
 
   async createUserAndSystemMock() {
@@ -146,6 +180,20 @@ class MockGenerator {
 
     return {
       item,
+      checklist,
+    };
+  }
+
+  async createItemAndLawAndDeviceAndChecklistMock() {
+    const item = await this.createItemMock();
+    const law = await this.createLawMock();
+    const device = await this.createDeviceMock();
+    const checklist = await this.createChecklistMock();
+
+    return {
+      item,
+      law,
+      device,
       checklist,
     };
   }

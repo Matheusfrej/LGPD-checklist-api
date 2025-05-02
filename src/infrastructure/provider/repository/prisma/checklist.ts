@@ -47,6 +47,12 @@ class ChecklistPrismaRepository
             }),
           },
         },
+        laws: {
+          connect: req.laws.map((id) => ({ id })),
+        },
+        devices: {
+          connect: req.devices.map((id) => ({ id })),
+        },
       },
       include: {
         ItemsChecklists: {
@@ -54,6 +60,8 @@ class ChecklistPrismaRepository
             item: true,
           },
         },
+        laws: true,
+        devices: true,
       },
     });
 
@@ -76,6 +84,10 @@ class ChecklistPrismaRepository
             itemChecklist.severityDegree as SeverityDegreeType,
             itemChecklist.userComment,
           ),
+      ),
+      checklist.laws.map((law) => new LawEntity(law.id, law.name)),
+      checklist.devices.map(
+        (device) => new DeviceEntity(device.id, device.name),
       ),
     );
   }

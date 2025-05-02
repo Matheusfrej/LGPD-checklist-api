@@ -8,24 +8,30 @@ import { Controller } from "./controller";
 
 class CreateChecklistController extends Controller {
   async execute(req: Request, res: Response) {
-    const { tokenUserId, userId, systemId, items } = req.body;
+    const { tokenUserId, userId, systemId, items, laws, devices } = req.body;
 
     const ucReq = {
       tokenUserId,
       userId,
       systemId,
       items,
+      laws,
+      devices,
     };
 
     const checklistRepository = this.factory.makeChecklistRepository();
     const systemRepository = this.factory.makeSystemRepository();
     const userRepository = this.factory.makeUserRepository();
     const itemRepository = this.factory.makeItemRepository();
+    const lawRepository = this.factory.makeLawRepository();
+    const deviceRepository = this.factory.makeDeviceRepository();
     const ucRes = await new useCase.CreateChecklistUseCase(
       checklistRepository,
       systemRepository,
       userRepository,
       itemRepository,
+      lawRepository,
+      deviceRepository,
     ).execute(ucReq);
 
     if (!ucRes.error) {

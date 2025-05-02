@@ -1,5 +1,7 @@
 import { ChecklistEntity } from "../../entity/checklist";
 import { AnswerType, SeverityDegreeType } from "../../entity/checklistItem";
+import { DeviceEntity } from "../../entity/device";
+import { LawEntity } from "../../entity/law";
 import { BaseResponse, UserAuthenticated } from "./common";
 
 type ItemsInput = {
@@ -13,6 +15,8 @@ export type CreateChecklistUseCaseRequest = UserAuthenticated & {
   userId: number;
   systemId: number;
   items: ItemsInput;
+  laws: LawEntity["id"][];
+  devices: DeviceEntity["id"][];
 };
 
 export type CreateChecklistUseCaseResponse = BaseResponse & {

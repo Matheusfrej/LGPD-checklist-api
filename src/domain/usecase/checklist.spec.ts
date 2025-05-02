@@ -17,11 +17,15 @@ import { UserRepositoryInterface } from "./repository/user";
 import { SystemRepositoryInterface } from "./repository/system";
 import { ChecklistRepositoryInterface } from "./repository/checklist";
 import { ItemRepositoryInterface } from "./repository/item";
+import { LawRepositoryInterface } from "./repository/law";
+import { DeviceRepositoryInterface } from "./repository/device";
 
 let userRepository: UserRepositoryInterface;
 let systemRepository: SystemRepositoryInterface;
 let checklistRepository: ChecklistRepositoryInterface;
 let itemRepository: ItemRepositoryInterface;
+let lawRepository: LawRepositoryInterface;
+let deviceRepository: DeviceRepositoryInterface;
 let mockGenerator: MockGenerator;
 
 describe("Create Checklist Use Case", () => {
@@ -32,17 +36,23 @@ describe("Create Checklist Use Case", () => {
     systemRepository = testFactory.makeSystemRepository();
     checklistRepository = testFactory.makeChecklistRepository();
     itemRepository = testFactory.makeItemRepository();
+    lawRepository = testFactory.makeLawRepository();
+    deviceRepository = testFactory.makeDeviceRepository();
     useCase = new CreateChecklistUseCase(
       checklistRepository,
       systemRepository,
       userRepository,
       itemRepository,
+      lawRepository,
+      deviceRepository,
     );
     mockGenerator = new MockGenerator(
       userRepository,
       systemRepository,
       null,
       itemRepository,
+      lawRepository,
+      deviceRepository,
     );
   });
 
@@ -50,6 +60,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -67,12 +79,16 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expect(result.error).toBe(null);
     expect(result.checklist.userId).toBe(user.id);
     expect(result.checklist.systemId).toBe(system.id);
     expect(result.checklist.checklistItems[0].item.id).toBe(item.id);
+    expect(result.checklist.laws[0].id).toBe(law.id);
+    expect(result.checklist.devices[0].id).toBe(device.id);
     expect(result.checklist.checklistItems[0].answer).toBe(answer);
     expect(checklistRepository.items[0]).toEqual(result.checklist);
     expect(oldSize).toBe(checklistRepository.items.length - 1);
@@ -82,6 +98,8 @@ describe("Create Checklist Use Case", () => {
     const userId = 1;
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -99,6 +117,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -110,6 +130,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const systemId = 1;
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -127,6 +149,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -138,6 +162,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const itemId = 1;
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -155,6 +181,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -168,6 +196,8 @@ describe("Create Checklist Use Case", () => {
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
     const itemIds = [item.id, 2];
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -185,6 +215,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined as string,
         };
       }),
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -197,6 +229,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const itemIds = [1, 2];
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -214,6 +248,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined as string,
         };
       }),
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -226,6 +262,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -243,6 +281,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -254,6 +294,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -272,6 +314,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -283,6 +327,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -302,6 +348,8 @@ describe("Create Checklist Use Case", () => {
           userComment,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expect(result.error).toBe(null);
@@ -321,6 +369,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -338,6 +388,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -349,6 +401,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -357,6 +411,8 @@ describe("Create Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: user.id,
       items: [],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -368,6 +424,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -385,6 +443,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error, noPermission: true });
@@ -396,6 +456,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -413,6 +475,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -424,6 +488,8 @@ describe("Create Checklist Use Case", () => {
     const user = await mockGenerator.createUserMock();
     await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -441,6 +507,8 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -453,6 +521,8 @@ describe("Create Checklist Use Case", () => {
     const user2 = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock({ userId: user2.id });
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldSize = checklistRepository.items.length;
 
@@ -470,10 +540,216 @@ describe("Create Checklist Use Case", () => {
           userComment: undefined,
         },
       ],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error, noPermission: true });
     expect(result.checklist).toBe(null);
+    expect(oldSize).toBe(checklistRepository.items.length);
+  });
+
+  it("should not create checklist for inexistent law", async () => {
+    const user = await mockGenerator.createUserMock();
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    const lawId = 1; // inexistent law
+    const device = await mockGenerator.createDeviceMock();
+
+    const oldSize = checklistRepository.items.length;
+
+    const answer = "Sim";
+
+    const result = await useCase.execute({
+      userId: user.id,
+      systemId: system.id,
+      tokenUserId: user.id,
+      items: [
+        {
+          id: item.id,
+          answer,
+          severityDegree: undefined,
+          userComment: undefined,
+        },
+      ],
+      laws: [lawId],
+      devices: [device.id],
+    });
+
+    expectPreConditionalError({ error: result.error });
+    expect(result.checklist).toBe(null);
+    expect(result.error.message).toContain(lawId);
+    expect(oldSize).toBe(checklistRepository.items.length);
+  });
+
+  it("should not create checklist for inexistent device", async () => {
+    const user = await mockGenerator.createUserMock();
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const deviceId = 1; // inexistent device
+
+    const oldSize = checklistRepository.items.length;
+
+    const answer = "Sim";
+
+    const result = await useCase.execute({
+      userId: user.id,
+      systemId: system.id,
+      tokenUserId: user.id,
+      items: [
+        {
+          id: item.id,
+          answer,
+          severityDegree: undefined,
+          userComment: undefined,
+        },
+      ],
+      laws: [law.id],
+      devices: [deviceId],
+    });
+
+    expectPreConditionalError({ error: result.error });
+    expect(result.checklist).toBe(null);
+    expect(result.error.message).toContain(deviceId);
+    expect(oldSize).toBe(checklistRepository.items.length);
+  });
+
+  it("should not create checklist for two inexistent laws", async () => {
+    const user = await mockGenerator.createUserMock();
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    const lawIds = [1, 2]; // inexistent laws
+    const device = await mockGenerator.createDeviceMock();
+
+    const oldSize = checklistRepository.items.length;
+
+    const answer = "Sim";
+
+    const result = await useCase.execute({
+      userId: user.id,
+      systemId: system.id,
+      tokenUserId: user.id,
+      items: [
+        {
+          id: item.id,
+          answer,
+          severityDegree: undefined,
+          userComment: undefined,
+        },
+      ],
+      laws: lawIds,
+      devices: [device.id],
+    });
+
+    console.log(lawRepository.items);
+
+    console.log(result);
+
+    expectPreConditionalError({ error: result.error });
+    expect(result.checklist).toBe(null);
+    expect(result.error.message).toContain(lawIds.join(", "));
+    expect(oldSize).toBe(checklistRepository.items.length);
+  });
+
+  it("should not create checklist for two inexistent devices", async () => {
+    const user = await mockGenerator.createUserMock();
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const deviceIds = [1, 2]; // inexistent devices
+
+    const oldSize = checklistRepository.items.length;
+
+    const answer = "Sim";
+
+    const result = await useCase.execute({
+      userId: user.id,
+      systemId: system.id,
+      tokenUserId: user.id,
+      items: [
+        {
+          id: item.id,
+          answer,
+          severityDegree: undefined,
+          userComment: undefined,
+        },
+      ],
+      laws: [law.id],
+      devices: deviceIds,
+    });
+
+    expectPreConditionalError({ error: result.error });
+    expect(result.checklist).toBe(null);
+    expect(result.error.message).toContain(deviceIds.join(", "));
+    expect(oldSize).toBe(checklistRepository.items.length);
+  });
+
+  it("should not create checklist for one existent law and the other inexistent", async () => {
+    const user = await mockGenerator.createUserMock();
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const lawIds = [law.id, 2]; // one existent, one inexistent
+    const device = await mockGenerator.createDeviceMock();
+
+    const oldSize = checklistRepository.items.length;
+
+    const answer = "Sim";
+
+    const result = await useCase.execute({
+      userId: user.id,
+      systemId: system.id,
+      tokenUserId: user.id,
+      items: [
+        {
+          id: item.id,
+          answer,
+          severityDegree: undefined,
+          userComment: undefined,
+        },
+      ],
+      laws: lawIds,
+      devices: [device.id],
+    });
+
+    expectPreConditionalError({ error: result.error });
+    expect(result.checklist).toBe(null);
+    expect(result.error.message).toContain(lawIds[1]);
+    expect(oldSize).toBe(checklistRepository.items.length);
+  });
+
+  it("should not create checklist for one existent device and the other inexistent", async () => {
+    const user = await mockGenerator.createUserMock();
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
+    const deviceIds = [device.id, 2]; // one existent, one inexistent
+
+    const oldSize = checklistRepository.items.length;
+
+    const answer = "Sim";
+
+    const result = await useCase.execute({
+      userId: user.id,
+      systemId: system.id,
+      tokenUserId: user.id,
+      items: [
+        {
+          id: item.id,
+          answer,
+          severityDegree: undefined,
+          userComment: undefined,
+        },
+      ],
+      laws: [law.id],
+      devices: deviceIds,
+    });
+
+    expectPreConditionalError({ error: result.error });
+    expect(result.checklist).toBe(null);
+    expect(result.error.message).toContain(deviceIds[1]);
     expect(oldSize).toBe(checklistRepository.items.length);
   });
 });

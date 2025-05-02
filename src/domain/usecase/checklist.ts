@@ -13,6 +13,8 @@ import { UserRepositoryInterface } from "./repository/user";
 import { ItemRepositoryInterface } from "./repository/item";
 import { ChecklistItemEntity } from "../entity/checklistItem";
 import { ItemEntity } from "../entity/item";
+import { LawRepositoryInterface } from "./repository/law";
+import { DeviceRepositoryInterface } from "./repository/device";
 
 class CreateChecklistUseCase {
   public validate: validate.CreateChecklistUseCaseValidate;
@@ -23,11 +25,15 @@ class CreateChecklistUseCase {
     systemRepository: SystemRepositoryInterface,
     userRepository: UserRepositoryInterface,
     itemRepository: ItemRepositoryInterface,
+    lawRepository: LawRepositoryInterface,
+    deviceRepository: DeviceRepositoryInterface,
   ) {
     this.validate = new validate.CreateChecklistUseCaseValidate(
       systemRepository,
       userRepository,
       itemRepository,
+      lawRepository,
+      deviceRepository,
     );
     this.checklistRepository = checklistRepository;
   }
