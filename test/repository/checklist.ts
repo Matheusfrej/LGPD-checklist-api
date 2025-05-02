@@ -31,6 +31,8 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
             item.userComment,
           ),
       ),
+      null,
+      null,
       new Date(),
       new Date(),
     );

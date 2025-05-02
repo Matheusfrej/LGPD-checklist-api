@@ -96,6 +96,8 @@ class ChecklistPrismaRepository
             },
           },
         },
+        laws: true,
+        devices: true,
       },
     });
 
@@ -125,6 +127,10 @@ class ChecklistPrismaRepository
                 itemChecklist.severityDegree as SeverityDegreeType,
                 itemChecklist.userComment,
               ),
+          ),
+          checklist.laws.map((law) => new LawEntity(law.id, law.name)),
+          checklist.devices.map(
+            (device) => new DeviceEntity(device.id, device.name),
           ),
           checklist.createdAt,
           checklist.updatedAt,
@@ -170,6 +176,8 @@ class ChecklistPrismaRepository
           checklist.userId,
           checklist.systemId,
           null,
+          null,
+          null,
           checklist.createdAt,
           checklist.updatedAt,
         ),
@@ -194,6 +202,8 @@ class ChecklistPrismaRepository
           checklist.id,
           checklist.userId,
           checklist.systemId,
+          null,
+          null,
           null,
           checklist.createdAt,
           checklist.updatedAt,
