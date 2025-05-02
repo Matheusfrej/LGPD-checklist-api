@@ -17,9 +17,6 @@ export class LawInMemoryRepository implements LawRepositoryInterface {
   }
 
   async existByIds(ids: number[]): Promise<number[]> {
-    console.log(ids);
-    console.log(ids.filter((id) => !this.items.find((item) => item.id === id)));
-
     return ids.filter((id) => !this.items.find((item) => item.id === id));
   }
 }

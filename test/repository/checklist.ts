@@ -84,7 +84,7 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
     return this.items.filter((item) => item.systemId === req.systemId);
   }
 
-  async getItemsFromChecklist(id: number): Promise<ChecklistItemEntity[]> {
+  async getItems(id: number): Promise<ChecklistItemEntity[]> {
     const index = this.items.findIndex((item) => item.id === id);
 
     if (index === -1) {
@@ -94,10 +94,7 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
     return this.items[index].checklistItems;
   }
 
-  async insertItemsFromChecklist(
-    id: number,
-    items: ChecklistItemEntity[],
-  ): Promise<void> {
+  async insertItems(id: number, items: ChecklistItemEntity[]): Promise<void> {
     const checklist = await this.getChecklist(id);
     if (!checklist) return;
 
@@ -105,10 +102,7 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
     checklist.updatedAt = new Date();
   }
 
-  async removeItemsFromChecklist(
-    id: number,
-    itemsIds: number[],
-  ): Promise<void> {
+  async removeItems(id: number, itemsIds: number[]): Promise<void> {
     const checklist = await this.getChecklist(id);
     if (!checklist) return;
 
@@ -118,10 +112,7 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
     checklist.updatedAt = new Date();
   }
 
-  async updateItemFromChecklist(
-    id: number,
-    item: ChecklistItemEntity,
-  ): Promise<void> {
+  async updateItem(id: number, item: ChecklistItemEntity): Promise<void> {
     const checklist = await this.getChecklist(id);
     if (!checklist) return;
 
@@ -131,6 +122,57 @@ class ChecklistInMemoryRepository implements ChecklistRepositoryInterface {
     if (index === -1) return;
 
     checklist.checklistItems[index] = item;
+    checklist.updatedAt = new Date();
+  }
+
+  async getLaws(id: number): Promise<LawEntity[]> {
+    const checklist = await this.getChecklist(id);
+    return checklist ? checklist.laws : [];
+  }
+
+  async insertLaws(id: number, lawsIds: number[]): Promise<void> {
+    const checklist = await this.getChecklist(id);
+
+    if (!checklist) return;
+
+    const newLaws = lawsIds.map((lawId) => new LawEntity(lawId, null));
+
+    checklist.laws = [...(checklist.laws || []), ...newLaws];
+
+    checklist.updatedAt = new Date();
+  }
+
+  async removeLaws(id: number, lawsIds: number[]): Promise<void> {
+    const checklist = await this.getChecklist(id);
+    if (!checklist) return;
+
+    checklist.laws = checklist.laws.filter((law) => !lawsIds.includes(law.id));
+    checklist.updatedAt = new Date();
+  }
+
+  async getDevices(id: number): Promise<DeviceEntity[]> {
+    const checklist = await this.getChecklist(id);
+    return checklist ? checklist.devices : [];
+  }
+
+  async insertDevices(id: number, devicesIds: number[]): Promise<void> {
+    const checklist = await this.getChecklist(id);
+    if (!checklist) return;
+
+    const newDevices = devicesIds.map(
+      (deviceId) => new DeviceEntity(deviceId, null),
+    );
+    checklist.devices = [...(checklist.devices || []), ...newDevices];
+    checklist.updatedAt = new Date();
+  }
+
+  async removeDevices(id: number, devicesIds: number[]): Promise<void> {
+    const checklist = await this.getChecklist(id);
+    if (!checklist) return;
+
+    checklist.devices = checklist.devices.filter(
+      (device) => !devicesIds.includes(device.id),
+    );
     checklist.updatedAt = new Date();
   }
 

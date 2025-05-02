@@ -2,7 +2,7 @@ const INTERNAL_SERVER_ERROR_CODE = 1;
 const PRE_CONDITIONAL_ERROR_CODE = 2;
 const TAG_INTERNAL_SERVER_ERROR = "[INTERNAL SERVER ERROR]";
 const TAG_PRE_CONDITIONAL_ERROR = "[PRE CONDITIONAL ERROR]";
-const INTERNAL_SERVER_ERROR_MESSAGE = "Erro interno do servidor: ";
+const INTERNAL_SERVER_ERROR_MESSAGE = "Erro interno do servidor.";
 const NO_PERMISSION_MESSAGE = "Você não tem permissão para isso.";
 const DEFAULT_VALIDATION_MESSAGE = "Erro de validação.";
 

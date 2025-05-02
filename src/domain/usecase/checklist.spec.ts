@@ -420,6 +420,66 @@ describe("Create Checklist Use Case", () => {
     expect(oldSize).toBe(checklistRepository.items.length);
   });
 
+  it("should not create checklist for no law", async () => {
+    const user = await mockGenerator.createUserMock();
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
+
+    const oldSize = checklistRepository.items.length;
+
+    const result = await useCase.execute({
+      userId: user.id,
+      systemId: system.id,
+      tokenUserId: user.id,
+      items: [
+        {
+          id: item.id,
+          answer: "Sim",
+          severityDegree: undefined,
+          userComment: undefined,
+        },
+      ],
+      laws: [],
+      devices: [device.id],
+    });
+
+    expectPreConditionalError({ error: result.error });
+    expect(result.checklist).toBe(null);
+    expect(oldSize).toBe(checklistRepository.items.length);
+  });
+
+  it("should not create checklist for no device", async () => {
+    const user = await mockGenerator.createUserMock();
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    await mockGenerator.createDeviceMock();
+
+    const oldSize = checklistRepository.items.length;
+
+    const result = await useCase.execute({
+      userId: user.id,
+      systemId: system.id,
+      tokenUserId: user.id,
+      items: [
+        {
+          id: item.id,
+          answer: "Sim",
+          severityDegree: undefined,
+          userComment: undefined,
+        },
+      ],
+      laws: [law.id],
+      devices: [],
+    });
+
+    expectPreConditionalError({ error: result.error });
+    expect(result.checklist).toBe(null);
+    expect(oldSize).toBe(checklistRepository.items.length);
+  });
+
   it("should not create checklist for user different from authenticated user", async () => {
     const user = await mockGenerator.createUserMock();
     const system = await mockGenerator.createSystemMock();
@@ -642,10 +702,6 @@ describe("Create Checklist Use Case", () => {
       devices: [device.id],
     });
 
-    console.log(lawRepository.items);
-
-    console.log(result);
-
     expectPreConditionalError({ error: result.error });
     expect(result.checklist).toBe(null);
     expect(result.error.message).toContain(lawIds.join(", "));
@@ -865,12 +921,22 @@ describe("Update Checklist Use Case", () => {
     checklistRepository = testFactory.makeChecklistRepository();
     systemRepository = testFactory.makeSystemRepository();
     itemRepository = testFactory.makeItemRepository();
-    useCase = new UpdateChecklistUseCase(checklistRepository, systemRepository);
+    lawRepository = testFactory.makeLawRepository();
+    deviceRepository = testFactory.makeDeviceRepository();
+    useCase = new UpdateChecklistUseCase(
+      checklistRepository,
+      systemRepository,
+      itemRepository,
+      lawRepository,
+      deviceRepository,
+    );
     mockGenerator = new MockGenerator(
       undefined,
       systemRepository,
       checklistRepository,
       itemRepository,
+      lawRepository,
+      deviceRepository,
     );
 
     vi.useFakeTimers();
@@ -883,6 +949,8 @@ describe("Update Checklist Use Case", () => {
   it("should update checklist", async () => {
     const system1 = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldItem = {
       id: item.id,
@@ -895,6 +963,8 @@ describe("Update Checklist Use Case", () => {
       await mockGenerator.createChecklistMock({
         systemId: system1.id,
         items: [oldItem],
+        laws: [law.id],
+        devices: [device.id],
       }),
     );
 
@@ -914,6 +984,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system2.id,
       tokenUserId: oldChecklist.userId,
       items: [newItem],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     const checklistUpdated = checklistRepository.items.find(
@@ -940,6 +1012,8 @@ describe("Update Checklist Use Case", () => {
     vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const oldItem = {
       id: item.id,
@@ -952,6 +1026,8 @@ describe("Update Checklist Use Case", () => {
       await mockGenerator.createChecklistMock({
         systemId: system.id,
         items: [oldItem],
+        laws: [law.id],
+        devices: [device.id],
       }),
     );
 
@@ -969,6 +1045,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: oldChecklist.userId,
       items: [newItem],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     const checklistUpdated = checklistRepository.items.find(
@@ -996,6 +1074,8 @@ describe("Update Checklist Use Case", () => {
 
     const system1 = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const checklistItem = {
       id: item.id,
@@ -1008,6 +1088,8 @@ describe("Update Checklist Use Case", () => {
       await mockGenerator.createChecklistMock({
         systemId: system1.id,
         items: [checklistItem],
+        laws: [law.id],
+        devices: [device.id],
       }),
     );
 
@@ -1020,6 +1102,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system2.id,
       tokenUserId: oldChecklist.userId,
       items: [checklistItem],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     const checklistUpdated = checklistRepository.items.find(
@@ -1044,6 +1128,8 @@ describe("Update Checklist Use Case", () => {
 
   it("should remove item not present in updated checklist", async () => {
     const system = await mockGenerator.createSystemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
     const item1 = await mockGenerator.createItemMock();
     const item2 = await mockGenerator.createItemMock();
 
@@ -1065,6 +1151,8 @@ describe("Update Checklist Use Case", () => {
       await mockGenerator.createChecklistMock({
         systemId: system.id,
         items: [checklistItem1, checklistItem2],
+        laws: [law.id],
+        devices: [device.id],
       }),
     );
 
@@ -1076,6 +1164,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: oldChecklist.userId,
       items: [checklistItem2],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     const checklistUpdated = checklistRepository.items.find(
@@ -1102,6 +1192,8 @@ describe("Update Checklist Use Case", () => {
 
   it("should add new item to checklist if not previously present", async () => {
     const system = await mockGenerator.createSystemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
     const item1 = await mockGenerator.createItemMock();
     const item2 = await mockGenerator.createItemMock();
     const item3 = await mockGenerator.createItemMock(); // novo item
@@ -1124,6 +1216,8 @@ describe("Update Checklist Use Case", () => {
       await mockGenerator.createChecklistMock({
         systemId: system.id,
         items: [checklistItem1, checklistItem2],
+        laws: [law.id],
+        devices: [device.id],
       }),
     );
 
@@ -1139,6 +1233,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: oldChecklist.userId,
       items: [checklistItem1, checklistItem2, checklistItem3],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     const checklistUpdated = checklistRepository.items.find(
@@ -1155,6 +1251,8 @@ describe("Update Checklist Use Case", () => {
   it("should update fields of existing checklist item", async () => {
     const system = await mockGenerator.createSystemMock();
     const item1 = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const originalItem = {
       id: item1.id,
@@ -1167,6 +1265,8 @@ describe("Update Checklist Use Case", () => {
       await mockGenerator.createChecklistMock({
         systemId: system.id,
         items: [originalItem],
+        laws: [law.id],
+        devices: [device.id],
       }),
     );
 
@@ -1182,6 +1282,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: oldChecklist.userId,
       items: [updatedItem],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     const checklistUpdated = checklistRepository.items.find(
@@ -1201,6 +1303,8 @@ describe("Update Checklist Use Case", () => {
 
   it("should remove one item, add another and update one", async () => {
     const system = await mockGenerator.createSystemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
     const item1 = await mockGenerator.createItemMock(); // será atualizado
     const item2 = await mockGenerator.createItemMock(); // será removido
     const item3 = await mockGenerator.createItemMock(); // será adicionado
@@ -1223,6 +1327,8 @@ describe("Update Checklist Use Case", () => {
       await mockGenerator.createChecklistMock({
         systemId: system.id,
         items: [checklistItem1, checklistItem2],
+        laws: [law.id],
+        devices: [device.id],
       }),
     );
 
@@ -1245,6 +1351,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: oldChecklist.userId,
       items: [updatedItem1, newItem3],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     const checklistUpdated = checklistRepository.items.find(
@@ -1263,6 +1371,8 @@ describe("Update Checklist Use Case", () => {
   it("should not update inexistent checklist", async () => {
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const checklistItem = {
       id: item.id,
@@ -1276,6 +1386,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: 1,
       items: [checklistItem],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -1283,6 +1395,8 @@ describe("Update Checklist Use Case", () => {
 
   it("should not update checklist to system that doesnt exist", async () => {
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const checklist = {
       ...(await mockGenerator.createChecklistMock()),
@@ -1300,6 +1414,8 @@ describe("Update Checklist Use Case", () => {
       systemId: 1,
       tokenUserId: checklist.userId,
       items: [checklistItem],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error });
@@ -1311,6 +1427,8 @@ describe("Update Checklist Use Case", () => {
     };
     const system = await mockGenerator.createSystemMock();
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const checklistItem = {
       id: item.id,
@@ -1324,6 +1442,8 @@ describe("Update Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: checklist.userId + 1,
       items: [checklistItem],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error, noPermission: true });
@@ -1337,6 +1457,8 @@ describe("Update Checklist Use Case", () => {
       userId: checklist.userId + 1,
     });
     const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+    const device = await mockGenerator.createDeviceMock();
 
     const checklistItem = {
       id: item.id,
@@ -1350,9 +1472,187 @@ describe("Update Checklist Use Case", () => {
       systemId: system.id,
       tokenUserId: checklist.userId,
       items: [checklistItem],
+      laws: [law.id],
+      devices: [device.id],
     });
 
     expectPreConditionalError({ error: result.error, noPermission: true });
+  });
+
+  it("should add new law to checklist if not previously present", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const item = await mockGenerator.createItemMock();
+    const device = await mockGenerator.createDeviceMock();
+    const law1 = await mockGenerator.createLawMock();
+    const law2 = await mockGenerator.createLawMock(); // new law
+
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [checklistItem],
+        laws: [law1.id],
+        devices: [device.id],
+      }),
+    );
+
+    const result = await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [checklistItem],
+      laws: [law1.id, law2.id],
+      devices: [device.id],
+    });
+
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
+
+    const updatedLawIds = checklistUpdated?.laws.map((law) => law.id);
+
+    expect(result.error).toBe(null);
+    expect(updatedLawIds).toContain(law1.id);
+    expect(updatedLawIds).toContain(law2.id); // new law was added
+  });
+
+  it("should remove law not present in updated checklist", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const law1 = await mockGenerator.createLawMock();
+    const law2 = await mockGenerator.createLawMock();
+    const item = await mockGenerator.createItemMock();
+    const device = await mockGenerator.createDeviceMock();
+
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [checklistItem],
+        laws: [law1.id, law2.id],
+        devices: [device.id],
+      }),
+    );
+
+    const result = await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [checklistItem],
+      laws: [law1.id], // remove law2
+      devices: [device.id],
+    });
+
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
+
+    const updatedLawIds = checklistUpdated?.laws.map((law) => law.id);
+
+    expect(result.error).toBe(null);
+    expect(updatedLawIds).toContain(law1.id); // law1 is present
+    expect(updatedLawIds).not.toContain(law2.id); // law2 was removed
+  });
+
+  it("should add new device to checklist if not previously present", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const device1 = await mockGenerator.createDeviceMock();
+    const device2 = await mockGenerator.createDeviceMock(); // new device
+    const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [checklistItem],
+        laws: [law.id],
+        devices: [device1.id],
+      }),
+    );
+
+    const result = await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [checklistItem],
+      laws: [law.id],
+      devices: [device1.id, device2.id],
+    });
+
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
+
+    const updatedDeviceIds = checklistUpdated?.devices.map(
+      (device) => device.id,
+    );
+
+    expect(result.error).toBe(null);
+    expect(updatedDeviceIds).toContain(device1.id);
+    expect(updatedDeviceIds).toContain(device2.id); // new device was added
+  });
+
+  it("should remove device not present in updated checklist", async () => {
+    const system = await mockGenerator.createSystemMock();
+    const device1 = await mockGenerator.createDeviceMock();
+    const device2 = await mockGenerator.createDeviceMock();
+    const item = await mockGenerator.createItemMock();
+    const law = await mockGenerator.createLawMock();
+
+    const checklistItem = {
+      id: item.id,
+      answer: "Sim" as AnswerType,
+      severityDegree: undefined as SeverityDegreeType,
+      userComment: undefined as string,
+    };
+
+    const oldChecklist = structuredClone(
+      await mockGenerator.createChecklistMock({
+        systemId: system.id,
+        items: [checklistItem],
+        laws: [law.id],
+        devices: [device1.id, device2.id],
+      }),
+    );
+
+    const result = await useCase.execute({
+      id: oldChecklist.id,
+      systemId: system.id,
+      tokenUserId: oldChecklist.userId,
+      items: [checklistItem],
+      laws: [law.id],
+      devices: [device1.id], // remove device2
+    });
+
+    const checklistUpdated = checklistRepository.items.find(
+      (item) => item.id === oldChecklist.id,
+    );
+
+    const updatedDeviceIds = checklistUpdated?.devices.map(
+      (device) => device.id,
+    );
+
+    expect(result.error).toBe(null);
+    expect(updatedDeviceIds).toContain(device1.id); // device1 is present
+    expect(updatedDeviceIds).not.toContain(device2.id); // device2 was removed
   });
 });
 

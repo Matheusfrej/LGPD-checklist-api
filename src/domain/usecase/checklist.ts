@@ -159,10 +159,16 @@ class UpdateChecklistUseCase {
   constructor(
     checklistRepository: ChecklistRepositoryInterface,
     systemRepository: SystemRepositoryInterface,
+    itemRepository: ItemRepositoryInterface,
+    lawRepository: LawRepositoryInterface,
+    deviceRepository: DeviceRepositoryInterface,
   ) {
     this.validate = new validate.UpdateChecklistUseCaseValidate(
       checklistRepository,
       systemRepository,
+      itemRepository,
+      lawRepository,
+      deviceRepository,
     );
     this.checklistRepository = checklistRepository;
   }
@@ -174,7 +180,16 @@ class UpdateChecklistUseCase {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
-        await this.update(req);
+        // Transação
+        await this.checklistRepository.runInTransaction(async (repo) => {
+          await this.updateItems(req, repo);
+
+          await this.updateLaws(req, repo);
+          await this.updateDevices(req, repo);
+
+          // Atualiza o resto dos campos
+          await repo.updateChecklist(req);
+        });
 
         return {
           error: null,
@@ -193,57 +208,86 @@ class UpdateChecklistUseCase {
     }
   }
 
-  async update(req: ucio.UpdateChecklistUseCaseRequest) {
-    // Transação
-    await this.checklistRepository.runInTransaction(async (repo) => {
-      const currentItems = await repo.getItemsFromChecklist(req.id);
+  async updateItems(
+    req: ucio.UpdateChecklistUseCaseRequest,
+    repo: ChecklistRepositoryInterface,
+  ) {
+    const currentItems = await repo.getItems(req.id);
 
-      const currentIds = currentItems.map((item) => item.item.id);
-      const newItemsIds = req.items.map((item) => item.id);
+    const currentIds = currentItems.map((item) => item.item.id);
+    const newItemsIds = req.items.map((item) => item.id);
 
-      const itemsToDelete = currentIds.filter(
-        (id) => !newItemsIds.includes(id),
+    const itemsToDelete = currentIds.filter((id) => !newItemsIds.includes(id));
+    const itemsToCreate = req.items.filter(
+      (item) => !currentIds.includes(item.id),
+    );
+    const itemsToUpdate = req.items.filter((item) =>
+      currentIds.includes(item.id),
+    );
+
+    if (itemsToDelete.length) await repo.removeItems(req.id, itemsToDelete);
+
+    if (itemsToCreate.length)
+      await repo.insertItems(
+        req.id,
+        itemsToCreate.map(
+          (item) =>
+            new ChecklistItemEntity(
+              null,
+              new ItemEntity(item.id, null, null, null, null, null, null),
+              item.answer,
+              item.severityDegree,
+              item.userComment,
+            ),
+        ),
       );
-      const itemsToCreate = req.items.filter(
-        (item) => !currentIds.includes(item.id),
+
+    for (const item of itemsToUpdate)
+      await repo.updateItem(
+        req.id,
+        new ChecklistItemEntity(
+          null,
+          new ItemEntity(item.id, null, null, null, null, null, null),
+          item.answer,
+          item.severityDegree,
+          item.userComment,
+        ),
       );
-      const itemsToUpdate = req.items.filter((item) =>
-        currentIds.includes(item.id),
-      );
+  }
 
-      if (itemsToDelete.length)
-        await repo.removeItemsFromChecklist(req.id, itemsToDelete);
+  async updateLaws(
+    req: ucio.UpdateChecklistUseCaseRequest,
+    repo: ChecklistRepositoryInterface,
+  ) {
+    const currentItems = await repo.getLaws(req.id);
 
-      if (itemsToCreate.length)
-        await repo.insertItemsFromChecklist(
-          req.id,
-          itemsToCreate.map(
-            (item) =>
-              new ChecklistItemEntity(
-                null,
-                new ItemEntity(item.id, null, null, null, null, null, null),
-                item.answer,
-                item.severityDegree,
-                item.userComment,
-              ),
-          ),
-        );
+    const currentIds = currentItems.map((item) => item.id);
+    const newItemsIds = req.laws;
 
-      for (const item of itemsToUpdate)
-        await repo.updateItemFromChecklist(
-          req.id,
-          new ChecklistItemEntity(
-            null,
-            new ItemEntity(item.id, null, null, null, null, null, null),
-            item.answer,
-            item.severityDegree,
-            item.userComment,
-          ),
-        );
+    const itemsToDelete = currentIds.filter((id) => !newItemsIds.includes(id));
+    const itemsToCreate = req.laws.filter((item) => !currentIds.includes(item));
 
-      // Atualiza o resto dos campos
-      await repo.updateChecklist(req);
-    });
+    if (itemsToDelete.length) await repo.removeLaws(req.id, itemsToDelete);
+
+    if (itemsToCreate.length) await repo.insertLaws(req.id, itemsToCreate);
+  }
+
+  async updateDevices(
+    req: ucio.UpdateChecklistUseCaseRequest,
+    repo: ChecklistRepositoryInterface,
+  ) {
+    const currentItems = await repo.getDevices(req.id);
+
+    const currentIds = currentItems.map((item) => item.id);
+    const newItemsIds = req.devices;
+
+    const itemsToDelete = currentIds.filter((id) => !newItemsIds.includes(id));
+    const itemsToCreate = req.devices.filter(
+      (item) => !currentIds.includes(item),
+    );
+    if (itemsToDelete.length) await repo.removeDevices(req.id, itemsToDelete);
+
+    if (itemsToCreate.length) await repo.insertDevices(req.id, itemsToCreate);
   }
 }
 

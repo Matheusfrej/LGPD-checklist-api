@@ -223,7 +223,7 @@ class ChecklistPrismaRepository
     );
   }
 
-  async getItemsFromChecklist(id: number): Promise<ChecklistItemEntity[]> {
+  async getItems(id: number): Promise<ChecklistItemEntity[]> {
     const items = await this.prisma.checklistItems.findMany({
       where: {
         checklistId: id,
@@ -252,10 +252,7 @@ class ChecklistPrismaRepository
     });
   }
 
-  async insertItemsFromChecklist(
-    id: number,
-    items: ChecklistItemEntity[],
-  ): Promise<void> {
+  async insertItems(id: number, items: ChecklistItemEntity[]): Promise<void> {
     await this.prisma.checklists.update({
       where: { id },
       data: {
@@ -275,10 +272,7 @@ class ChecklistPrismaRepository
     });
   }
 
-  async removeItemsFromChecklist(
-    id: number,
-    itemsIds: number[],
-  ): Promise<void> {
+  async removeItems(id: number, itemsIds: number[]): Promise<void> {
     await this.prisma.checklistItems.deleteMany({
       where: {
         AND: {
@@ -291,16 +285,85 @@ class ChecklistPrismaRepository
     });
   }
 
-  async updateItemFromChecklist(
-    id: number,
-    item: ChecklistItemEntity,
-  ): Promise<void> {
+  async updateItem(id: number, item: ChecklistItemEntity): Promise<void> {
     await this.prisma.checklistItems.update({
       where: { checklistId_itemId: { checklistId: id, itemId: item.item.id } },
       data: {
         answer: item.answer,
         severityDegree: item.severityDegree,
         userComment: item.userComment,
+      },
+    });
+  }
+
+  async getLaws(id: number): Promise<LawEntity[]> {
+    const laws = await this.prisma.laws.findMany({
+      where: {
+        checklists: {
+          some: {
+            id,
+          },
+        },
+      },
+    });
+
+    return laws.map((law) => new LawEntity(law.id, law.name));
+  }
+
+  async insertLaws(id: number, lawsIds: number[]): Promise<void> {
+    await this.prisma.checklists.update({
+      where: { id },
+      data: {
+        laws: {
+          connect: lawsIds.map((lawId) => ({ id: lawId })),
+        },
+      },
+    });
+  }
+
+  async removeLaws(id: number, lawsIds: number[]): Promise<void> {
+    await this.prisma.checklists.update({
+      where: { id },
+      data: {
+        laws: {
+          disconnect: lawsIds.map((lawId) => ({ id: lawId })),
+        },
+      },
+    });
+  }
+
+  async getDevices(id: number): Promise<DeviceEntity[]> {
+    const devices = await this.prisma.devices.findMany({
+      where: {
+        checklists: {
+          some: {
+            id,
+          },
+        },
+      },
+    });
+
+    return devices.map((device) => new DeviceEntity(device.id, device.name));
+  }
+
+  async insertDevices(id: number, devicesIds: number[]): Promise<void> {
+    await this.prisma.checklists.update({
+      where: { id },
+      data: {
+        devices: {
+          connect: devicesIds.map((deviceId) => ({ id: deviceId })),
+        },
+      },
+    });
+  }
+
+  async removeDevices(id: number, devicesIds: number[]): Promise<void> {
+    await this.prisma.checklists.update({
+      where: { id },
+      data: {
+        devices: {
+          disconnect: devicesIds.map((deviceId) => ({ id: deviceId })),
+        },
       },
     });
   }

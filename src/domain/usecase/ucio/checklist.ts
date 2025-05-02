@@ -41,6 +41,8 @@ export type UpdateChecklistUseCaseRequest = UserAuthenticated & {
   id: number;
   systemId: number;
   items: ItemsInput;
+  laws: LawEntity["id"][];
+  devices: DeviceEntity["id"][];
 };
 
 export type UpdateChecklistUseCaseResponse = BaseResponse;

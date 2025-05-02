@@ -91,14 +91,20 @@ class DeleteChecklistController extends Controller {
 class UpdateChecklistController extends Controller {
   async execute(req: Request, res: Response) {
     const { id } = req.params;
-    const { tokenUserId, systemId, items } = req.body;
+    const { tokenUserId, systemId, items, laws, devices } = req.body;
 
     const checklistRepository = this.factory.makeChecklistRepository();
     const systemRepository = this.factory.makeSystemRepository();
+    const itemRepository = this.factory.makeItemRepository();
+    const lawRepository = this.factory.makeLawRepository();
+    const deviceRepository = this.factory.makeDeviceRepository();
 
     const usecase = new useCase.UpdateChecklistUseCase(
       checklistRepository,
       systemRepository,
+      itemRepository,
+      lawRepository,
+      deviceRepository,
     );
 
     const ucRes = await usecase.execute({
@@ -106,6 +112,8 @@ class UpdateChecklistController extends Controller {
       tokenUserId,
       systemId,
       items,
+      laws,
+      devices,
     });
 
     if (!ucRes.error) {

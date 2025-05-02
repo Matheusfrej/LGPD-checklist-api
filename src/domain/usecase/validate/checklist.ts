@@ -185,19 +185,35 @@ class DeleteChecklistUseCaseValidate implements ValidateInterface {
 class UpdateChecklistUseCaseValidate implements ValidateInterface {
   private checklistRepository: ChecklistRepositoryInterface;
   private systemRepository: SystemRepositoryInterface;
+  private itemRepository: ItemRepositoryInterface;
+  private lawRepository: LawRepositoryInterface;
+  private deviceRepository: DeviceRepositoryInterface;
+
   private validationSchema = z.object({
     id: zodNumberSchema("Id"),
     systemId: zodNumberSchema("SystemId"),
     tokenUserId: zodNumberSchema("Id do token"),
     items: itemsZodValidation,
+    laws: zodNumberSchema("laws").array().nonempty({
+      message: "Laws não pode ser um array vazio.",
+    }),
+    devices: zodNumberSchema("devices").array().nonempty({
+      message: "Devices não pode ser um array vazio.",
+    }),
   });
 
   constructor(
     checklistRepository: ChecklistRepositoryInterface,
     systemRepository: SystemRepositoryInterface,
+    itemRepository: ItemRepositoryInterface,
+    lawRepository: LawRepositoryInterface,
+    deviceRepository: DeviceRepositoryInterface,
   ) {
     this.checklistRepository = checklistRepository;
     this.systemRepository = systemRepository;
+    this.itemRepository = itemRepository;
+    this.lawRepository = lawRepository;
+    this.deviceRepository = deviceRepository;
   }
 
   async validate(req: UpdateChecklistUseCaseRequest): Promise<string | null> {
@@ -215,6 +231,26 @@ class UpdateChecklistUseCaseValidate implements ValidateInterface {
         if (!system) {
           return "O sistema não foi encontrado.";
         }
+
+        const items = await this.itemRepository.itemsExistByIds(
+          req.items.map((i) => i.id),
+        );
+
+        if (items.length)
+          return "Os seguintes ids de item não existem: " + items.join(", ");
+
+        const laws = await this.lawRepository.existByIds(req.laws);
+
+        if (laws.length)
+          return "Os seguintes ids de leis não existem: " + laws.join(", ");
+
+        const devices = await this.deviceRepository.existByIds(req.devices);
+
+        if (devices.length)
+          return (
+            "Os seguintes ids de dispositivos não existem: " +
+            devices.join(", ")
+          );
 
         if (
           checklist.userId !== req.tokenUserId ||
