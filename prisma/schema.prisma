@@ -48,26 +48,30 @@ model Checklists {
   user            Users            @relation(fields: [userId], references: [id], onDelete: Cascade)
   system          Systems          @relation(fields: [systemId], references: [id], onDelete: Cascade)
   ItemsChecklists ChecklistItems[]
+  laws            Laws[]           @relation("checklist_laws")
+  devices         Devices[]        @relation("checklist_devices")
 
   @@map("checklists")
 }
 
 model Laws {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-  items     Items[]  @relation("item_laws")
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(255)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at")
+  items      Items[]      @relation("item_laws")
+  checklists Checklists[] @relation("checklist_laws")
 
   @@map("laws")
 }
 
 model Devices {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-  items     Items[]  @relation("item_devices")
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(255)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at")
+  items      Items[]      @relation("item_devices")
+  checklists Checklists[] @relation("checklist_devices")
 
   @@map("devices")
 }
