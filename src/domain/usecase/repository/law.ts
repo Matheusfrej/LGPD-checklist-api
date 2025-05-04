@@ -6,4 +6,5 @@ export interface LawRepositoryInterface {
 
   create(req: CreateLawUseCaseRequest): Promise<LawEntity>;
   existByIds(ids: number[]): Promise<number[]>;
+  list(): Promise<LawEntity[]>;
 }

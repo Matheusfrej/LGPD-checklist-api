@@ -25,4 +25,10 @@ export class LawPrismaRepository
 
     return ids.filter((id) => !items.find((item) => item.id === id));
   }
+
+  async list(): Promise<LawEntity[]> {
+    const laws = await this.prisma.laws.findMany({});
+
+    return laws.map((law) => new LawEntity(law.id, law.name));
+  }
 }

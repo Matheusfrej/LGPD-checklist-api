@@ -4,6 +4,7 @@ import { UserRouter } from "./user";
 import { SystemRouter } from "./system";
 import { ChecklistRouter } from "./checklist";
 import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
+import { LawRouter } from "./law";
 
 class Router {
   constructor(app: express.Router, factory: RepositoryFactory) {
@@ -11,6 +12,7 @@ class Router {
     app.use(new UserRouter(factory).getRouter());
     app.use(new SystemRouter(factory).getRouter());
     app.use(new ChecklistRouter(factory).getRouter());
+    app.use(new LawRouter(factory).getRouter());
   }
 }
 
