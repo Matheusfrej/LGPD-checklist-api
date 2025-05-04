@@ -1,6 +1,5 @@
 import * as z from "zod";
 import { DEFAULT_VALIDATION_MESSAGE } from "../../../entity/error";
-import { Json } from "../../../@types";
 
 const requiredErrorMessage = (fieldName: string) =>
   `${fieldName} não pode ser vazio.`;
@@ -96,25 +95,4 @@ const validateWithZod = async (
   }
 };
 
-const isNonEmptyJson = (val: unknown): val is Json => {
-  try {
-    const parsed = JSON.parse(JSON.stringify(val));
-    return (
-      typeof parsed === "object" &&
-      parsed !== null &&
-      (Array.isArray(parsed)
-        ? parsed.length > 0
-        : Object.keys(parsed).length > 0)
-    );
-  } catch (e) {
-    return false;
-  }
-};
-
-export {
-  zodStringSchema,
-  zodNumberSchema,
-  zodBooleanSchema,
-  validateWithZod,
-  isNonEmptyJson,
-};
+export { zodStringSchema, zodNumberSchema, zodBooleanSchema, validateWithZod };
