@@ -1,7 +1,7 @@
 import "dotenv/config";
 import "module-alias/register";
 import { CmdRest } from "./delivery/api/rest/cmd/server";
-import { PrismaRepositoryFactory } from "./domain/factory/prismaRepositoryFactory";
+import { PrismaRepositoryFactory } from "./infrastructure/provider/repository/prisma/prismaRepositoryFactory";
 import { RepositoryFactory } from "./domain/factory/repositoryFactory";
 import { PrismaClient } from "@prisma/client";
 

@@ -5,7 +5,6 @@ import {
   SuccessResponse,
 } from "../response/response";
 import { NextFunction, Request, Response } from "express";
-import { AuthJWTRepository } from "../../../../infrastructure/provider/repository/auth";
 import { Controller } from "./controller";
 import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
 
@@ -75,7 +74,7 @@ class VerifyTokenController extends Controller {
     };
 
     const userRepository = this.factory.makeUserRepository();
-    const authRepository = new AuthJWTRepository();
+    const authRepository = this.factory.makeAuthRepository();
     const usecase = new useCase.VerifyTokenUseCase(
       userRepository,
       authRepository,
