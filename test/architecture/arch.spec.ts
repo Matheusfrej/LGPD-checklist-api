@@ -15,19 +15,22 @@ const readImports = (file: string): string[] => {
   return imports;
 };
 
+const mapFolderName = (folders: string[]): string[] =>
+  folders
+    .map((folder) => [`../${folder}`, `src/${folder}`, `@/${folder}`]) // vira um array com arrays
+    .flat(); // transforma em um único array com strings
+
 const hasForbiddenImport = (
   imp: string,
   forbiddenSegments: string[],
-): boolean => {
-  return forbiddenSegments.some((segment) => imp.includes(segment)); // Check if the import path contains the forbidden segment
-};
+): boolean => forbiddenSegments.some((segment) => imp.includes(segment)); // Check if the import path contains the forbidden segment
 
 describe("Architecture Rules", () => {
   it("delivery must NOT import from infrastructure", async () => {
     const files = await fg("**/delivery/**/*.ts", { absolute: true });
 
     const folder = "infrastructure";
-    const forbidden = ["../" + folder, "src/" + folder, "@/" + folder];
+    const forbidden = mapFolderName([folder]);
 
     const violations: string[] = [];
 
@@ -52,7 +55,7 @@ describe("Architecture Rules", () => {
     const files = await fg("**/infrastructure/**/*.ts", { absolute: true });
 
     const folder = "delivery";
-    const forbidden = ["../" + folder, "src/" + folder, "@/" + folder];
+    const forbidden = mapFolderName([folder]);
 
     const violations: string[] = [];
 
@@ -79,9 +82,8 @@ describe("Architecture Rules", () => {
     const violations: string[] = [];
 
     const folders = ["delivery", "infrastructure"];
-    const forbidden = folders
-      .map((folder) => [`../${folder}`, `src/${folder}`, `@/${folder}`]) // vira um array com arrays
-      .flat(); // transforma em um único array com strings
+    const forbidden = mapFolderName(folders);
+
     for (const file of files) {
       const imports = readImports(file);
       for (const imp of imports) {
