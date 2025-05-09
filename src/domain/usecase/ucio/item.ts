@@ -1,5 +1,4 @@
 export type CreateItemUseCaseRequest = {
-  id: number;
   code: string;
   itemDesc: string;
   recommendations: string;

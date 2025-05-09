@@ -110,7 +110,6 @@ class MockGenerator {
   }
 
   async createItemMock({
-    id = 1,
     code = "I-01",
     itemDesc = "itemDesc",
     recommendations = "recommendations",
@@ -120,7 +119,6 @@ class MockGenerator {
   } = {}) {
     if (this.itemRepository) {
       return await this.itemRepository.createItem({
-        id,
         code,
         itemDesc,
         recommendations,
@@ -132,20 +130,18 @@ class MockGenerator {
     throw new NoRepositoryError(Repositories.Item);
   }
 
-  async createLawMock({ id = 1, name = "LGPD" } = {}) {
+  async createLawMock({ name = "LGPD" } = {}) {
     if (this.lawRepository) {
       return await this.lawRepository.create({
-        id,
         name,
       });
     }
     throw new NoRepositoryError(Repositories.Law);
   }
 
-  async createDeviceMock({ id = 1, name = "Sensor IoT" } = {}) {
+  async createDeviceMock({ name = "Sensor IoT" } = {}) {
     if (this.deviceRepository) {
       return await this.deviceRepository.create({
-        id,
         name,
       });
     }
