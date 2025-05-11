@@ -85,6 +85,14 @@ O npm já vem por padrão na instalação do Node.
 
 **Configurando o Banco no PGAdmin:** Após fazer login, será necessário adicionar um novo servidor no PGAdmin. No campo "Connection" da nova configuração de servidor, no campo Host name/address, insira o nome do serviço do PostgreSQL definido no docker-compose.yml, que neste caso é db. Use as demais informações de conexão (usuário, senha, etc.) conforme descritas no arquivo .env.
 
+## Estrutura do Projeto
+
+O projeto segue uma arquitetura limpa (Clean Architecture), dividindo responsabilidades em camadas bem definidas:
+
+- **Domain**: Contém as regras de negócio, entidades principais e casos de uso.
+- **Delivery**: Responsável pela interface com o mundo externo (ex.: APIs REST).
+- **Infrastructure**: Contém implementações específicas de banco de dados, serviços externos, etc.
+
 ## Testes automatizados
 
 A aplicação possui testes automatizados de unidade, integração e arquitetura para garantir maior segurança no código e adequação aos requisitos.
@@ -139,3 +147,13 @@ Para rodar todos os testes (unitários, de integração e de arquitetura), execu
 ```sh
 npm run test:all
 ```
+
+## Contribuindo
+
+Contribuições são bem-vindas! Siga os passos abaixo para contribuir:
+
+1. Crie uma issue ou escolha uma issue existente do projeto.
+1. Crie uma branch para sua feature ou correção de bug, baseado na issue.
+2. Faça commit das suas alterações.
+3. Envie para o repositório remoto.
+4. Abra um Pull Request.
