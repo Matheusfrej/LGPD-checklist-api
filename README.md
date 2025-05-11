@@ -156,4 +156,4 @@ Contribuições são bem-vindas! Siga os passos abaixo para contribuir:
 1. Crie uma branch para sua feature ou correção de bug, baseado na issue.
 2. Faça commit das suas alterações.
 3. Envie para o repositório remoto.
-4. Abra um Pull Request.
+4. Abra um Pull Request para branch "dev".
