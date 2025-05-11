@@ -25,6 +25,7 @@
     "test:e2e": "set NODE_ENV=test&& vitest run --dir src/delivery ",
     "test:e2e:watch": "set NODE_ENV=test&& vitest --dir src/delivery",
     "test:arch": "vitest run --dir test/architecture",
+    "test:arch:watch": "vitest --dir test/architecture",
     "test:coverage": "vitest --coverage",
     "test:ui": "vitest --ui",
     "test:all": "run-s test test:e2e test:arch",

@@ -87,7 +87,9 @@ O npm já vem por padrão na instalação do Node.
 
 ## Testes automatizados
 
-A aplicação possui testes automatizados de unidade e de integração para ter uma maior segurança no código e adequação aos requisitos.
+A aplicação possui testes automatizados de unidade, integração e arquitetura para garantir maior segurança no código e adequação aos requisitos.
+
+### Testes de unidade
 
 Para executar os testes de unidade, rode:
 ```sh
@@ -102,6 +104,7 @@ npm run test:watch
 
 Assim, sempre que houver uma atualização no código, os testes de unidade vão ser rodados novamente de forma automática.
 
+### Testes de integração (e2e)
 
 Se quiser rodar os testes integrados (e2e), pode rodar:
 
@@ -115,7 +118,23 @@ Da mesma forma, para rodar eles de forma automática sempre que houver alteraç�
 npm run test:e2e:watch
 ```
 
-Pra finalizar, se quiser rodar todos os testes (unitários e de integração), rode:
+### Testes de arquitetura
+
+Os testes de arquitetura verificam se o código segue os padrões e boas práticas definidos para o projeto. Para rodar esses testes, execute:
+
+```sh
+npm run test:arch
+```
+
+Se quiser rodar os testes de arquitetura de forma contínua enquanto desenvolve, use:
+
+```sh
+npm run test:arch:watch
+```
+
+### Rodando todos os testes
+
+Para rodar todos os testes (unitários, de integração e de arquitetura), execute:
 
 ```sh
 npm run test:all
