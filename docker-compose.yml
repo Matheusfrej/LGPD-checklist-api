@@ -10,6 +10,18 @@ services:
       - postgres-data:/var/lib/postgresql/data
     restart: always
 
+  pgadmin:
+    image: 'docker.io/dpage/pgadmin4:latest'
+    mem_limit: 512m
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - 7070:80
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin/
+
   app:
     build: .
     command: sh -c "npx prisma migrate deploy && npm run start"
@@ -23,4 +35,6 @@ services:
 
 volumes:
   postgres-data:
+    driver: local
+  pgadmin-data:
     driver: local
