@@ -6,4 +6,5 @@ export interface DeviceRepositoryInterface {
 
   create(req: CreateDeviceUseCaseRequest): Promise<DeviceEntity>;
   existByIds(ids: number[]): Promise<number[]>;
+  list(): Promise<DeviceEntity[]>;
 }

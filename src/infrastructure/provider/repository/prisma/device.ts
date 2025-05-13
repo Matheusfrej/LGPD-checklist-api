@@ -25,4 +25,9 @@ export class DevicePrismaRepository
 
     return ids.filter((id) => !items.find((item) => item.id === id));
   }
+
+  async list(): Promise<DeviceEntity[]> {
+    const devices = await this.prisma.devices.findMany({});
+    return devices.map((Device) => new DeviceEntity(Device.id, Device.name));
+  }
 }

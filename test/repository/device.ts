@@ -20,4 +20,8 @@ export class DeviceInMemoryRepository implements DeviceRepositoryInterface {
   async existByIds(ids: number[]): Promise<number[]> {
     return ids.filter((id) => !this.items.find((item) => item.id === id));
   }
+
+  async list(): Promise<DeviceEntity[]> {
+    return this.items;
+  }
 }
