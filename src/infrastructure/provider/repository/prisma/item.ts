@@ -1,6 +1,9 @@
 import { ItemRepositoryInterface } from "../../../../domain/usecase/repository/item";
 import { ItemEntity } from "../../../../domain/entity/item";
-import { CreateItemUseCaseRequest } from "../../../../domain/usecase/ucio/item";
+import {
+  CreateItemUseCaseRequest,
+  ListItemsUseCaseRequest,
+} from "../../../../domain/usecase/ucio/item";
 import { PrismaRepository } from "./repository";
 import { Prisma } from "@prisma/client";
 
@@ -24,6 +27,51 @@ class ItemPrismaRepository
     });
 
     return ids.filter((id) => !items.find((item) => item.id === id));
+  }
+
+  async list(req: ListItemsUseCaseRequest): Promise<ItemEntity[]> {
+    const items = await this.prisma.items.findMany({
+      where: {
+        laws: {
+          some: {
+            id: { in: req.laws },
+          },
+        },
+        ...(req.devices?.length
+          ? {
+              OR: [
+                {
+                  devices: {
+                    some: {
+                      id: { in: req.devices },
+                    },
+                  },
+                },
+                {
+                  devices: {
+                    none: {}, // também aceita quem não tem nenhum device
+                  },
+                },
+              ],
+            }
+          : {
+              devices: {
+                none: {}, // se não passou nada, só traz quem não tem device
+              },
+            }),
+      },
+    });
+
+    return items.map(
+      (item) =>
+        new ItemEntity(
+          item.id,
+          item.code,
+          item.itemDesc,
+          item.recommendations,
+          item.isMandatory,
+        ),
+    );
   }
 }
 

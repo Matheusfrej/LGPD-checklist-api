@@ -22,7 +22,6 @@ describe("List Laws Use Case", () => {
 
     const law1 = await mockGenerator.createLawMock();
     const law2 = await mockGenerator.createLawMock({
-      id: law1.id + 1,
       name: "GDPR",
     });
 

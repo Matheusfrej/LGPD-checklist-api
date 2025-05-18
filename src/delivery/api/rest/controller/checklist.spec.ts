@@ -4,70 +4,17 @@ import { restApp } from "../../../../main";
 import { createUserAndSystem } from "../../../../../test/utils/createUserAndSystem";
 import { PrismaClient } from "@prisma/client";
 import { createChecklist } from "../../../../../test/utils/createChecklist";
-import { CreateItemUseCaseRequest } from "../../../../domain/usecase/ucio/item";
-import { CreateDeviceUseCaseRequest } from "../../../../domain/usecase/ucio/device";
-import { CreateLawUseCaseRequest } from "../../../../domain/usecase/ucio/law";
+import { createLaw } from "../../../../../test/utils/createLaw";
+import { createDevice } from "../../../../../test/utils/createDevice";
+import { createItem } from "../../../../../test/utils/createItem";
 
 const prisma = new PrismaClient();
-
-const createLaw = async (
-  prisma: PrismaClient,
-  req: CreateLawUseCaseRequest = {
-    name: "LGPD",
-  },
-) => {
-  return await prisma.laws.create({
-    data: {
-      name: req.name,
-    },
-  });
-};
-
-const createDevice = async (
-  prisma: PrismaClient,
-  req: CreateDeviceUseCaseRequest = {
-    name: "Sensor IoT",
-  },
-) => {
-  return await prisma.devices.create({
-    data: {
-      name: req.name,
-    },
-  });
-};
-
-const createItem = async (
-  prisma: PrismaClient,
-  req: CreateItemUseCaseRequest = {
-    code: "I-01",
-    itemDesc: "itemDesc",
-    recommendations: "recommendations",
-    isMandatory: true,
-    lawsIds: [1],
-    devicesIds: [1],
-  },
-) => {
-  return await prisma.items.create({
-    data: {
-      code: req.code,
-      itemDesc: req.itemDesc,
-      recommendations: req.recommendations,
-      isMandatory: req.isMandatory,
-      laws: {
-        connect: req.lawsIds.map((id) => ({ id })),
-      },
-      devices: {
-        connect: req.devicesIds.map((id) => ({ id })),
-      },
-    },
-  });
-};
 
 describe("Create Checklist (e2e)", () => {
   it("should create checklist", async () => {
     const { user, token, system } = await createUserAndSystem(restApp);
 
-    // só pode criar uma vez, nos outros testes já vai ter criado no banco
+    // só pode criar uma vez, nos outros testes dessa suite já vai ter criado no banco
     const law = await createLaw(prisma);
     await createDevice(prisma);
     const item = await createItem(prisma);

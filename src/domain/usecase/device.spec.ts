@@ -29,7 +29,6 @@ describe("List Devices Use Case", () => {
 
     const device1 = await mockGenerator.createDeviceMock();
     const device2 = await mockGenerator.createDeviceMock({
-      id: device1.id + 1,
       name: "Sensor IoT LORA",
     });
 
