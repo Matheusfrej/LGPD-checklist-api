@@ -17,6 +17,7 @@ import { LawEntity } from "../../../../domain/entity/law";
 import { DeviceEntity } from "../../../../domain/entity/device";
 import { PrismaRepository } from "./repository";
 import { Prisma } from "@prisma/client";
+import { SectionEntity } from "../../../../domain/entity/section";
 
 class ChecklistPrismaRepository
   extends PrismaRepository
@@ -57,7 +58,11 @@ class ChecklistPrismaRepository
       include: {
         ItemsChecklists: {
           include: {
-            item: true,
+            item: {
+              include: {
+                section: true,
+              },
+            },
           },
         },
         laws: true,
@@ -79,6 +84,11 @@ class ChecklistPrismaRepository
               itemChecklist.item.itemDesc,
               itemChecklist.item.recommendations,
               itemChecklist.item.isMandatory,
+              itemChecklist.item.sectionId,
+              new SectionEntity(
+                itemChecklist.item.section.id,
+                itemChecklist.item.section.name,
+              ),
             ),
             itemChecklist.answer as AnswerType,
             itemChecklist.severityDegree as SeverityDegreeType,
@@ -104,6 +114,7 @@ class ChecklistPrismaRepository
               include: {
                 devices: true,
                 laws: true,
+                section: true,
               },
             },
           },
@@ -128,6 +139,11 @@ class ChecklistPrismaRepository
                   itemChecklist.item.itemDesc,
                   itemChecklist.item.recommendations,
                   itemChecklist.item.isMandatory,
+                  itemChecklist.item.sectionId,
+                  new SectionEntity(
+                    itemChecklist.item.section.id,
+                    itemChecklist.item.section.name,
+                  ),
                   itemChecklist.item.laws.map(
                     (law) => new LawEntity(law.id, law.name),
                   ),
@@ -229,7 +245,11 @@ class ChecklistPrismaRepository
         checklistId: id,
       },
       include: {
-        item: true,
+        item: {
+          include: {
+            section: true,
+          },
+        },
       },
     });
 
@@ -242,6 +262,8 @@ class ChecklistPrismaRepository
           item.item.itemDesc,
           item.item.recommendations,
           item.item.isMandatory,
+          item.item.sectionId,
+          new SectionEntity(item.item.section.id, item.item.section.name),
           null,
           null,
         ),

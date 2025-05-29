@@ -8,6 +8,7 @@ export const createItem = async (
     itemDesc: "itemDesc",
     recommendations: "recommendations",
     isMandatory: true,
+    sectionId: 1,
     lawsIds: [1],
     devicesIds: [1],
   },
@@ -18,6 +19,7 @@ export const createItem = async (
       itemDesc: req.itemDesc,
       recommendations: req.recommendations,
       isMandatory: req.isMandatory,
+      sectionId: req.sectionId,
       laws: {
         connect: req.lawsIds.map((id) => ({ id })),
       },

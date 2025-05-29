@@ -12,7 +12,9 @@ import { ItemRepositoryInterface } from "../../src/domain/usecase/repository/ite
 import { LawRepositoryInterface } from "../../src/domain/usecase/repository/law";
 import { SystemRepositoryInterface } from "../../src/domain/usecase/repository/system";
 import { UserRepositoryInterface } from "../../src/domain/usecase/repository/user";
+import { SectionRepositoryInterface } from "../../src/domain/usecase/repository/section";
 import { RepositoryFactory } from "../../src/domain/factory/repositoryFactory";
+import { SectionInMemoryRepository } from "./section";
 
 export class InMemoryRepositoryFactory implements RepositoryFactory {
   makeUserRepository(): UserRepositoryInterface {
@@ -37,6 +39,10 @@ export class InMemoryRepositoryFactory implements RepositoryFactory {
 
   makeDeviceRepository(): DeviceRepositoryInterface {
     return new DeviceInMemoryRepository();
+  }
+
+  makeSectionRepository(): SectionRepositoryInterface {
+    return new SectionInMemoryRepository();
   }
 
   makeAuthRepository(): AuthRepositoryInterface {

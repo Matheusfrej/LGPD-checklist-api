@@ -87,6 +87,8 @@ model Items {
   laws            Laws[]           @relation("item_laws")
   devices         Devices[]        @relation("item_devices")
   ItemsChecklists ChecklistItems[]
+  sectionId       Int
+  section         Sections         @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
   @@map("items")
 }
@@ -103,4 +105,14 @@ model ChecklistItems {
 
   @@id([checklistId, itemId])
   @@map("checklist_items")
+}
+
+model Sections {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  Items     Items[]
+
+  @@map("sections")
 }

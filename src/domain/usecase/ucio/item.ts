@@ -8,6 +8,7 @@ export type CreateItemUseCaseRequest = {
   itemDesc: string;
   recommendations: string;
   isMandatory: boolean;
+  sectionId: number;
   lawsIds: number[];
   devicesIds: number[];
 };

@@ -5,11 +5,13 @@ import { testFactory } from "../../../test/factory";
 import { LawRepositoryInterface } from "./repository/law";
 import { DeviceRepositoryInterface } from "./repository/device";
 import { ItemRepositoryInterface } from "./repository/item";
+import { SectionRepositoryInterface } from "./repository/section";
 import { ListItemsUseCase } from "./item";
 
 let itemRepository: ItemRepositoryInterface;
 let lawRepository: LawRepositoryInterface;
 let deviceRepository: DeviceRepositoryInterface;
+let sectionRepository: SectionRepositoryInterface;
 let mockGenerator: MockGenerator;
 
 describe("List Items Use Case", () => {
@@ -19,6 +21,7 @@ describe("List Items Use Case", () => {
     itemRepository = testFactory.makeItemRepository();
     lawRepository = testFactory.makeLawRepository();
     deviceRepository = testFactory.makeDeviceRepository();
+    sectionRepository = testFactory.makeSectionRepository();
     useCase = new ListItemsUseCase(
       itemRepository,
       lawRepository,
@@ -31,6 +34,7 @@ describe("List Items Use Case", () => {
       itemRepository,
       lawRepository,
       deviceRepository,
+      sectionRepository,
     );
   });
 
@@ -38,12 +42,14 @@ describe("List Items Use Case", () => {
     const oldSize = itemRepository.items.length;
 
     const law = await mockGenerator.createLawMock();
+    const section = await mockGenerator.createSectionMock();
 
     const item1 = await mockGenerator.createItemMock({
       code: "I-01",
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law.id],
       devicesIds: [],
     });
@@ -52,6 +58,7 @@ describe("List Items Use Case", () => {
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law.id],
       devicesIds: [],
     });
@@ -85,12 +92,14 @@ describe("List Items Use Case", () => {
 
     const law1 = await mockGenerator.createLawMock();
     const law2 = await mockGenerator.createLawMock();
+    const section = await mockGenerator.createSectionMock();
 
     const item1 = await mockGenerator.createItemMock({
       code: "I-01",
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law1.id],
       devicesIds: [],
     });
@@ -99,6 +108,7 @@ describe("List Items Use Case", () => {
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law1.id, law2.id],
       devicesIds: [],
     });
@@ -119,12 +129,14 @@ describe("List Items Use Case", () => {
 
     const law1 = await mockGenerator.createLawMock();
     const law2 = await mockGenerator.createLawMock();
+    const section = await mockGenerator.createSectionMock();
 
     const item1 = await mockGenerator.createItemMock({
       code: "I-01",
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law1.id],
       devicesIds: [],
     });
@@ -133,6 +145,7 @@ describe("List Items Use Case", () => {
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law2.id],
       devicesIds: [],
     });
@@ -151,6 +164,7 @@ describe("List Items Use Case", () => {
   it("should not list items when requested laws array is empty", async () => {
     const law1 = await mockGenerator.createLawMock();
     const law2 = await mockGenerator.createLawMock();
+    const section = await mockGenerator.createSectionMock();
 
     await mockGenerator.createItemMock({
       code: "I-01",
@@ -158,6 +172,7 @@ describe("List Items Use Case", () => {
       recommendations: "recommendations",
       isMandatory: true,
       lawsIds: [law1.id],
+      sectionId: section.id,
       devicesIds: [],
     });
     await mockGenerator.createItemMock({
@@ -166,6 +181,7 @@ describe("List Items Use Case", () => {
       recommendations: "recommendations",
       isMandatory: true,
       lawsIds: [law2.id],
+      sectionId: section.id,
       devicesIds: [],
     });
 
@@ -187,11 +203,14 @@ describe("List Items Use Case", () => {
     const device1 = await mockGenerator.createDeviceMock();
     const device2 = await mockGenerator.createDeviceMock();
 
+    const section = await mockGenerator.createSectionMock();
+
     const item1 = await mockGenerator.createItemMock({
       code: "I-01",
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law1.id],
       devicesIds: [device1.id],
     });
@@ -200,6 +219,7 @@ describe("List Items Use Case", () => {
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law2.id],
       devicesIds: [device1.id, device2.id],
     });
@@ -224,11 +244,14 @@ describe("List Items Use Case", () => {
     const device1 = await mockGenerator.createDeviceMock();
     const device2 = await mockGenerator.createDeviceMock();
 
+    const section = await mockGenerator.createSectionMock();
+
     const item1 = await mockGenerator.createItemMock({
       code: "I-01",
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law1.id],
       devicesIds: [device1.id],
     });
@@ -237,6 +260,7 @@ describe("List Items Use Case", () => {
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law2.id],
       devicesIds: [device2.id],
     });
@@ -262,11 +286,14 @@ describe("List Items Use Case", () => {
     const device1 = await mockGenerator.createDeviceMock();
     const device2 = await mockGenerator.createDeviceMock();
 
+    const section = await mockGenerator.createSectionMock();
+
     const item1 = await mockGenerator.createItemMock({
       code: "I-01",
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law1.id],
       devicesIds: [device1.id],
     });
@@ -275,6 +302,7 @@ describe("List Items Use Case", () => {
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law2.id],
       devicesIds: [device2.id],
     });
@@ -299,11 +327,14 @@ describe("List Items Use Case", () => {
     const device1 = await mockGenerator.createDeviceMock();
     const device2 = await mockGenerator.createDeviceMock();
 
+    const section = await mockGenerator.createSectionMock();
+
     const item1 = await mockGenerator.createItemMock({
       code: "I-01",
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law1.id],
       devicesIds: [device1.id],
     });
@@ -312,6 +343,7 @@ describe("List Items Use Case", () => {
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law2.id],
       devicesIds: [device2.id],
     });
@@ -336,11 +368,14 @@ describe("List Items Use Case", () => {
     const device1 = await mockGenerator.createDeviceMock();
     const device2 = await mockGenerator.createDeviceMock();
 
+    const section = await mockGenerator.createSectionMock();
+
     const item1 = await mockGenerator.createItemMock({
       code: "I-01",
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law1.id],
       devicesIds: [],
     });
@@ -349,6 +384,7 @@ describe("List Items Use Case", () => {
       itemDesc: "descricao",
       recommendations: "recommendations",
       isMandatory: true,
+      sectionId: section.id,
       lawsIds: [law2.id],
       devicesIds: [device2.id],
     });

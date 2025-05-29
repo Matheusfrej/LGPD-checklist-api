@@ -7,6 +7,7 @@ import { createChecklist } from "../../../../../test/utils/createChecklist";
 import { createLaw } from "../../../../../test/utils/createLaw";
 import { createDevice } from "../../../../../test/utils/createDevice";
 import { createItem } from "../../../../../test/utils/createItem";
+import { createSection } from "../../../../../test/utils/createSection";
 
 const prisma = new PrismaClient();
 
@@ -17,6 +18,7 @@ describe("Create Checklist (e2e)", () => {
     // só pode criar uma vez, nos outros testes dessa suite já vai ter criado no banco
     const law = await createLaw(prisma);
     await createDevice(prisma);
+    await createSection(prisma);
     const item = await createItem(prisma);
 
     const response = await request(restApp)

@@ -6,6 +6,9 @@ import {
 } from "../../../../domain/usecase/ucio/item";
 import { PrismaRepository } from "./repository";
 import { Prisma } from "@prisma/client";
+import { SectionEntity } from "../../../../domain/entity/section";
+import { LawEntity } from "../../../../domain/entity/law";
+import { DeviceEntity } from "../../../../domain/entity/device";
 
 class ItemPrismaRepository
   extends PrismaRepository
@@ -60,6 +63,11 @@ class ItemPrismaRepository
               },
             }),
       },
+      include: {
+        laws: true,
+        devices: true,
+        section: true,
+      },
     });
 
     return items.map(
@@ -70,6 +78,12 @@ class ItemPrismaRepository
           item.itemDesc,
           item.recommendations,
           item.isMandatory,
+          item.sectionId,
+          new SectionEntity(item.section.id, item.section.name),
+          item.laws.map((law) => new LawEntity(law.id, law.name)),
+          item.devices.map(
+            (device) => new DeviceEntity(device.id, device.name),
+          ),
         ),
     );
   }

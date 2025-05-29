@@ -6,6 +6,7 @@ import {
 } from "../../src/domain/usecase/ucio/item";
 import { LawEntity } from "../../src/domain/entity/law";
 import { DeviceEntity } from "../../src/domain/entity/device";
+import { SectionEntity } from "../../src/domain/entity/section";
 
 export class ItemInMemoryRepository implements ItemRepositoryInterface {
   public items: ItemEntity[] = [];
@@ -20,6 +21,8 @@ export class ItemInMemoryRepository implements ItemRepositoryInterface {
       req.itemDesc,
       req.recommendations,
       req.isMandatory,
+      req.sectionId,
+      new SectionEntity(req.sectionId, null),
       req.lawsIds.map((id) => new LawEntity(id, null)),
       req.devicesIds.map((id) => new DeviceEntity(id, null)),
     );

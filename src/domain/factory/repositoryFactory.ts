@@ -3,6 +3,7 @@ import { ChecklistRepositoryInterface } from "../usecase/repository/checklist";
 import { DeviceRepositoryInterface } from "../usecase/repository/device";
 import { ItemRepositoryInterface } from "../usecase/repository/item";
 import { LawRepositoryInterface } from "../usecase/repository/law";
+import { SectionRepositoryInterface } from "../usecase/repository/section";
 import { SystemRepositoryInterface } from "../usecase/repository/system";
 import { UserRepositoryInterface } from "../usecase/repository/user";
 
@@ -13,5 +14,6 @@ export interface RepositoryFactory {
   makeItemRepository(): ItemRepositoryInterface;
   makeLawRepository(): LawRepositoryInterface;
   makeDeviceRepository(): DeviceRepositoryInterface;
+  makeSectionRepository(): SectionRepositoryInterface;
   makeAuthRepository(): AuthRepositoryInterface;
 }

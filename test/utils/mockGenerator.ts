@@ -2,10 +2,14 @@ import bcrypt from "bcryptjs";
 import { SystemRepositoryInterface } from "../../src/domain/usecase/repository/system";
 import { UserRepositoryInterface } from "../../src/domain/usecase/repository/user";
 import { ChecklistRepositoryInterface } from "../../src/domain/usecase/repository/checklist";
-import { AnswerType, SeverityDegreeType } from "../domain/entity/checklistItem";
-import { ItemRepositoryInterface } from "../domain/usecase/repository/item";
-import { LawRepositoryInterface } from "../domain/usecase/repository/law";
-import { DeviceRepositoryInterface } from "../domain/usecase/repository/device";
+import {
+  AnswerType,
+  SeverityDegreeType,
+} from "../../src/domain/entity/checklistItem";
+import { ItemRepositoryInterface } from "../../src/domain/usecase/repository/item";
+import { LawRepositoryInterface } from "../../src/domain/usecase/repository/law";
+import { DeviceRepositoryInterface } from "../../src/domain/usecase/repository/device";
+import { SectionRepositoryInterface } from "../../src/domain/usecase/repository/section";
 const { genSaltSync, hashSync } = bcrypt;
 
 enum Repositories {
@@ -15,6 +19,7 @@ enum Repositories {
   "Item" = "Item",
   "Law" = "Law",
   "Device" = "Device",
+  "Section" = "Section",
 }
 
 class NoRepositoryError extends Error {
@@ -30,6 +35,7 @@ class MockGenerator {
   private itemRepository: ItemRepositoryInterface;
   private lawRepository: LawRepositoryInterface;
   private deviceRepository: DeviceRepositoryInterface;
+  private sectionRepository: SectionRepositoryInterface;
 
   constructor(
     userRepository?: UserRepositoryInterface,
@@ -38,6 +44,7 @@ class MockGenerator {
     itemRepository?: ItemRepositoryInterface,
     lawRepository?: LawRepositoryInterface,
     deviceRepository?: DeviceRepositoryInterface,
+    sectionRepository?: SectionRepositoryInterface,
   ) {
     this.userRepository = userRepository;
     this.systemRepository = systemRepository;
@@ -45,6 +52,7 @@ class MockGenerator {
     this.itemRepository = itemRepository;
     this.lawRepository = lawRepository;
     this.deviceRepository = deviceRepository;
+    this.sectionRepository = sectionRepository;
   }
 
   async createUserMock({
@@ -114,6 +122,7 @@ class MockGenerator {
     itemDesc = "itemDesc",
     recommendations = "recommendations",
     isMandatory = true,
+    sectionId = 1,
     lawsIds = [1],
     devicesIds = [1],
   } = {}) {
@@ -123,6 +132,7 @@ class MockGenerator {
         itemDesc,
         recommendations,
         isMandatory,
+        sectionId,
         lawsIds,
         devicesIds,
       });
@@ -146,6 +156,15 @@ class MockGenerator {
       });
     }
     throw new NoRepositoryError(Repositories.Device);
+  }
+
+  async createSectionMock({ name = "Sobre transparência de Dados" } = {}) {
+    if (this.sectionRepository) {
+      return await this.sectionRepository.create({
+        name,
+      });
+    }
+    throw new NoRepositoryError(Repositories.Section);
   }
 
   async createUserAndSystemMock() {
