@@ -1,9 +1,10 @@
 import * as ucio from "@/domain/usecase/ucio/user";
 import { UserEntity } from "../../../../domain/entity/user";
 import { UserRepositoryInterface } from "../../../../domain/usecase/repository/user";
-import { compareSync } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { PrismaRepository } from "./repository";
 import { Prisma } from "@prisma/client";
+const { compareSync } = bcrypt;
 
 class UserPrismaRepository
   extends PrismaRepository

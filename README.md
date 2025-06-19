@@ -83,7 +83,7 @@ O npm já vem por padrão na instalação do Node.
 
 **Acessando o PGAdmin:** Com o Docker em execução, você pode acessar o PGAdmin localmente. No seu navegador, vá até http://localhost:7070. A página pedirá um e-mail e senha, que estão configurados no arquivo .env do seu projeto.
 
-**Configurando o Banco no PGAdmin:** Após fazer login, será necessário adicionar um novo servidor no PGAdmin. No campo "Connection" da nova configuração de servidor, no campo Host name/address, insira o nome do serviço do PostgreSQL definido no docker-compose.yml, que neste caso é db. Use as demais informações de conexão (usuário, senha, etc.) conforme descritas no arquivo .env.
+**Configurando o Banco no PGAdmin:** Após fazer login, será necessário adicionar um novo servidor no PGAdmin. Na aba "Connection" da nova configuração de servidor, no campo Host name/address, insira o nome do serviço do PostgreSQL definido no docker-compose.yml, que neste caso é db. Use as demais informações de conexão (usuário, senha, etc.) conforme descritas no arquivo .env.
 
 ## Estrutura do Projeto
 
