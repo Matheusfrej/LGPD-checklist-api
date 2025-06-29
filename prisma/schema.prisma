@@ -87,7 +87,7 @@ model Items {
   laws            Laws[]           @relation("item_laws")
   devices         Devices[]        @relation("item_devices")
   ItemsChecklists ChecklistItems[]
-  sectionId       Int
+  sectionId       Int              @map("section_id")
   section         Sections         @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
   @@map("items")
