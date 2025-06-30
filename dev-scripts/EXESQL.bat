@@ -1,8 +1,12 @@
 @echo off
-:: Define a senha do PostgreSQL como uma variável de ambiente temporária
-set PGPASSWORD=alterar_para_senha_do_bd
+:: ===== CONFIGURAÇÃO =====
+set "PGUSER=postgres"
+set "PGPASSWORD=alterar_para_senha_do_bd"
+set "PGDB=bdchecklist"
+set "PGHOST=localhost"
+set "SQLFILE=InserirDadosTeste.sql"
 
-:: Define o padrão UTF8 para evitar caracteres estranhos
+:: ===== VARIÁVEIS DE AMBIENTE =====
 set PGCLIENTENCODING=UTF8
 
 echo.
@@ -10,10 +14,10 @@ echo ===================================================
 echo   INICIANDO SCRIPT DE POPULACAO DE BANCO DE DADOS
 echo ===================================================
 echo.
-echo Inserindo dados de teste no banco 'bdchecklist'...
+echo Inserindo dados de teste no banco '%PGDB%'...
 
 :: Executa o arquivo .sql usando psql
-psql -U postgres -h localhost -d bdchecklist -f InserirDadosTeste.sql
+psql -U %PGUSER% -h %PGHOST% -d %PGDB% -f %SQLFILE%
 
 echo.
 echo ===================================================
