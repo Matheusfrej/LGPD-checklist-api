@@ -1,11 +1,10 @@
 import cors from "cors";
-import { Request, Response, NextFunction, Router } from "express";
+import { Request, Response, NextFunction } from "express";
+import { CustomRouter } from "./customRouter";
 
-class CorsRouter {
-  private router: Router;
-
+class CorsRouter extends CustomRouter {
   constructor() {
-    this.router = Router();
+    super();
 
     this.router.options("*", cors());
 
@@ -18,10 +17,6 @@ class CorsRouter {
       );
       next();
     });
-  }
-
-  getRouter(): Router {
-    return this.router;
   }
 }
 

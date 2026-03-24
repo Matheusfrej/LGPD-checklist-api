@@ -1,6 +1,4 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { UserInMemoryRepository } from "../../../test/repository/user";
-import { SystemInMemoryRepository } from "../../../test/repository/system";
 import {
   CreateSystemUseCase,
   DeleteSystemUseCase,
@@ -11,17 +9,20 @@ import {
 import { expectPreConditionalError } from "../../../test/utils/expectPreConditionalError";
 import { SystemEntity } from "../entity/system";
 import { MockGenerator } from "../../../test/utils/mockGenerator";
+import { UserRepositoryInterface } from "./repository/user";
+import { SystemRepositoryInterface } from "./repository/system";
+import { testFactory } from "../../../test/factory";
 
-let userRepository: UserInMemoryRepository;
-let systemRepository: SystemInMemoryRepository;
+let userRepository: UserRepositoryInterface;
+let systemRepository: SystemRepositoryInterface;
 let mockGenerator: MockGenerator;
 
 describe("Create System Use Case", () => {
   let useCase: CreateSystemUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
-    systemRepository = new SystemInMemoryRepository();
+    userRepository = testFactory.makeUserRepository();
+    systemRepository = testFactory.makeSystemRepository();
     useCase = new CreateSystemUseCase(systemRepository, userRepository);
     mockGenerator = new MockGenerator(userRepository, systemRepository);
   });
@@ -101,8 +102,8 @@ describe("List User Systems Use Case", () => {
   let useCase: ListSystemsByUserIdUseCase;
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
-    systemRepository = new SystemInMemoryRepository();
+    userRepository = testFactory.makeUserRepository();
+    systemRepository = testFactory.makeSystemRepository();
     useCase = new ListSystemsByUserIdUseCase(systemRepository, userRepository);
     mockGenerator = new MockGenerator(userRepository, systemRepository);
   });
@@ -169,7 +170,7 @@ describe("Get System Use Case", () => {
   let useCase: GetSystemUseCase;
 
   beforeEach(() => {
-    systemRepository = new SystemInMemoryRepository();
+    systemRepository = testFactory.makeSystemRepository();
     useCase = new GetSystemUseCase(systemRepository);
     mockGenerator = new MockGenerator(userRepository, systemRepository);
   });
@@ -202,7 +203,7 @@ describe("Update System Use Case", () => {
   let useCase: UpdateSystemUseCase;
 
   beforeEach(() => {
-    systemRepository = new SystemInMemoryRepository();
+    systemRepository = testFactory.makeSystemRepository();
     useCase = new UpdateSystemUseCase(systemRepository);
     mockGenerator = new MockGenerator(userRepository, systemRepository);
   });
@@ -333,7 +334,7 @@ describe("Delete System Use Case", () => {
   let useCase: DeleteSystemUseCase;
 
   beforeEach(() => {
-    systemRepository = new SystemInMemoryRepository();
+    systemRepository = testFactory.makeSystemRepository();
     useCase = new DeleteSystemUseCase(systemRepository);
     mockGenerator = new MockGenerator(userRepository, systemRepository);
   });

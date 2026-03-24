@@ -6,19 +6,20 @@ import bodyParser from "body-parser";
 import { PORT } from "../config/config";
 import { Router } from "../router/index";
 import { env } from "@/domain/env";
+import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
 
 class CmdRest {
   public app: express.Application;
   private server: http.Server;
 
-  constructor() {
+  constructor(factory: RepositoryFactory) {
     this.app = express();
     this.middleware();
-    this.router();
+    this.router(factory);
   }
 
-  private router() {
-    (() => new Router(this.app))();
+  private router(factory: RepositoryFactory) {
+    (() => new Router(this.app, factory))();
   }
 
   private middleware() {

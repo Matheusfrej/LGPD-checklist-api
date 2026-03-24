@@ -1,4 +1,3 @@
-import { Router } from "express";
 import { verifyTokenMiddleware } from "../middleware/verifyToken";
 import {
   CreateSystemController,
@@ -7,38 +6,40 @@ import {
   ListSystemsByUserIdController,
   UpdateSystemController,
 } from "../controller/system";
+import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
+import { CustomRouter } from "./customRouter";
 
-class SystemRouter {
-  private router: Router;
+class SystemRouter extends CustomRouter {
+  constructor(factory: RepositoryFactory) {
+    super();
 
-  constructor() {
-    this.router = Router();
+    const create = new CreateSystemController(factory);
+    const get = new GetSystemController(factory);
+    const listByUser = new ListSystemsByUserIdController(factory);
+    const _delete = new DeleteSystemController(factory);
+    const update = new UpdateSystemController(factory);
 
     this.router.post(
       "/systems",
-      verifyTokenMiddleware,
-      new CreateSystemController().execute,
+      verifyTokenMiddleware(factory),
+      create.execute.bind(create),
     );
-    this.router.get("/systems/:id", new GetSystemController().execute);
+    this.router.get("/systems/:id", get.execute.bind(get));
     this.router.get(
       "/systemsByUserId/:userId",
-      verifyTokenMiddleware,
-      new ListSystemsByUserIdController().execute,
+      verifyTokenMiddleware(factory),
+      listByUser.execute.bind(listByUser),
     );
     this.router.delete(
       "/systems/:id",
-      verifyTokenMiddleware,
-      new DeleteSystemController().execute,
+      verifyTokenMiddleware(factory),
+      _delete.execute.bind(_delete),
     );
     this.router.put(
       "/systems/:id",
-      verifyTokenMiddleware,
-      new UpdateSystemController().execute,
+      verifyTokenMiddleware(factory),
+      update.execute.bind(update),
     );
-  }
-
-  getRouter(): Router {
-    return this.router;
   }
 }
 

@@ -1,5 +1,5 @@
-import * as systemValidateInterface from "../usecase/validate/system";
-import * as systemUcioInterface from "../usecase/ucio/system";
+import * as validate from "../usecase/validate/system";
+import * as ucio from "../usecase/ucio/system";
 import {
   INTERNAL_SERVER_ERROR_MESSAGE,
   newInternalServerError,
@@ -11,107 +11,102 @@ import { SystemRepositoryInterface } from "./repository/system";
 import { UserRepositoryInterface } from "./repository/user";
 
 class CreateSystemUseCase {
-  public validate: systemValidateInterface.CreateSystemUseCaseValidate;
+  public validate: validate.CreateSystemUseCaseValidate;
   public systemRepository: SystemRepositoryInterface;
 
   constructor(
     systemRepository: SystemRepositoryInterface,
     userRepository: UserRepositoryInterface,
   ) {
-    this.validate = new systemValidateInterface.CreateSystemUseCaseValidate(
+    this.validate = new validate.CreateSystemUseCaseValidate(userRepository);
+    this.systemRepository = systemRepository;
+  }
+
+  async execute(
+    req: ucio.CreateSystemUseCaseRequest,
+  ): Promise<ucio.CreateSystemUseCaseResponse> {
+    try {
+      const messageError = await this.validate.validate(req);
+
+      if (!messageError) {
+        const systemResp = await this.systemRepository.createSystem(req);
+        return {
+          system: systemResp,
+          error: null,
+        };
+      } else {
+        console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
+        return {
+          system: null,
+          error: newPreConditionalError(messageError),
+        };
+      }
+    } catch (error) {
+      console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
+      return {
+        system: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
+    }
+  }
+}
+
+class ListSystemsByUserIdUseCase {
+  public validate: validate.ListSystemsByUserIdUseCaseValidate;
+  public systemRepository: SystemRepositoryInterface;
+
+  constructor(
+    systemRepository: SystemRepositoryInterface,
+    userRepository: UserRepositoryInterface,
+  ) {
+    this.validate = new validate.ListSystemsByUserIdUseCaseValidate(
       userRepository,
     );
     this.systemRepository = systemRepository;
   }
 
   async execute(
-    req: systemUcioInterface.CreateSystemUseCaseRequest,
-  ): Promise<systemUcioInterface.CreateSystemUseCaseResponse> {
-    try {
-      const messageError = await this.validate.validate(req);
-
-      if (!messageError) {
-        const systemResp = await this.systemRepository.createSystem(req);
-
-        return new systemUcioInterface.CreateSystemUseCaseResponse(
-          systemResp,
-          null,
-        );
-      } else {
-        console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new systemUcioInterface.CreateSystemUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
-      }
-    } catch (error) {
-      console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new systemUcioInterface.CreateSystemUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
-    }
-  }
-}
-
-class ListSystemsByUserIdUseCase {
-  public validate: systemValidateInterface.ListSystemsByUserIdUseCaseValidate;
-  public systemRepository: SystemRepositoryInterface;
-
-  constructor(
-    systemRepository: SystemRepositoryInterface,
-    userRepository: UserRepositoryInterface,
-  ) {
-    this.validate =
-      new systemValidateInterface.ListSystemsByUserIdUseCaseValidate(
-        userRepository,
-      );
-    this.systemRepository = systemRepository;
-  }
-
-  async execute(
-    req: systemUcioInterface.ListSystemsByUserIdUseCaseRequest,
-  ): Promise<systemUcioInterface.ListSystemsByUserIdUseCaseResponse> {
+    req: ucio.ListSystemsByUserIdUseCaseRequest,
+  ): Promise<ucio.ListSystemsByUserIdUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         const systemsResp =
           await this.systemRepository.listSystemsByUserId(req);
-
-        return new systemUcioInterface.ListSystemsByUserIdUseCaseResponse(
-          systemsResp,
-          null,
-        );
+        return {
+          systems: systemsResp,
+          error: null,
+        };
       } else {
         console.log(`${TAG_PRE_CONDITIONAL_ERROR} ${messageError}`);
-        return new systemUcioInterface.ListSystemsByUserIdUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          systems: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(`${TAG_INTERNAL_SERVER_ERROR} ${error}`);
-      return new systemUcioInterface.ListSystemsByUserIdUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        systems: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
 
 class GetSystemUseCase {
-  public validate: systemValidateInterface.GetSystemUseCaseValidate;
+  public validate: validate.GetSystemUseCaseValidate;
   public systemRepository: SystemRepositoryInterface;
 
   constructor(systemRepository: SystemRepositoryInterface) {
-    this.validate = new systemValidateInterface.GetSystemUseCaseValidate();
+    this.validate = new validate.GetSystemUseCaseValidate();
     this.systemRepository = systemRepository;
   }
 
   async execute(
-    req: systemUcioInterface.GetSystemUseCaseRequest,
-  ): Promise<systemUcioInterface.GetSystemUseCaseResponse> {
+    req: ucio.GetSystemUseCaseRequest,
+  ): Promise<ucio.GetSystemUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
 
@@ -119,94 +114,96 @@ class GetSystemUseCase {
         const system = await this.systemRepository.getSystem(req.id);
 
         if (system) {
-          return new systemUcioInterface.GetSystemUseCaseResponse(system, null);
+          return {
+            system,
+            error: null,
+          };
         } else {
-          return new systemUcioInterface.GetSystemUseCaseResponse(
-            null,
-            newPreConditionalError("Sistema não encontrado"),
-          );
+          return {
+            system: null,
+            error: newPreConditionalError("Sistema não encontrado"),
+          };
         }
       } else {
-        return new systemUcioInterface.GetSystemUseCaseResponse(
-          null,
-          newPreConditionalError(messageError),
-        );
+        return {
+          system: null,
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new systemUcioInterface.GetSystemUseCaseResponse(
-        null,
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        system: null,
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
 
 class DeleteSystemUseCase {
-  public validate: systemValidateInterface.DeleteSystemUseCaseValidate;
+  public validate: validate.DeleteSystemUseCaseValidate;
   public systemRepository: SystemRepositoryInterface;
 
   constructor(systemRepository: SystemRepositoryInterface) {
-    this.validate = new systemValidateInterface.DeleteSystemUseCaseValidate(
-      systemRepository,
-    );
+    this.validate = new validate.DeleteSystemUseCaseValidate(systemRepository);
     this.systemRepository = systemRepository;
   }
 
   async execute(
-    req: systemUcioInterface.DeleteSystemUseCaseRequest,
-  ): Promise<systemUcioInterface.DeleteSystemUseCaseResponse> {
+    req: ucio.DeleteSystemUseCaseRequest,
+  ): Promise<ucio.DeleteSystemUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
       if (!messageError) {
         await this.systemRepository.deleteSystem(req);
-
-        return new systemUcioInterface.DeleteSystemUseCaseResponse(null);
+        return {
+          error: null,
+        };
       } else {
-        return new systemUcioInterface.DeleteSystemUseCaseResponse(
-          newPreConditionalError(messageError),
-        );
+        return {
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new systemUcioInterface.DeleteSystemUseCaseResponse(
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+      return {
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
 
 class UpdateSystemUseCase {
-  public validate: systemValidateInterface.UpdateSystemUseCaseValidate;
+  public validate: validate.UpdateSystemUseCaseValidate;
   public systemRepository: SystemRepositoryInterface;
 
   constructor(systemRepository: SystemRepositoryInterface) {
-    this.validate = new systemValidateInterface.UpdateSystemUseCaseValidate(
-      systemRepository,
-    );
+    this.validate = new validate.UpdateSystemUseCaseValidate(systemRepository);
     this.systemRepository = systemRepository;
   }
 
   async execute(
-    req: systemUcioInterface.UpdateSystemUseCaseRequest,
-  ): Promise<systemUcioInterface.UpdateSystemUseCaseResponse> {
+    req: ucio.UpdateSystemUseCaseRequest,
+  ): Promise<ucio.UpdateSystemUseCaseResponse> {
     try {
       const messageError = await this.validate.validate(req);
 
       if (!messageError) {
         await this.systemRepository.updateSystem(req);
-
-        return new systemUcioInterface.UpdateSystemUseCaseResponse(null);
+        return {
+          error: null,
+        };
       } else {
-        return new systemUcioInterface.UpdateSystemUseCaseResponse(
-          newPreConditionalError(messageError),
-        );
+        return {
+          error: newPreConditionalError(messageError),
+        };
       }
     } catch (error) {
       console.log(error);
-      return new systemUcioInterface.UpdateSystemUseCaseResponse(
-        newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
-      );
+
+      return {
+        error: newInternalServerError(INTERNAL_SERVER_ERROR_MESSAGE),
+      };
     }
   }
 }
