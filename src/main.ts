@@ -1,12 +1,15 @@
 import "dotenv/config";
 import "module-alias/register";
 import { CmdRest } from "./delivery/api/rest/cmd/server";
+import { PrismaRepositoryFactory } from "./infrastructure/provider/repository/prisma/prismaRepositoryFactory";
+import { RepositoryFactory } from "./domain/factory/repositoryFactory";
+import { PrismaClient } from "@prisma/client";
 
 class Main {
   public restApp: CmdRest;
 
-  constructor() {
-    this.restApp = new CmdRest();
+  constructor(factory: RepositoryFactory) {
+    this.restApp = new CmdRest(factory);
   }
 
   public init(): void {
@@ -14,7 +17,8 @@ class Main {
   }
 }
 
-const main = new Main();
+const prisma = new PrismaClient();
+const main = new Main(new PrismaRepositoryFactory(prisma));
 
 main.init();
 

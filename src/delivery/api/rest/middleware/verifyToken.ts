@@ -1,9 +1,12 @@
+import { RepositoryFactory } from "../../../../domain/factory/repositoryFactory";
 import { VerifyTokenController } from "../controller/user";
 
-const verifyTokenMiddlewareBind = new VerifyTokenController(true);
+const verifyTokenMiddlewareBind = (factory: RepositoryFactory) =>
+  new VerifyTokenController(true, factory);
 
-const verifyTokenMiddleware = verifyTokenMiddlewareBind.execute.bind(
-  verifyTokenMiddlewareBind,
-);
+const verifyTokenMiddleware = (factory: RepositoryFactory) =>
+  verifyTokenMiddlewareBind(factory).execute.bind(
+    verifyTokenMiddlewareBind(factory),
+  );
 
 export { verifyTokenMiddleware };

@@ -2,30 +2,42 @@ import { describe, expect, it } from "vitest";
 import request from "supertest";
 import { restApp } from "../../../../main";
 import { createUserAndSystem } from "../../../../../test/utils/createUserAndSystem";
-import { ChecklistEntity } from "../../../../domain/entity/checklist";
-import { MockGenerator } from "../../../../../test/utils/mockGenerator";
+import { PrismaClient } from "@prisma/client";
+import { createChecklist } from "../../../../../test/utils/createChecklist";
+import { createLaw } from "../../../../../test/utils/createLaw";
+import { createDevice } from "../../../../../test/utils/createDevice";
+import { createItem } from "../../../../../test/utils/createItem";
+import { createSection } from "../../../../../test/utils/createSection";
 
-const checklistDummy: ChecklistEntity = {
-  id: undefined,
-  userId: undefined,
-  checklistData: new MockGenerator().checklistData,
-  systemId: undefined,
-  isGeneral: true,
-  isIot: false,
-};
+const prisma = new PrismaClient();
 
 describe("Create Checklist (e2e)", () => {
   it("should create checklist", async () => {
     const { user, token, system } = await createUserAndSystem(restApp);
 
+    // só pode criar uma vez, nos outros testes dessa suite já vai ter criado no banco
+    const law = await createLaw(prisma);
+    await createDevice(prisma);
+    await createSection(prisma);
+    const item = await createItem(prisma);
+
     const response = await request(restApp)
       .post("/checklists")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        ...checklistDummy,
         userId: user.id,
         systemId: system.id,
         isIot: false,
+        items: [
+          {
+            id: item.id,
+            answer: "Sim",
+            severityDegree: undefined,
+            userComment: undefined,
+          },
+        ],
+        laws: [law.id],
+        devices: [],
       });
 
     expect(response.statusCode).toBe(200);
@@ -34,20 +46,10 @@ describe("Create Checklist (e2e)", () => {
 
 describe("Get Checklist (e2e)", () => {
   it("should get checklist", async () => {
-    const { user, token, system } = await createUserAndSystem(restApp);
-
-    const checklistResponse = await request(restApp)
-      .post("/checklists")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        ...checklistDummy,
-        userId: user.id,
-        systemId: system.id,
-        isIot: false,
-      });
+    const { token, checklist, user, system } = await createChecklist(restApp);
 
     const response = await request(restApp)
-      .get(`/checklists/${checklistResponse.body.checklist.id}`)
+      .get(`/checklists/${checklist.id}`)
       .set("Authorization", `Bearer ${token}`);
 
     expect(response.statusCode).toBe(200);
@@ -58,20 +60,10 @@ describe("Get Checklist (e2e)", () => {
 
 describe("Delete Checklist (e2e)", () => {
   it("should delete checklist", async () => {
-    const { user, token, system } = await createUserAndSystem(restApp);
-
-    const checklistResponse = await request(restApp)
-      .post("/checklists")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        ...checklistDummy,
-        userId: user.id,
-        systemId: system.id,
-        isIot: false,
-      });
+    const { token, checklist } = await createChecklist(restApp);
 
     const response = await request(restApp)
-      .delete(`/checklists/${checklistResponse.body.checklist.id}`)
+      .delete(`/checklists/${checklist.id}`)
       .set("Authorization", `Bearer ${token}`);
 
     expect(response.statusCode).toBe(200);
@@ -80,25 +72,23 @@ describe("Delete Checklist (e2e)", () => {
 
 describe("Update Checklist (e2e)", () => {
   it("should update checklist", async () => {
-    const { user, token, system } = await createUserAndSystem(restApp);
-
-    const checklistResponse = await request(restApp)
-      .post("/checklists")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        ...checklistDummy,
-        userId: user.id,
-        systemId: system.id,
-        isIot: false,
-      });
+    const { token, system, checklist } = await createChecklist(restApp);
 
     const response = await request(restApp)
-      .put(`/checklists/${checklistResponse.body.checklist.id}`)
+      .put(`/checklists/${checklist.id}`)
       .set("Authorization", `Bearer ${token}`)
       .send({
-        ...checklistDummy,
         systemId: system.id,
-        isIot: true,
+        items: [
+          {
+            id: 1,
+            answer: "Não",
+            severityDegree: "Grave",
+            userComment: "Comentário",
+          },
+        ],
+        laws: [1],
+        devices: [1],
       });
 
     expect(response.statusCode).toBe(200);
@@ -107,17 +97,7 @@ describe("Update Checklist (e2e)", () => {
 
 describe("List User Checklists (e2e)", () => {
   it("should list user checklists", async () => {
-    const { user, token, system } = await createUserAndSystem(restApp);
-
-    await request(restApp)
-      .post("/checklists")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        ...checklistDummy,
-        userId: user.id,
-        systemId: system.id,
-        isIot: false,
-      });
+    const { token, user, system } = await createChecklist(restApp);
 
     const response = await request(restApp)
       .get(`/checklistsByUserId/${user.id}`)
@@ -131,17 +111,7 @@ describe("List User Checklists (e2e)", () => {
 
 describe("List System Checklists (e2e)", () => {
   it("should list system checklists", async () => {
-    const { user, token, system } = await createUserAndSystem(restApp);
-
-    await request(restApp)
-      .post("/checklists")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        ...checklistDummy,
-        userId: user.id,
-        systemId: system.id,
-        isIot: false,
-      });
+    const { token, user, system } = await createChecklist(restApp);
 
     const response = await request(restApp)
       .get(`/checklistsBySystemId/${system.id}`)
